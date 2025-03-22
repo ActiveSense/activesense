@@ -1,14 +1,8 @@
 activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   
-  # --- TIMER VALUES ---
-  
-  #timer = params$timer
-  # timer = TRUE # For Manual Testing and vebrose mode remove comment
-  if (timer) {
-    times = time_stage = c()
-    times = append(times, Sys.time())  
-    time_stage = append(time_stage, paste0("Start of File"))
-  }
+  # ==================================
+  # CONFIGURATION
+  # ==================================
   
   # --- R PARAMETERS ---
   
@@ -32,14 +26,14 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   library(reshape2)
   
   # Functions to use.
-  source("utils/01_library_installer.R")
-  source("utils/02_activity_combine_segment_data.R")
-  source("utils/03_naming_protocol.R")
-  source("utils/04_activity_create_df_pcp.R")
-  source("utils/05_number_of_days.R")
-  source("utils/06_bed_rise_detect.R")
-  source("utils/07_activity_state_rearrange.R")
-  source("utils/08_activity_summary.R")
+  source("functions/01_library_installer.R")
+  source("functions/02_activity_combine_segment_data.R")
+  source("functions/03_naming_protocol.R")
+  source("functions/04_activity_create_df_pcp.R")
+  source("functions/05_number_of_days.R")
+  source("functions/06_bed_rise_detect.R")
+  source("functions/07_activity_state_rearrange.R")
+  source("functions/08_activity_summary.R")
   
   i = 1
   BinPattern = "*\\.[bB][iI][nN]$"
@@ -64,12 +58,8 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   # --- COMBINING AND CLASSIFYING SEGMENTED DATA ---
 
   if (timer) {
-    # Starting the timer
-    cat("
-        #. Start of Segmenting data")
-    print(Sys.time())
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Start of Segmenting data"))
+    my_timer <- create_timer("Activity Timer")
+    my_timer <- append.timer(my_timer, "Segmentation") 
   }
   
   data_name = naming_protocol(binfile, prefix = "")
@@ -105,14 +95,9 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   #)
   
   # --- ACTIVITY_CREATE_DF_PCP FUNCTION ---
-  
+
   if (timer) {
-    # Starting the timer
-    cat("
-        #. Deciding on classes")
-    print(Sys.time())
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Deciding on Classes"))
+    my_timer <- append.timer(my_timer, "Classification")
   }
   
   header = header.info(binfile)
@@ -160,12 +145,7 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   # --- BED RISE DETECTION ---
   
   if (timer) {
-    # Starting the timer
-    cat("
-        #. Start of Bed Rise Algorithm")
-    print(Sys.time())
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Start of Bed Rise Algorithm"))
+    my_timer <- append.timer(my_timer, "Bed Rise Algorithm")
   }
   
   # Find the Bed and Rise times
@@ -220,15 +200,7 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   write.csv(activity_df, file.path(paste0("outputs/", summary_name, ".csv")), row.names = FALSE)
   
   # --- OUTPUTTING TIMER CSV ---
-  if (timer){
-        cat("
-          #. End of analysis for file ", binfile)
-      print(Sys.time())
-    times = as.numeric(append(times, Sys.time()))
-    time_stage = append(time_stage, paste0("End of File"))
-    timing_csv_name = naming_protocol(binfile, prefix = "", suffix = "_Time_Analysis_Report.csv")
-    time_df = data.frame(times, time_stage)
-    write.csv(time_df, timing_csv_name)
+  if (timer) {
+    return(my_timer)
   }
-
 }

@@ -1,11 +1,5 @@
 sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
 
-  if (timer) {
-    times = time_stage = c()
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Start of File"))
-  }
-  
   # --- R PARAMETERS ---
   UpDown.mad_plot_switch = TRUE
   daily_plot_switch = TRUE
@@ -40,21 +34,21 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   library(scales)
   library(reshape2)
   
-  # utils to use.
+  # functions to use.
   # Although these functions are named in this list with a prefix number,
   # This is so that the functions show in the folder in the order that they are used.
   # When they are called then the internal function name 
   # does not contain the number
   # ie 02_combine_segment_data is called using combine_segment_data
   
-  source("utils/01_library_installer.R")
-  source("utils/02_sleep_combine_segment_data.R")
-  source("utils/03_naming_protocol.R")
-  source("utils/04_sleep_create_df_pcp.R")
-  source("utils/05_number_of_days.R")
-  source("utils/06_bed_rise_detect.R")
-  source("utils/07_sleep_state_rearrange.R")
-  source("utils/08_sleep_summary.R")
+  source("functions/01_library_installer.R")
+  source("functions/02_sleep_combine_segment_data.R")
+  source("functions/03_naming_protocol.R")
+  source("functions/04_sleep_create_df_pcp.R")
+  source("functions/05_number_of_days.R")
+  source("functions/06_bed_rise_detect.R")
+  source("functions/07_sleep_state_rearrange.R")
+  source("functions/08_sleep_summary.R")
   
   i = 1
   file_pattern = "*\\.[bB][iI][nN]$"
@@ -78,14 +72,10 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   # --- COMBINING AND CLASSIFYING SEGMENTED DATA ---
   # This section segments the data into whole 24 hour periods and partial periods,
   # ready to calculate the information correctly
+  
   if (timer) {
-    # Starting the timer
-    cat("
-      #. Start of Segmenting data")
-    print(Sys.time())
-    times = time_stage = c()
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Start of Segmenting data"))
+    my_timer <- create_timer("Sleep Timer")
+    my_timer <- append.timer(my_timer, "Data segmentation") 
   }
   
   # Segment the data.
@@ -119,12 +109,7 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   
   # --- CREATE DF PCP ---
   if (timer) {
-    # Starting the timer
-    cat("
-      #. Deciding on classes")
-    print(Sys.time())
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Deciding on Classes"))
+    my_timer <- append.timer(my_timer, "Classification") 
   }
   
   df_pcp = create_df_pcp(segment_data,
@@ -170,12 +155,7 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   # --- BED RISE DETECTION ---
   
   if (timer) {
-    # Starting the timer
-    cat("
-      #. Start of Bed Rise Algorithm")
-    print(Sys.time())
-    times = append(times, Sys.time())
-    time_stage = append(time_stage, paste0("Start of Bed Rise Algorithm"))
+    my_timer <- append.timer(my_timer, "Bed Rise Algorithm") 
   }
   
   # TODO: We don't have a sleep diary. Kill this.
@@ -248,15 +228,8 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   # --- OUTPUTTING TIMER CSV ---
   
   # Outputting additional information to identify issues
-  if (timer){
-    cat("
-        #. End of analysis for file ", binfile)
-    print(Sys.time())
-    times = as.numeric(append(times, Sys.time()))
-    time_stage = append(time_stage, paste0("End of File"))
-    timing_csv_name = naming_protocol(binfile, prefix = "Sleep_", suffix = "_Time_Analysis_Report.csv")
-    time_df = data.frame(times, time_stage)
-    write.csv(time_df, timing_csv_name)
+  if (timer) {
+    return(my_timer)
   }
   
 }
