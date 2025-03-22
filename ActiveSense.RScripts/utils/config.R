@@ -1,0 +1,95 @@
+# ==================================
+# BASIC
+# ==================================
+
+# clears persistent data objects
+rm(list=ls())
+
+# Sets repository
+local({
+  r <- getOption("repos")
+  r["CRAN"] <- "http://cran.r-project.org"
+  options(repos = r)
+})
+
+# time zone
+Sys.setenv(TZ = "CET")
+
+# check existence of folders and create thems
+dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
+dir.create(file.path(paste0(getwd(), "/outputs/")), showWarnings = FALSE)
+dir.create(file.path(paste0(getwd(), "/GENEAclassification/")), showWarnings = FALSE)
+
+# execution control parameters
+timer <- TRUE
+rerun <- FALSE
+mmap.load = TRUE
+
+# ==================================
+# SOURCE
+# ==================================
+
+# functions
+source("analysis/activity_analysis.R")
+source("analysis/sleep_analysis.R")
+source("functions/01_library_installer.R")
+source("functions/02_activity_combine_segment_data.R")
+source("functions/02_sleep_combine_segment_data.R")
+source("functions/03_naming_protocol.R")
+source("functions/04_activity_create_df_pcp.R")
+source("functions/04_sleep_create_df_pcp.R")
+source("functions/05_number_of_days.R")
+source("functions/06_bed_rise_detect.R")
+source("functions/07_activity_state_rearrange.R")
+source("functions/07_sleep_state_rearrange.R")
+source("functions/08_activity_summary.R")
+source("functions/08_sleep_summary.R")
+
+# utils
+source("utils/timer.R")
+
+# ==================================
+# LIBRARIES
+# ==================================
+
+librarys <- c(
+  "GENEAread",
+  "GENEAclassify",
+  "scales",
+  "reshape2",
+  "versions", # TODO: Check if this is still needed
+)
+
+library_installer(librarys)
+
+library(GENEAread)
+library(GENEAclassify)
+library(scales)
+library(reshape2)
+
+# ==================================
+# DATACOLS
+# ==================================
+
+activity_datacols = c(
+  "UpDown.mean", "UpDown.var", "UpDown.mad",
+  "Degrees.mean", "Degrees.var", "Degrees.mad",
+  "Magnitude.mean",
+  "Light.mean",
+  "Temp.mean", "Temp.sumdiff", "Temp.abssumdiff",
+  "Step.GENEAcount", "Step.sd", "Step.mean", "Step.median"
+)
+
+timer_datacols = c(
+  "UpDown.mean", "UpDown.var", "UpDown.sd",
+  "Degrees.mean", "Degrees.var", "Degrees.sd",
+  "Magnitude.mean", "Magnitude.var", "Magnitude.meandiff", "Magnitude.mad",
+  "Light.mean", "Light.max",
+  "Temp.mean", "Temp.sumdiff", "Temp.meandiff", "Temp.abssumdiff",
+  "Temp.sddiff", "Temp.var", "Temp.GENEAskew", "Temp.mad",
+  "Step.GENEAcount", "Step.sd", "Step.mean", 
+  "Principal.Frequency.mean", "Principal.Frequency.median"
+)
+
+
+

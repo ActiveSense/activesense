@@ -50,10 +50,6 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   source("functions/07_sleep_state_rearrange.R")
   source("functions/08_sleep_summary.R")
   
-  i = 1
-  file_pattern = "*\\.[bB][iI][nN]$"
-  files = list.files(path = paste0(getwd(), "/data"), pattern = file_pattern, full.names = TRUE)
-  binfile = files[i]
   summary_name = paste0("Sleep_Summary_Metrics_", strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]])
   timer = TRUE
   datacols = c(
@@ -108,9 +104,7 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   #write.csv(segment_data, file = file.path(paste0("outputs/", csvname)))
   
   # --- CREATE DF PCP ---
-  if (timer) {
-    my_timer <- append.timer(my_timer, "Classification") 
-  }
+  if (timer) my_timer <- append.timer(my_timer, "Classification") 
   
   df_pcp = create_df_pcp(segment_data,
                          summary_name,
@@ -154,9 +148,7 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   
   # --- BED RISE DETECTION ---
   
-  if (timer) {
-    my_timer <- append.timer(my_timer, "Bed Rise Algorithm") 
-  }
+  if (timer) my_timer <- append.timer(my_timer, "Bed Rise Algorithm") 
   
   # TODO: We don't have a sleep diary. Kill this.
   # Now check to see if there is a sleep_diary 
@@ -221,7 +213,6 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
                                first_date)
     
     write.csv(statistics, file.path(paste0("outputs/", summary_name, ".csv")), row.names = FALSE)
-    
   }
   
   
@@ -229,6 +220,7 @@ sleep_analysis <- function(binfile, summary_name, timer = FALSE) {
   
   # Outputting additional information to identify issues
   if (timer) {
+    my_timer <- append.timer(my_timer, "End of sleep analysis")
     return(my_timer)
   }
   

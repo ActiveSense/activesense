@@ -21,7 +21,6 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   # --- MANUAL PARAMETERS ---
   library(GENEAread)
   library(GENEAclassify)
-  library(ggplot2)
   library(scales)
   library(reshape2)
   
@@ -35,10 +34,6 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   source("functions/07_activity_state_rearrange.R")
   source("functions/08_activity_summary.R")
   
-  i = 1
-  BinPattern = "*\\.[bB][iI][nN]$"
-  files = list.files(path = paste0(getwd(), "/data"), pattern = BinPattern, full.names = TRUE)
-  binfile = files[i]
   header = header.info(binfile)
   summary_name = paste0("Activity_Summary_Metrics_", strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]])
   mmap.load = FALSE
@@ -96,9 +91,7 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   
   # --- ACTIVITY_CREATE_DF_PCP FUNCTION ---
 
-  if (timer) {
-    my_timer <- append.timer(my_timer, "Classification")
-  }
+  if (timer) my_timer <- append.timer(my_timer, "Classification")
   
   header = header.info(binfile)
   
@@ -144,9 +137,7 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   
   # --- BED RISE DETECTION ---
   
-  if (timer) {
-    my_timer <- append.timer(my_timer, "Bed Rise Algorithm")
-  }
+  if (timer) my_timer <- append.timer(my_timer, "Bed Rise Algorithm")
   
   # Find the Bed and Rise times
   bed_rise_df = bed_rise_detect(binfile,
@@ -201,6 +192,7 @@ activity_analysis <- function(binfile, summary_name, timer = FALSE) {
   
   # --- OUTPUTTING TIMER CSV ---
   if (timer) {
+    my_timer <- append.timer(my_timer, "End of activity analysis")
     return(my_timer)
   }
 }

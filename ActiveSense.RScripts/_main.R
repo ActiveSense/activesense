@@ -2,6 +2,9 @@
 # CONFIGURATION
 # ==================================
 
+# TODO: This clears list, even when session are being reused.
+rm(list=ls())
+
 source("utils/timer.R")
 
 # Set the repository
@@ -12,9 +15,9 @@ local({
 })
 
 # Set the timezone 
-Sys.setenv(TZ = "GMT")
+Sys.setenv(TZ = "CET")
 
-# --- VARIABLES ---
+# Variables
 timer <- TRUE
 rerun <- FALSE # rerun the analysis
 
@@ -23,7 +26,7 @@ if (timer) {
   timer_total <- append.timer(timer_total, "Start of the analysis") 
 }
 
-# --- INSTALLING LIBRARIES ---
+# Installing libraries
 
 source("functions/01_library_installer.R")
 
@@ -75,42 +78,32 @@ dir.create(file.path(paste0(getwd(), "/GENEAclassification/")), showWarnings = F
 # MAIN LOGIC
 # ==================================
 
-# --- FINDING ALL BINARY FILES IN DIRECTORY ---
+# Retrieving all .bin files in /data/ directory
 
-## Grab all bin files
-# Taking all the bin files from the data folder.
-# Finding the bin files inside the folder
 BinPattern <- "*\\.[bB][iI][nN]$"
 files <- list.files(path = paste0(getwd(), "/data"), pattern = BinPattern, full.names = TRUE)
-# This will be changed to a parameter which can be feed as an output.
 
-# --- CALLING SUBSCRIPTS ---
-path <- getwd()
+# Calling subscripts
+
+# path <- getwd()
 
 seq <- c(1:length(files))
 
-# seq = seq[c(-3)] # Which numbers are corrupt from the files listed. Use this line to skip a file. Make sure to update on line 216 as well.
-
 for (i in seq) {
-  
-  # Is this working accordingly?
-  #timer && timer_print(paste("File", i, "starting at", Sys.time()))
 
   binfile <- files[i]
-
-  # Write logic
   
-  # timer_activity <- activity_analysis(
-  #     binfile = binfile,
-  #     summary_name = paste0("Activity_Summary_Metrics_", strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]]),
-  #     timer = timer
-  # )
-
-  timer_sleep <- sleep_analysis(
-    binfile = binfile,
-    summary_name = paste0("Sleep_Summary_Metrics_", strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]]),
-    timer = timer
+  timer_activity <- activity_analysis(
+      binfile = binfile,
+      summary_name = paste0("Activity_Summary_Metrics_", strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]]),
+      timer = timer
   )
+
+  # timer_sleep <- sleep_analysis(
+  #   binfile = binfile,
+  #   summary_name = paste0("Sleep_Summary_Metrics_", strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]]),
+  #   timer = timer
+  # )
 
 }
 
@@ -121,7 +114,9 @@ for (i in seq) {
 if (timer) {
   timer_total <- append.timer(timer_total, "End of Analyis")
   
-  analysis_list <- list(timer_total, timer_activity, timer_sleep)
+  analysis_list <- list(timer_total)
+  if (exists("timer_activity")) analysis_list <- c(analysis_list, list(timer_activity))
+  if (exists("timer_sleep")) analysis_list <- c(analysis_list, list(timer_sleep)) 
   
   timer_merge(analysis_list, binfile)
 }
