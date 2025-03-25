@@ -13,7 +13,7 @@ local({
 })
 
 # time zone
-Sys.setenv(TZ = "CET")
+Sys.setenv(TZ = "GMT")
 
 # check existence of folders and create thems
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)

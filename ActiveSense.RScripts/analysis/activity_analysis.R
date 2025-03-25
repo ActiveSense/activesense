@@ -9,6 +9,9 @@ activity_analysis <- function(binfile, summary_name) {
   start_time = "03:00"
 
   header = header.info(binfile)
+  print("IS THE HEADER BEING PRINTED ?")
+  print(header)
+  print("END OF PRINT")
   
   # ==================================
   # DATA SEGMENTATION 
