@@ -18,10 +18,9 @@ Sys.setenv(TZ = "CET")
 # check existence of folders and create thems
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
 dir.create(file.path(paste0(getwd(), "/outputs/")), showWarnings = FALSE)
-dir.create(file.path(paste0(getwd(), "/GENEAclassification/")), showWarnings = FALSE)
 
 # execution control parameters
-timer <- TRUE
+timer <- FALSE
 rerun <- FALSE
 mmap.load = TRUE
 
@@ -47,6 +46,7 @@ source("functions/08_sleep_summary.R")
 
 # utils
 source("utils/timer.R")
+source("utils/cleanup.R")
 
 # ==================================
 # LIBRARIES
@@ -57,7 +57,7 @@ librarys <- c(
   "GENEAclassify",
   "scales",
   "reshape2",
-  "versions", # TODO: Check if this is still needed
+  "versions"
 )
 
 library_installer(librarys)
@@ -80,7 +80,7 @@ activity_datacols = c(
   "Step.GENEAcount", "Step.sd", "Step.mean", "Step.median"
 )
 
-timer_datacols = c(
+sleep_datacols = c(
   "UpDown.mean", "UpDown.var", "UpDown.sd",
   "Degrees.mean", "Degrees.var", "Degrees.sd",
   "Magnitude.mean", "Magnitude.var", "Magnitude.meandiff", "Magnitude.mad",
@@ -91,5 +91,19 @@ timer_datacols = c(
   "Principal.Frequency.mean", "Principal.Frequency.median"
 )
 
+# ==================================
+# HELPER FUNCTIONS
+# ==================================
+
+getBinFiles <- function() {
+  BinPattern <- "*\\.[bB][iI][nN]$"
+  files <- list.files(path = paste0(getwd(), "/data"), pattern = BinPattern, full.names = TRUE)
+  return(files)
+}
+
+getSummaryName <- function(name) {
+  summary_name = paste0(name, strsplit(unlist(strsplit(binfile, "/"))[length(unlist(strsplit(binfile, "/")))], ".bin")[[1]])
+  return(summary_name)
+}
 
 

@@ -23,7 +23,7 @@
 #' current and post parts in a single row.
 #'
 
-create_df_pcp <- function(segment_data,
+sleep_create_df_pcp <- function(segment_data,
                           Summary_name,
                           # Cut_points
                           Magsa_cut = 0.04, # 40mg

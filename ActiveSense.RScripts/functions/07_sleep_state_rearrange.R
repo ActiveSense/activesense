@@ -24,7 +24,7 @@
 # rise_time = bed_rise_df$rise_time
 # first_date = first_date
 
-state_rearrange <- function(segment_data,
+sleep_state_rearrange <- function(segment_data,
                             boundarys,
                             bed_time,
                             rise_time,
