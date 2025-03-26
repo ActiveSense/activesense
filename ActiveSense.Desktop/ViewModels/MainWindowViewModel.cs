@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -14,11 +13,10 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private IStorageProvider? _storageProvider;
-
-    [ObservableProperty] private string _greeting = "Welcome to ActiveSense!";
+    [ObservableProperty] private string _greeting = "";
 
     [ObservableProperty] private bool _isAnalyzing;
+    private IStorageProvider? _storageProvider;
 
     public ObservableCollection<string> SelectedFiles { get; } = new();
 
@@ -117,12 +115,12 @@ public partial class MainWindowViewModel : ViewModelBase
             Greeting = "No files selected for analysis";
             return;
         }
-        
+
         try
         {
             IsAnalyzing = true;
             Greeting = "Analyzing files...";
-        
+
             var csvFile = SelectedFiles.FirstOrDefault(f => Path.GetExtension(f).ToLowerInvariant() == ".csv");
 
             if (csvFile != null)
