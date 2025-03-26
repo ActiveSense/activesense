@@ -15,6 +15,33 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <StackPanel Grid.Column="0" Background="LightGray">
+            <Button Margin="10" Content="Button 1"/>
+            <Button Margin="10" Content="Button 2"/>
+            <Button Margin="10" Content="Button 3"/>
+        </StackPanel>
+
+        <!-- Main Content -->
+        <StackPanel Grid.Column="1">
+            <TabControl Margin="5">
+                <TabItem Header="Tab 1">
+                    <TextBlock Margin="5">This is tab 1 content</TextBlock>
+                </TabItem>
+                <TabItem Header="Tab 2">
+                    <TextBlock Margin="5">This is tab 2 content</TextBlock>
+                </TabItem>
+                <TabItem Header="Tab 3">
+                    <TextBlock Margin="5">This is tab 3 content</TextBlock>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </Grid>
 
 </Window>
