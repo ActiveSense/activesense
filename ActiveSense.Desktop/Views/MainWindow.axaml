@@ -3,45 +3,102 @@
         xmlns:vm="using:ActiveSense.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:helpers="clr-namespace:ActiveSense.Desktop.Helpers"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
         x:Class="ActiveSense.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="ActiveSense.Desktop">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <Grid ColumnDefinitions="250,*">
 
         <!-- Sidebar -->
-        <StackPanel Grid.Column="0" Background="LightGray">
-            <Button Margin="10" Content="Button 1"/>
-            <Button Margin="10" Content="Button 2"/>
-            <Button Margin="10" Content="Button 3"/>
-        </StackPanel>
+        <Grid Grid.Column="0"
+              RowDefinitions="Auto,*,Auto"
+              Background="#F0F0F0"
+              Margin="0">
 
-        <!-- Main Content -->
-        <StackPanel Grid.Column="1">
-            <TabControl Margin="5">
-                <TabItem Header="Tab 1">
-                    <TextBlock Margin="5">This is tab 1 content</TextBlock>
-                </TabItem>
-                <TabItem Header="Tab 2">
-                    <TextBlock Margin="5">This is tab 2 content</TextBlock>
-                </TabItem>
-                <TabItem Header="Tab 3">
-                    <TextBlock Margin="5">This is tab 3 content</TextBlock>
-                </TabItem>
-            </TabControl>
-        </StackPanel>
+            <!-- File Picker Button at the top of sidebar -->
+            <Button Grid.Row="0"
+                    Content="Select Files"
+                    Command="{Binding SelectFilesCommand}"
+                    HorizontalAlignment="Stretch"
+                    Margin="10"
+                    Padding="10"
+                    Background="#007ACC"
+                    Foreground="White" />
+
+            <!-- File List in sidebar -->
+            <Grid Grid.Row="1" RowDefinitions="Auto,*" Margin="10,0,10,10">
+                <TextBlock Grid.Row="0"
+                           Text="Selected Files:"
+                           FontWeight="Bold"
+                           Margin="0,0,0,5" />
+
+                <Border Grid.Row="1"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Background="White">
+                    <ScrollViewer>
+                        <ListBox ItemsSource="{Binding SelectedFiles}"
+                                 SelectionMode="Multiple"
+                                 Background="Transparent"
+                                 BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=., Converter={StaticResource FileNameConverter}}"
+                                               ToolTip.Tip="{Binding}"
+                                               TextWrapping="Wrap" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <Button Grid.Row="2"
+                    Content="Analyze"
+                    Command="{Binding AnalyzeFiles}"
+                    HorizontalAlignment="Stretch"
+                    Margin="10"
+                    Padding="10"
+                    Background="#28A745"
+                    Foreground="White" />
+        </Grid>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" Margin="20">
+            <!-- Header -->
+            <TextBlock Grid.Row="0"
+                       Text="{Binding Greeting}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="0,10,0,20"
+                       FontSize="18" />
+
+            <!-- Main Content -->
+            <Border Grid.Row="1"
+                    BorderBrush="#CCCCCC"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="15">
+                <Grid>
+                    <TextBlock Text="Select CSV files and click 'Analyze' to view data"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Opacity="0.5"/>
+
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 
+    <Window.Resources>
+        <helpers:FileNameConverter x:Key="FileNameConverter" />
+    </Window.Resources>
 </Window>
