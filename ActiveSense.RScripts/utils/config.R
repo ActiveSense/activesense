@@ -20,7 +20,7 @@ dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
 dir.create(file.path(paste0(getwd(), "/outputs/")), showWarnings = FALSE)
 
 # execution control parameters
-timer <- FALSE
+timer <- TRUE
 rerun <- FALSE
 mmap.load = TRUE
 
@@ -57,6 +57,8 @@ librarys <- c(
   "GENEAclassify",
   "scales",
   "reshape2",
+  "future",
+  "promises",
   "versions"
 )
 
@@ -66,6 +68,8 @@ library(GENEAread)
 library(GENEAclassify)
 library(scales)
 library(reshape2)
+library(future)
+library(promises)
 
 # ==================================
 # DATACOLS

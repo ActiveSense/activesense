@@ -13,29 +13,34 @@ if (timer) {
 # MAIN LOGIC
 # ==================================
 
-# Retrieving all .bin files in /data/ directory
+plan(multisession, workers = 2)
 
+# Retrieving all .bin files in /data/ directory
 files <- getBinFiles()
 
-# Calling subscripts
+# Process each file
+for (binfile in files) {
 
-seq <- c(1:length(files))
-
-for (i in seq) {
-
-  binfile <- files[i]
-  
-  timer_activity <- activity_analysis(
+  #Run analysis in parallel
+  future_activity <- future({
+    activity_analysis(
       binfile = binfile,
       summary_name = getSummaryName("Activity_Summary_Metrics_")
-  )
+    )
+  })
+  
+  future_sleep <- future({
+    sleep_analysis(
+      binfile = binfile,
+      summary_name = getSummaryName("Sleep_Summary_Metrics_")
+    )
+  })
 
-  # timer_sleep <- sleep_analysis(
-  #   binfile = binfile,
-  #   summary_name = getSummaryName("Sleep_Summary_Metrics_")
-  # )
-
+  timer_activity <- value(future_activity)
+  timer_sleep <- value(future_sleep)
 }
+
+plan(sequential)
 
 # ==================================
 # END OF PROGRAM // TIMER END

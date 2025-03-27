@@ -13,7 +13,7 @@ sleep_combine_segment_data <- function(binfile,
                                  start_time,
                                  datacols,
                                  mmap.load = T) {
-
+  
   # Naming of the csv file protocol.
   dataname <- naming_protocol(binfile)
 
@@ -23,7 +23,6 @@ sleep_combine_segment_data <- function(binfile,
   # Finding the first time
   AccData1 <- read.bin(binfile, start = 0, end = 0.01)
   First_Time <- as.numeric(AccData1$data.out[1, 1])
-
   
   # Now I need to check that there is at least 24 hours of data
   # Last Time
@@ -49,11 +48,11 @@ sleep_combine_segment_data <- function(binfile,
       DayNo = DayNo -1 
     }
   }
-  
+
   # Initialise the segmented data
   segment_data <- c()
   # Break this into partial days -  needs to be based on start_time 
-  
+
   for (i in 0:DayNo) {
     if (i == 0){
       segment_data1 <- getGENEAsegments(binfile,
@@ -63,6 +62,7 @@ sleep_combine_segment_data <- function(binfile,
                                         Use.Timestamps = TRUE,
                                         changepoint = "UpDownMeanVarDegreesMeanVar",
                                         penalty = "Manual",
+                                        outputdir = "SleepClassification",
                                         pen.value1 = 40,
                                         pen.value2 = 400,
                                         datacols = datacols,
@@ -78,6 +78,7 @@ sleep_combine_segment_data <- function(binfile,
                                         Use.Timestamps = TRUE,
                                         changepoint = "UpDownMeanVarDegreesMeanVar",
                                         penalty = "Manual",
+                                        outputdir = "SleepClassification",
                                         pen.value1 = 40,
                                         pen.value2 = 400,
                                         datacols = datacols,
@@ -93,6 +94,7 @@ sleep_combine_segment_data <- function(binfile,
                                         Use.Timestamps = TRUE,
                                         changepoint = "UpDownMeanVarDegreesMeanVar",
                                         penalty = "Manual",
+                                        outputdir = "SleepClassification",
                                         pen.value1 = 40,
                                         pen.value2 = 400,
                                         datacols = datacols,

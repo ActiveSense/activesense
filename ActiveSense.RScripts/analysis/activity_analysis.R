@@ -9,14 +9,11 @@ activity_analysis <- function(binfile, summary_name) {
   start_time = "03:00"
 
   header = header.info(binfile)
-  print("IS THE HEADER BEING PRINTED ?")
-  print(header)
-  print("END OF PRINT")
   
   # ==================================
   # DATA SEGMENTATION 
   # ==================================
-
+  
   if (timer) {
     my_timer <- create_timer("Activity Timer")
     my_timer <- append.timer(my_timer, "Segmentation") 
@@ -29,7 +26,7 @@ activity_analysis <- function(binfile, summary_name) {
                                       mmap.load = mmap.load
   )
   
-  cleanup_classification()
+  cleanup_classification("ActivityClassification")
   
   # Routine to remove overlap segments
   k = 1 # Counter
