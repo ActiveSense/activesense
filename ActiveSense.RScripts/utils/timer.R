@@ -29,7 +29,7 @@ translate.timer <- function(df) {
   df$time_diff <- NA
   
   for (i in 1:nrow(df)-1) {
-    time_difference <- df[i+1, "time"] - df[i, "time"]
+    time_difference <- as.numeric(difftime(df[i+1, "time"], df[i, "time"], units = "secs"))
     
     df[i, "time_diff"] <- time_difference
   }
