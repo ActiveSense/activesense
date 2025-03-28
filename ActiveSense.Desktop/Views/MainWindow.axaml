@@ -13,22 +13,33 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <SplitView IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="200" CompactPaneLength="48" DisplayMode="CompactInline">
+    <SplitView IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="200" CompactPaneLength="48"
+               DisplayMode="CompactInline">
         <SplitView.Pane>
-           <StackPanel>
-               <Button Command="{Binding TriggerPaneCommand}">Test</Button>
-               <ListBox>
-                   <ListBoxItem>test</ListBoxItem>
-                   <ListBoxItem>test</ListBoxItem>
-                   <ListBoxItem>test</ListBoxItem>
-                   <ListBoxItem>test</ListBoxItem>
-               </ListBox>
-           </StackPanel> 
+            <StackPanel>
+                <Button Margin="2" Command="{Binding TriggerPaneCommand}">Test</Button>
+                <ListBox>
+                    <ListBoxItem>test</ListBoxItem>
+                    <ListBoxItem>test</ListBoxItem>
+                    <ListBoxItem>test</ListBoxItem>
+                    <ListBoxItem>test</ListBoxItem>
+                </ListBox>
+            </StackPanel>
         </SplitView.Pane>
         <SplitView.Content>
-            <Border CornerRadius="12 0 0 0" Background="Bisque">
-                <TransitioningContentControl Content="{Binding  ActivePage}"></TransitioningContentControl>
-            </Border>
+            <StackPanel>
+                <TabControl Margin="5">
+                    <TabItem Header="Allgemein">
+                        <TextBlock Margin="5">This is tab 1 content</TextBlock>
+                    </TabItem>
+                    <TabItem Header="Schlaf">
+                        <TextBlock Margin="5">This is tab 2 content</TextBlock>
+                    </TabItem>
+                    <TabItem Header="Aktivität">
+                        <TransitioningContentControl Content="{Binding  ActivePage}" />
+                    </TabItem>
+                </TabControl>
+            </StackPanel>
         </SplitView.Content>
     </SplitView>
 
