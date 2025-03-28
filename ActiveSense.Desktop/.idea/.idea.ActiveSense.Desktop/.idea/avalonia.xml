@@ -5,6 +5,7 @@
       <map>
         <entry key="App.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/MainWindow.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/RepresentationView.axaml" value="ActiveSense.Desktop.csproj" />
       </map>
     </option>
   </component>
