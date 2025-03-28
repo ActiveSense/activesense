@@ -5,7 +5,7 @@ using ScottPlot.Avalonia;
 
 namespace ActiveSense.Desktop.Views;
 
-public class MainWindow : Window
+public partial class MainWindow : Window
 {
     public MainWindow()
     {
