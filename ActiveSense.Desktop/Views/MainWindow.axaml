@@ -3,18 +3,57 @@
         xmlns:vm="using:ActiveSense.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ActiveSense.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="ActiveSense.Desktop">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <!-- <SplitView IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="200" CompactPaneLength="48" -->
+    <!--            DisplayMode="CompactInline"> -->
+    <!--     <SplitView.Pane> -->
+    <!--         <StackPanel Spacing="5" Margin="5"> -->
+    <!--             <Button Margin="2" Command="{Binding TriggerPaneCommand}"> -->
+    <!--                 <PathIcon Data="{StaticResource AppsListRegular}" /> -->
+    <!--             </Button> -->
+    <!--             <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"> -->
+    <!--                 <ListBox.ItemTemplate> -->
+    <!--                     <DataTemplate> -->
+    <!--                         <StackPanel Spacing="15" Orientation="Horizontal"> -->
+    <!--                             <PathIcon Data="{Binding ListItemIcon}" /> -->
+    <!--                             <TextBlock Text="{Binding Name}" /> -->
+    <!--                         </StackPanel> -->
+    <!--                     </DataTemplate> -->
+    <!--                 </ListBox.ItemTemplate> -->
+    <!--             </ListBox> -->
+    <!--         </StackPanel> -->
+    <!--     </SplitView.Pane> -->
+    <!-- -->
+    <!--     <SplitView.Content> -->
+    <!--         ~1~ <TransitioningContentControl Content="{Binding  ActivePage}" /> @1@ -->
+    <!-- -->
+    <!--     </SplitView.Content> -->
+    <!-- </SplitView> -->
+    <controls:NavigationView PaneDisplayMode="LeftCompact"
+                             MenuItemsSource="{Binding Items}"
+                             Content="{Binding ActivePage}"
+                             SelectedItem="{Binding SelectedItem}"
+                             IsSettingsVisible="False"
+                             PaneTitle="{Binding Title}">
+        <controls:NavigationView.MenuItemTemplate>
+            <DataTemplate DataType="{x:Type vm:ListItemTemplate}">
+                <controls:NavigationViewItem Content="{Binding Name}">
+                    <controls:NavigationViewItem.IconSource>
+                        <controls:PathIconSource Data="{Binding ListItemIcon}" />
+                    </controls:NavigationViewItem.IconSource>
+                </controls:NavigationViewItem>
+            </DataTemplate>
+        </controls:NavigationView.MenuItemTemplate>
+    </controls:NavigationView>
 
 </Window>

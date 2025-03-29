@@ -2,14 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ActiveSense.Desktop.App"
              xmlns:local="using:ActiveSense.Desktop"
+             xmlns:style="using:FluentAvalonia.Styling"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
-  
+
     <Application.Styles>
-        <FluentTheme />
+        <style:FluentAvaloniaTheme PreferUserAccentColor="True"/>
+        <StyleInclude Source="Assets/Icons.axaml"></StyleInclude>
     </Application.Styles>
 </Application>
