@@ -4,8 +4,13 @@
     <option name="projectPerEditor">
       <map>
         <entry key="App.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Assets/Icons.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/Analysis.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/AnalysisPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/MainWindow.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/ProcessView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/RepresentationView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/SleepPageView.axaml" value="ActiveSense.Desktop.csproj" />
       </map>
     </option>
   </component>

@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace ActiveSense.Desktop.Views;
 
-public partial class RepresentationView : UserControl
+public partial class ActivityPageView : UserControl
 {
-    public RepresentationView()
+    public ActivityPageView()
     {
         InitializeComponent();
     }
