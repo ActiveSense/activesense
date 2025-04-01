@@ -28,12 +28,15 @@ jobs:
     #     Rscript -e 'install.packages(c("GENEAread", "GENEAclassify", "scales", "reshape2", "future", "promises", "versions"), repos="https://cloud.r-project.org/")'
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore ActiveSense.Desktop/ActiveSense.Desktop.sln
       
     - name: Build
-      run: dotnet build --no-restore
+      run: |
+        dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --no-restore
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: |
+        dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
       env:
-        R_HOME: ${{ runner.temp }}/R  # Set R_HOME environment variable
+        R_HOME: ${{ runner.temp }}/R
