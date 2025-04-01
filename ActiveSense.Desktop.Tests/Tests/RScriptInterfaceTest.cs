@@ -83,7 +83,7 @@ public class RScriptInterfaceTest
     public void ParseResults()
     {
         var outputDirectory = _scriptService.GetROutputPath();
-        var results = _resultParserService.ParseScript(outputDirectory);
+        var results = _resultParserService.ParseResultsAsync(outputDirectory);
         
         foreach (var result in results.Result)
         {

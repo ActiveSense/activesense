@@ -8,12 +8,12 @@ namespace ActiveSense.Desktop.Services;
 
 public interface IResultParserService
 {
-    Task<IEnumerable<AnalysisResult>> ParseScript(string outputDirectory);
+    Task<IEnumerable<AnalysisResult>> ParseResultsAsync(string outputDirectory);
 }
 
 public class ResultParserService : IResultParserService
 {
-    public async Task<IEnumerable<AnalysisResult>> ParseScript(string outputDirectory)
+    public async Task<IEnumerable<AnalysisResult>> ParseResultsAsync(string outputDirectory)
     {
         var results = new List<AnalysisResult>();
 

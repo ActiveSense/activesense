@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.ViewModels;
@@ -21,6 +22,9 @@ public partial class ProcessView : UserControl
     // Stores a reference to the disposable in order to clean it up if needed
     IDisposable? _selectFilesInteractionDisposable;
 
+    /*
+     * Needs refactoring
+     */
     protected override void OnDataContextChanged(EventArgs e)
     {
         // Dispose any old handler
@@ -49,7 +53,28 @@ public partial class ProcessView : UserControl
                 Title = input
             });
 
-        // Transform the files as needed and return them. If no file was selected, null will be returned
-        return storageFiles?.Select(x => x.Name)?.ToArray();
+        if (storageFiles == null || !storageFiles.Any())
+        {
+            return null;
+        }
+    
+        var fullPaths = new List<string>();
+    
+        foreach (var file in storageFiles)
+        {
+            try
+            {
+                var path = file.Path.LocalPath;
+                fullPaths.Add(path);
+            
+                Console.WriteLine($"Selected file path: {path}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting path for file {file.Name}: {ex.Message}");
+            }
+        }
+
+        return fullPaths.ToArray();
     }
 }

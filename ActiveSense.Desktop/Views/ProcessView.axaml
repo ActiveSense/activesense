@@ -5,7 +5,8 @@
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ActiveSense.Desktop.Views.ProcessView">
+             x:Class="ActiveSense.Desktop.Views.ProcessView"
+             x:DataType="viewModels:ProcessViewModel">
     <ScrollViewer>
         <StackPanel Margin="20">
             <Grid Name="MainGrid" RowDefinitions="*, *" ColumnDefinitions="2*, *" ShowGridLines="True">
@@ -29,8 +30,32 @@
                             </ui:SettingsExpander>
                         </ListBoxItem>
                     </ListBox>
-                    <Button Margin="0 20">Analysieren</Button>
+                    <TextBlock Text="{Binding StatusMessage}"></TextBlock>
+                    <Button Margin="0 20" Command="{Binding ProcessFilesCommand}">Analysieren</Button>
+                    <!-- Output Window -->
+                    <Border Grid.Row="1"
+                            BorderBrush="LightGray"
+                            BorderThickness="0,1,0,0"
+                            IsVisible="{Binding ShowScriptOutput}">
+                        <Grid RowDefinitions="Auto,*">
+                            <TextBlock Grid.Row="0"
+                                       Text="Script Output"
+                                       FontWeight="SemiBold"
+                                       Margin="20,10" />
 
+                            <ScrollViewer Grid.Row="1"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Margin="20,0,20,20">
+                                <TextBox Text="{Binding ScriptOutput}"
+                                         IsReadOnly="True"
+                                         FontFamily="Consolas, Menlo, Monospace"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         MinHeight="200" />
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <TextBlock FontSize="20" FontWeight="Bold">Dateien</TextBlock>
