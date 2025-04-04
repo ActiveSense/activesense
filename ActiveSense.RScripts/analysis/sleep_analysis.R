@@ -24,8 +24,6 @@ sleep_analysis <- function(binfile, summary_name) {
                                       mmap.load = mmap.load
   )
   
-  cleanup_classification("SleepClassification")
-  
   # Routine to remove overlap segments.
   k = 1 # Counter
   collen = length(segment_data$Start.Time)

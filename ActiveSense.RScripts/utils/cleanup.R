@@ -1,7 +1,9 @@
-cleanup_classification <- function(type) {
-  classification_dir <- type
+cleanup_classification <- function() {
+  classification_dir <- list("ActivityClassification", "SleepClassification")
   
-  if (dir.exists(classification_dir)) {
-    unlink(classification_dir, recursive = TRUE)
+  for (dir in classification_dir) {
+    if (dir.exists(dir)) {
+      unlink(dir, recursive = TRUE)
+    } 
   }
 }

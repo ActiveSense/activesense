@@ -20,7 +20,7 @@ dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
 dir.create(file.path(paste0(getwd(), "/outputs/")), showWarnings = FALSE)
 
 # execution control parameters
-timer <- TRUE
+timer <- FALSE
 rerun <- FALSE
 mmap.load = TRUE
 
