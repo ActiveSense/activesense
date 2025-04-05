@@ -44,11 +44,6 @@ timer_merge <- function(timer_list, binfile) {
   result_df <- data.frame()
   
   for (el in timer_list) {
-    
-    print("PRINTING VECTOR")
-    print(el)
-    print("Finalized")
-    
     df <- el$timer_data
     df <- translate.timer(df)
     

@@ -15,9 +15,13 @@ local({
 # time zone
 Sys.setenv(TZ = "GMT")
 
+# read command line arguments
+args <- commandArgs(trailingOnly = TRUE)
+output_dir <- if (length(args) > 0) paste0(args[1], "/outputs/") else paste0(getwd(), "/outputs/")
+
 # check existence of folders and create thems
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
-dir.create(file.path(paste0(getwd(), "/outputs/")), showWarnings = FALSE)
+dir.create(file.path(output_dir), showWarnings = FALSE)
 
 # execution control parameters
 timer <- TRUE
