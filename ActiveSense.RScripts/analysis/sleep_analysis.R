@@ -13,7 +13,7 @@ sleep_analysis <- function(binfile, summary_name) {
   # ==================================
   
   if (timer) {
-    my_timer <- create_timer("Sleep Timer")
+    my_timer <- create_timer(summary_name)
     my_timer <- append.timer(my_timer, "Data segmentation") 
   }
   

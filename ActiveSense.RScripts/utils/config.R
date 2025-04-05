@@ -15,16 +15,8 @@ local({
 # time zone
 Sys.setenv(TZ = "GMT")
 
-# read command line arguments
-args <- commandArgs(trailingOnly = TRUE)
-output_dir <- if (length(args) > 0) paste0(args[1], "/outputs/") else paste0(getwd(), "/outputs/")
-
-# check existence of folders and create thems
-dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
-dir.create(file.path(output_dir), showWarnings = FALSE)
-
 # execution control parameters
-timer <- TRUE
+timer <- FALSE
 rerun <- FALSE
 mmap.load = TRUE
 
@@ -63,7 +55,8 @@ librarys <- c(
   "reshape2",
   "future",
   "promises",
-  "versions"
+  "versions",
+  "optparse"
 )
 
 library_installer(librarys)
@@ -74,6 +67,41 @@ library(scales)
 library(reshape2)
 library(future)
 library(promises)
+library(optparse)
+
+# ==================================
+# PARAMETERS
+# ==================================
+
+# Define command line options
+option_list <- list(
+  make_option(c("-d", "--directory"), type="character", default=getwd(),
+              help="Base directory for output [default: current directory]"),
+  make_option(c("-a", "--activity"), type="logical", default=TRUE,
+              help="Run activity analysis [default: %default]"),
+  make_option(c("-s", "--sleep"), type="logical", default=TRUE,
+              help="Run sleep analysis [default: %default]")
+)
+
+# Parse command line arguments
+opt_parser <- OptionParser(option_list=option_list)
+opt <- parse_args(opt_parser)
+
+# Set variables based on arguments
+output_dir <- paste0(opt$directory, "/outputs/")
+analyze_activity <- opt$activity
+analyze_sleep <- opt$sleep
+
+# Create directories
+dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
+dir.create(file.path(output_dir), showWarnings = FALSE)
+
+# Log configuration
+print("------")
+cat("Output directory:", output_dir, "\n")
+cat("Run activity analysis:", analyze_activity, "\n")
+cat("Run sleep analysis:", analyze_sleep, "\n")
+print("------")
 
 # ==================================
 # DATACOLS

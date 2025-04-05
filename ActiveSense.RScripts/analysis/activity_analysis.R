@@ -15,7 +15,7 @@ activity_analysis <- function(binfile, summary_name) {
   # ==================================
   
   if (timer) {
-    my_timer <- create_timer("Activity Timer")
+    my_timer <- create_timer(summary_name)
     my_timer <- append.timer(my_timer, "Segmentation") 
   }
   
