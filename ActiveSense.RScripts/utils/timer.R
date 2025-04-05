@@ -18,7 +18,6 @@ create_timer <- function(name) {
 
 append.timer <- function(self, stage) {
   new_row <- data.frame(name = stage, time = Sys.time())
-  print(new_row)
   
   self$timer_data <- rbind(self$timer_data, new_row)
   
@@ -45,6 +44,11 @@ timer_merge <- function(timer_list, binfile) {
   result_df <- data.frame()
   
   for (el in timer_list) {
+    
+    print("PRINTING VECTOR")
+    print(el)
+    print("Finalized")
+    
     df <- el$timer_data
     df <- translate.timer(df)
     

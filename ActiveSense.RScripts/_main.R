@@ -52,9 +52,8 @@ cleanup_classification()
 if (timer) {
   timer_total <- append.timer(timer_total, "End of Analyis")
   
-  analysis_list <- list(timer_total)
-  if (exists("timer_activity")) analysis_list <- c(analysis_list, list(timer_activity))
-  if (exists("timer_sleep")) analysis_list <- c(analysis_list, list(timer_sleep)) 
-  
-  timer_merge(analysis_list, binfile)
+  timer_results <- c(list(timer_total), timer_results)
+
+  timer_merge(timer_results, binfile)
 }
+
