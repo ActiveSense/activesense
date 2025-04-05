@@ -96,13 +96,6 @@ analyze_sleep <- opt$sleep
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
 dir.create(file.path(output_dir), showWarnings = FALSE)
 
-# Log configuration
-print("------")
-cat("Output directory:", output_dir, "\n")
-cat("Run activity analysis:", analyze_activity, "\n")
-cat("Run sleep analysis:", analyze_sleep, "\n")
-print("------")
-
 # ==================================
 # DATACOLS
 # ==================================
