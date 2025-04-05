@@ -15,7 +15,7 @@ activity_analysis <- function(binfile, summary_name) {
   # ==================================
   
   if (timer) {
-    my_timer <- create_timer("Activity Timer")
+    my_timer <- create_timer(summary_name)
     my_timer <- append.timer(my_timer, "Segmentation") 
   }
   
@@ -25,8 +25,6 @@ activity_analysis <- function(binfile, summary_name) {
                                       datacols,
                                       mmap.load = mmap.load
   )
-  
-  cleanup_classification("ActivityClassification")
   
   # Routine to remove overlap segments
   k = 1 # Counter
@@ -143,7 +141,7 @@ activity_analysis <- function(binfile, summary_name) {
     boundarys
   )
   
-  write.csv(activity_df, file.path(paste0("outputs/", summary_name, ".csv")), row.names = FALSE)
+  write.csv(activity_df, file.path(paste0(output_dir, summary_name, ".csv")), row.names = FALSE)
   
   # ==================================
   # END OF SCRIPT // TIMER
