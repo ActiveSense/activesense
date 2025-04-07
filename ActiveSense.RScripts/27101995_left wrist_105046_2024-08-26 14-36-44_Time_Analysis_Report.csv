@@ -1,0 +1,14 @@
+"","name","time","time_diff"
+"1","Total Timer","",""
+"2","Start of the analysis","1743763312.30992","737.160542964935"
+"3","End of Analyis","1743764049.47046",NA
+"4","Activity Timer","",""
+"5","Segmentation","1743764028.03759","11.2316627502441"
+"6","Classification","1743764039.26925","0.334512948989868"
+"7","Bed Rise Algorithm","1743764039.60377","0.0187392234802246"
+"8","End of activity analysis","1743764039.62251",NA
+"9","Sleep Timer","",""
+"10","Data segmentation","1743764029.35631","19.8071181774139"
+"11","Classification","1743764049.16343","0.271729946136475"
+"12","Bed Rise Algorithm","1743764049.43516","0.0160846710205078"
+"13","End of sleep analysis","1743764049.45124",NA
