@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia;
+using Serilog;
 
 namespace ActiveSense.Desktop;
 

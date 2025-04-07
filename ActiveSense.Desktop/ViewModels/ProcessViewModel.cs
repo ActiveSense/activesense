@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using ActiveSense.Desktop;
 using ActiveSense.Desktop.Helpers;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -44,20 +46,14 @@ public partial class ProcessViewModel : ViewModelBase
             return;
         }
 
-        /*
-         * For testing purposes only
-         */
-        if (SelectedFiles is not null)
-            foreach (var file in SelectedFiles)
-                Console.WriteLine($"Selected file: {file}");
-
         IsProcessing = true;
         StatusMessage = "Processing files...";
 
         try
         {
-            var rDataPath = _rScriptService.GetRDataPath();
-            var success = await _fileService.CopyFilesToDirectoryAsync(SelectedFiles, rDataPath);
+            var processingDirectory = _rScriptService.GetRDataPath();
+            var outputsDirectory = _rScriptService.GetROutputPath();
+            var success = await _fileService.CopyFilesToDirectoryAsync(SelectedFiles, processingDirectory, outputsDirectory);
 
             if (!success)
             {
@@ -68,7 +64,7 @@ public partial class ProcessViewModel : ViewModelBase
             var rScriptPath = Path.Combine(_rScriptService.GetRScriptBasePath(), "_main.R");
 
             var (scriptSuccess, output, error) = await _rScriptService.ExecuteScriptAsync(
-                rScriptPath, _rScriptService.GetRScriptBasePath());
+                rScriptPath, _rScriptService.GetRScriptBasePath(), $"-d {AppConfig.SolutionBasePath}");
 
             ScriptOutput = output;
             ShowScriptOutput = true;
@@ -79,14 +75,7 @@ public partial class ProcessViewModel : ViewModelBase
                 return;
             }
 
-            var results = await _resultParserService.ParseResultsAsync(_rScriptService.GetROutputPath());
-
             StatusMessage = "Success";
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
         }
         finally
         {
