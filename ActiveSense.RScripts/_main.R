@@ -13,31 +13,38 @@ if (timer) {
 # MAIN LOGIC
 # ==================================
 
-plan(multisession, workers = 2)
+num_cores <- parallel::detectCores() - 1
+plan(multisession, workers = num_cores)
 
-# Retrieving all .bin files in /data/ directory
 files <- getBinFiles()
 
-# Process each file
+future_tasks <- list()
+
 for (binfile in files) {
-
-  #Run analysis in parallel
-  future_activity <- future({
-    activity_analysis(
-      binfile = binfile,
-      summary_name = getSummaryName("Activity_Summary_Metrics_")
-    )
-  })
   
-  future_sleep <- future({
-    sleep_analysis(
-      binfile = binfile,
-      summary_name = getSummaryName("Sleep_Summary_Metrics_")
-    )
-  })
+  if (analyze_activity) {
+    future_tasks[[paste0(binfile, "_activity")]] <- future({
+      activity_analysis(
+        binfile = binfile,
+        summary_name = getSummaryName("Activity_Summary_Metrics_")
+      )
+    })
+  }
+  
+  if (analyze_sleep) {
+    future_tasks[[paste0(binfile, "_sleep")]] <- future({
+      sleep_analysis(
+        binfile = binfile,
+        summary_name = getSummaryName("Sleep_Summary_Metrics_")
+      )
+    })
+  }
+  
+}
 
-  timer_activity <- value(future_activity)
-  timer_sleep <- value(future_sleep)
+timer_results <- list()
+for (task_name in names(future_tasks)) {
+  timer_results[[task_name]] <- value(future_tasks[[task_name]])
 }
 
 plan(sequential)
@@ -46,12 +53,13 @@ plan(sequential)
 # END OF PROGRAM // TIMER END
 # ==================================
 
+cleanup_classification()
+
 if (timer) {
   timer_total <- append.timer(timer_total, "End of Analyis")
   
-  analysis_list <- list(timer_total)
-  if (exists("timer_activity")) analysis_list <- c(analysis_list, list(timer_activity))
-  if (exists("timer_sleep")) analysis_list <- c(analysis_list, list(timer_sleep)) 
-  
-  timer_merge(analysis_list, binfile)
+  timer_results <- c(list(timer_total), timer_results)
+
+  timer_merge(timer_results, binfile)
 }
+

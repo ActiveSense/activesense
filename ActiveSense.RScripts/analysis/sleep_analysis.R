@@ -13,7 +13,7 @@ sleep_analysis <- function(binfile, summary_name) {
   # ==================================
   
   if (timer) {
-    my_timer <- create_timer("Sleep Timer")
+    my_timer <- create_timer(summary_name)
     my_timer <- append.timer(my_timer, "Data segmentation") 
   }
   
@@ -23,8 +23,6 @@ sleep_analysis <- function(binfile, summary_name) {
                                       datacols,
                                       mmap.load = mmap.load
   )
-  
-  cleanup_classification("SleepClassification")
   
   # Routine to remove overlap segments.
   k = 1 # Counter
@@ -129,7 +127,7 @@ sleep_analysis <- function(binfile, summary_name) {
 
   statistics = sleep_summary(bed_rise_df, first_date)
   
-  write.csv(statistics, file.path(paste0("outputs/", summary_name, ".csv")), row.names = FALSE)
+  write.csv(statistics, file.path(paste0(output_dir, summary_name, ".csv")), row.names = FALSE)
   
   
   # ==================================

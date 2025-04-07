@@ -18,7 +18,6 @@ create_timer <- function(name) {
 
 append.timer <- function(self, stage) {
   new_row <- data.frame(name = stage, time = Sys.time())
-  print(new_row)
   
   self$timer_data <- rbind(self$timer_data, new_row)
   
