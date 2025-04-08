@@ -141,7 +141,10 @@ activity_analysis <- function(binfile, summary_name) {
     boundarys
   )
   
-  write.csv(activity_df, file.path(paste0(output_dir, summary_name, ".csv")), row.names = FALSE)
+  new_path <- paste0(output_dir, getSummaryName(""), "/")
+  dir.create(file.path(new_path), showWarnings = FALSE)
+  
+  write.csv(activity_df, file.path(paste0(new_path, summary_name, ".csv")), row.names = FALSE)
   
   # ==================================
   # END OF SCRIPT // TIMER
