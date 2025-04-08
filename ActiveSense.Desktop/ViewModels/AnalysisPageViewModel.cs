@@ -17,7 +17,7 @@ public partial class AnalysisPageViewModel : ViewModelBase
     private readonly IResultParserService _resultParserService;
 
     [ObservableProperty] private string _title = "Sleep";
-    [ObservableProperty] private ObservableCollection<AnalysisResult> _resultFiles = new();
+    [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = new ObservableCollection<TabItemTemplate>
     {
@@ -44,7 +44,6 @@ public partial class AnalysisPageViewModel : ViewModelBase
             foreach (var file in files)
             {
                 ResultFiles.Add(file);
-                Console.WriteLine(file.FileName);
             }
         }
         catch (Exception ex)

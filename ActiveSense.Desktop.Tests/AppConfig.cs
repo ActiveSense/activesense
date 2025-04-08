@@ -28,7 +28,7 @@ public static class AppConfig
     /// </summary>
     public static string OutputsDirectoryPath => Path.Combine(SolutionBasePath, "ActiveSense.Desktop.Tests/Tests/AnalysisTestFiles/outputs");
     public static string InputDirectoryPath => Path.Combine(SolutionBasePath, "ActiveSense.Desktop.Tests/Tests/AnalysisTestFiles/input");
-    
+    public static string DiffsDirectoryPath => Path.Combine(SolutionBasePath, "ActiveSense.Desktop.Tests/Tests/AnalysisTestFiles/diffs");
     private static string CalculateSolutionBasePath()
     {
         // Start with the executable directory

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -79,9 +80,12 @@ public class ResultParserTests
 
         foreach (var result in results.Result)
         {
-            if (result is ActivityAnalysis)
-            {
-                var records = ((ActivityAnalysis)result).ActivityRecords;
+                var records = result.ActivityRecords;
+
+                foreach (var record in records)
+                {
+                    Console.WriteLine(record);
+                }
 
                 var csvFile = Path.Combine(AppConfig.OutputsDirectoryPath, "activity1.csv");
                 using (var writer = new StreamWriter(csvFile))
@@ -91,9 +95,8 @@ public class ResultParserTests
                 }
 
                 var comparison = _comparer.CompareFiles(csvFile,
-                    Path.Combine(AppConfig.OutputsDirectoryPath, "activity.csv"));
+                    Path.Combine(AppConfig.OutputsDirectoryPath, "analysis1/activity.csv"));
                 Assert.That(comparison, Is.True);
-            }
         }
     }
 
@@ -105,9 +108,7 @@ public class ResultParserTests
 
         foreach (var result in results.Result)
         {
-            if (result is SleepAnalysis)
-            {
-                var records = ((SleepAnalysis)result).SleepRecords;
+                var records = result.SleepRecords;
 
                 var csvFile = Path.Combine(AppConfig.OutputsDirectoryPath, "sleep1.csv");
                 using (var writer = new StreamWriter(csvFile))
@@ -117,9 +118,8 @@ public class ResultParserTests
                 }
 
                 var comparison =
-                    _comparer.CompareFiles(csvFile, Path.Combine(AppConfig.OutputsDirectoryPath, "sleep.csv"));
+                    _comparer.CompareFiles(csvFile, Path.Combine(AppConfig.OutputsDirectoryPath, "analysis1/sleep.csv"));
                 Assert.That(comparison, Is.True);
-            }
         }
     }
 
@@ -131,9 +131,7 @@ public class ResultParserTests
 
         foreach (var result in results.Result)
         {
-            if (result is ActivityAnalysis)
-            {
-                var records = ((ActivityAnalysis)result).ActivityRecords;
+                var records = result.ActivityRecords;
 
                 var csvFile = Path.Combine(AppConfig.OutputsDirectoryPath, "activity1.csv");
                 using (var writer = new StreamWriter(csvFile))
@@ -143,9 +141,8 @@ public class ResultParserTests
                 }
 
                 var comparison = _comparer.CompareFiles(csvFile,
-                    Path.Combine(AppConfig.OutputsDirectoryPath, "diffs/activity_diff.csv"));
+                    Path.Combine(AppConfig.DiffsDirectoryPath, "activity_diff.csv"));
                 Assert.That(comparison, Is.False);
-            }
         }
     }
 
@@ -157,9 +154,7 @@ public class ResultParserTests
 
         foreach (var result in results.Result)
         {
-            if (result is SleepAnalysis)
-            {
-                var records = ((SleepAnalysis)result).SleepRecords;
+                var records = result.SleepRecords;
 
                 var csvFile = Path.Combine(AppConfig.OutputsDirectoryPath, "sleep1.csv");
                 using (var writer = new StreamWriter(csvFile))
@@ -169,9 +164,8 @@ public class ResultParserTests
                 }
 
                 var comparison =
-                    _comparer.CompareFiles(csvFile, Path.Combine(AppConfig.OutputsDirectoryPath, "diffs/sleep_diff.csv"));
+                    _comparer.CompareFiles(csvFile, Path.Combine(AppConfig.DiffsDirectoryPath, "sleep_diff.csv"));
                 Assert.That(comparison, Is.False);
-            }
         }
     }
 
@@ -205,6 +199,7 @@ public class TestCompleteAnalysisProcess
         _scriptService = new RScriptService("Rscript");
         _fileService = new FileService();
         _resultParserService = new ResultParserService();
+        Directory.CreateDirectory(Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output"));
     }
 
     [Test]
@@ -222,46 +217,41 @@ public class TestCompleteAnalysisProcess
     public async Task ExecuteRScript()
     {
         var rScriptPath = Path.Combine(_scriptService.GetRScriptBasePath(), "_main.R");
-        var arguments = $"-d {AppConfig.OutputsDirectoryPath}";
+        var arguments = $"-d {Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output")}";
         var (scriptSuccess, output, error) = await _scriptService.ExecuteScriptAsync(
             rScriptPath, _scriptService.GetRScriptBasePath(), arguments);
-        Console.WriteLine(scriptSuccess);
-        Console.WriteLine(output);
-        Console.WriteLine(error);
+        
+        Assert.That(scriptSuccess, Is.True);
     }
 
     [Test]
-    public void ParseResults()
+    public async Task ParseResults()
     {
-        var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "outputs");
-        var results = _resultParserService.ParseResultsAsync(outputDirectory);
-
-        foreach (var result in results.Result)
+        var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output");
+        var results = await _resultParserService.ParseResultsAsync(outputDirectory);
+        
+        Assert.That(results.Count, Is.EqualTo(1), "No results found in the output directory");
+    
+        foreach (var result in results)
         {
-            Console.WriteLine($"Name: {result.FileName}, Type: {result.AnalysisType}");
-            if (result is ActivityAnalysis)
-            {
-                foreach (var record in ((ActivityAnalysis)result).ActivityRecords)
+            Console.WriteLine($"Name: {result.FileName}, Type: {result.FileName}");
+                foreach (var record in result.ActivityRecords)
                 {
                     Console.WriteLine(
                         $"Day: {record.Day}, Steps: {record.Steps}, NonWear: {record.NonWear}, Sleep: {record.Sleep}, Sedentary: {record.Sedentary}, Light: {record.Light}, Moderate: {record.Moderate}, Vigorous: {record.Vigorous}");
                 }
-            }
-            else if (result is SleepAnalysis)
-            {
-                foreach (var record in ((SleepAnalysis)result).SleepRecords)
+                foreach (var record in result.SleepRecords)
                 {
                     Console.WriteLine(
                         $"NightStarting: {record.NightStarting}, SleepOnsetTime: {record.SleepOnsetTime}, RiseTime: {record.RiseTime}, TotalElapsedBedTime: {record.TotalElapsedBedTime}, TotalSleepTime: {record.TotalSleepTime}, TotalWakeTime: {record.TotalWakeTime}, SleepEfficiency: {record.SleepEfficiency}, NumActivePeriods: {record.NumActivePeriods}, MedianActivityLength: {record.MedianActivityLength}");
                 }
-            }
         }
     }
 
-    [TearDown]
+    [OneTimeTearDown]
     public void Cleanup()
     {
-        var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "outputs");
+        var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output");
         if (Directory.Exists(outputDirectory))
         {
             Directory.Delete(outputDirectory, true);

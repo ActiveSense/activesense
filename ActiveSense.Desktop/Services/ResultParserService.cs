@@ -11,68 +11,68 @@ namespace ActiveSense.Desktop.Services;
 
 public interface IResultParserService
 {
-    Task<IEnumerable<AnalysisResult>> ParseResultsAsync(string outputDirectory);
+    Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory);
 }
 
 public class ResultParserService : IResultParserService
 {
-    public async Task<IEnumerable<AnalysisResult>> ParseResultsAsync(string outputDirectory)
+    public async Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory)
     {
-        var results = new List<AnalysisResult>();
+        var analyses = new List<Analysis>();
 
         if (!Directory.Exists(outputDirectory))
         {
             Console.WriteLine($"Directory {outputDirectory} does not exist.");
-            return results;
+            return analyses;
         }
 
-        var files = Directory.GetFiles(outputDirectory, "*.csv");
+        var directories = Directory.GetDirectories(outputDirectory);
 
-        foreach (var file in files)
+        foreach (var directory in directories)
         {
-            Console.WriteLine("Parsing file: " + file);
-            try
+            Console.WriteLine("Processing directory: " + directory);
+            var analysis = new Analysis
             {
-                using var reader = new StreamReader(file);
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                FilePath = directory,
+                FileName = Path.GetFileName(directory)
+            };
 
-                csv.Read();
-                csv.ReadHeader();
-                var headers = csv.HeaderRecord;
+            var csvFiles = Directory.GetFiles(directory, "*.csv");
 
-                var analysisType = DetermineAnalysisType(headers);
-
-                if (analysisType == AnalysisType.Activity)
+            foreach (var file in csvFiles)
+            {
+                Console.WriteLine("Parsing file: " + file);
+                try
                 {
-                    var result = new ActivityAnalysis
+                    using var reader = new StreamReader(file);
+                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+                    csv.Read();
+                    csv.ReadHeader();
+                    var headers = csv.HeaderRecord;
+
+                    var analysisType = DetermineAnalysisType(headers);
+
+                    if (analysisType == AnalysisType.Activity)
                     {
-                        FilePath = file,
-                        FileName = Path.GetFileName(file),
-                        AnalysisType = analysisType,
-                        ActivityRecords = csv.GetRecords<ActivityRecord>().ToList()
-                    };
-                    results.Add(result);
+                        analysis.ActivityRecords = csv.GetRecords<ActivityRecord>().ToList();
+                    }
+                    else if (analysisType == AnalysisType.Sleep)
+                    {
+                        analysis.SleepRecords = csv.GetRecords<SleepRecord>().ToList();
+                    }
                 }
-                else if (analysisType == AnalysisType.Sleep)
+                catch (Exception e)
                 {
-                    var result = new SleepAnalysis
-                    {
-                        FilePath = file,
-                        FileName = Path.GetFileName(file),
-                        AnalysisType = analysisType,
-                        SleepRecords = csv.GetRecords<SleepRecord>().ToList()
-                    };
-                    results.Add(result);
+                    Console.WriteLine($"Error parsing file {file}: {e.Message}");
+                    throw;
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+
+            analyses.Add(analysis);
         }
 
-        return results;
+        return analyses;
     }
 
     private AnalysisType DetermineAnalysisType(string[] headers)
