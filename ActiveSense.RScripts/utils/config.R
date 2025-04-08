@@ -75,7 +75,7 @@ library(optparse)
 
 # Define command line options
 option_list <- list(
-  make_option(c("-d", "--directory"), type="character", default=getwd(),
+  make_option(c("-d", "--directory"), type="character", default=paste0(getwd(), "/outputs/"),
               help="Base directory for output [default: current directory]"),
   make_option(c("-a", "--activity"), type="logical", default=TRUE,
               help="Run activity analysis [default: %default]"),
@@ -88,7 +88,7 @@ opt_parser <- OptionParser(option_list=option_list)
 opt <- parse_args(opt_parser)
 
 # Set variables based on arguments
-output_dir <- paste0(opt$directory, "/outputs/")
+output_dir <- opt$directory
 analyze_activity <- opt$activity
 analyze_sleep <- opt$sleep
 
