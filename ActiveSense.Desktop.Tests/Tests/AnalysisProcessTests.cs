@@ -110,6 +110,11 @@ public class ResultParserTests
         {
                 var records = result.SleepRecords;
 
+                foreach (var record in records)
+                {
+                    Console.WriteLine(record);
+                }
+
                 var csvFile = Path.Combine(AppConfig.OutputsDirectoryPath, "sleep1.csv");
                 using (var writer = new StreamWriter(csvFile))
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
@@ -196,6 +201,7 @@ public class TestCompleteAnalysisProcess
     [SetUp]
     public void Setup()
     {
+        Directory.CreateDirectory(Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output"));
         _scriptService = new RScriptService("Rscript");
         _fileService = new FileService();
         _resultParserService = new ResultParserService();
@@ -205,7 +211,7 @@ public class TestCompleteAnalysisProcess
     [Test]
     public void CopyFilesToDirectory()
     {
-        var sourceFiles = _fileService.GetFilesInDirectory(AppConfig.InputDirectoryPath, "*.*");
+        var sourceFiles = _fileService.GetFilesInDirectory(AppConfig.InputDirectoryPath, "*.bin");
 
         var success = _fileService
             .CopyFilesToDirectoryAsync(sourceFiles, _scriptService.GetRDataPath(), AppConfig.OutputsDirectoryPath)
@@ -217,7 +223,7 @@ public class TestCompleteAnalysisProcess
     public async Task ExecuteRScript()
     {
         var rScriptPath = Path.Combine(_scriptService.GetRScriptBasePath(), "_main.R");
-        var arguments = $"-d {Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output")}";
+        var arguments = $"-d {Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output/")}";
         var (scriptSuccess, output, error) = await _scriptService.ExecuteScriptAsync(
             rScriptPath, _scriptService.GetRScriptBasePath(), arguments);
         

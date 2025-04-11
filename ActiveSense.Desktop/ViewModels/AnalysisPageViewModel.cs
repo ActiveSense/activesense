@@ -18,6 +18,7 @@ public partial class AnalysisPageViewModel : ViewModelBase
 
     [ObservableProperty] private string _title = "Sleep";
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
+    [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = new ObservableCollection<TabItemTemplate>
     {

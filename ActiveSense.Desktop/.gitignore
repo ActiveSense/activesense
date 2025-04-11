@@ -43,3 +43,5 @@ msbuild.log
 msbuild.err
 msbuild.wrn
 /outputs/
+/AnalysisFiles/
+/AnalysisFiles/

@@ -64,7 +64,7 @@ public partial class ProcessViewModel : ViewModelBase
             var rScriptPath = Path.Combine(_rScriptService.GetRScriptBasePath(), "_main.R");
 
             var (scriptSuccess, output, error) = await _rScriptService.ExecuteScriptAsync(
-                rScriptPath, _rScriptService.GetRScriptBasePath(), $"-d {AppConfig.SolutionBasePath}");
+                rScriptPath, _rScriptService.GetRScriptBasePath(), $"-d {AppConfig.OutputsDirectoryPath}");
 
             ScriptOutput = output;
             ShowScriptOutput = true;

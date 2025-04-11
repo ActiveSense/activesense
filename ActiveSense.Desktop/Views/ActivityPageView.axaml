@@ -6,10 +6,19 @@
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.ActivityPageView"
-             x:DataType="viewModels:ActivityPageViewModel">
+             x:DataType="viewModels:AnalysisPageViewModel">
     <ScrollViewer>
         <StackPanel>
-        <TextBox>test</TextBox>
+            <TextBox>test</TextBox>
+            <ListBox Grid.Column="1" ItemsSource="{Binding ResultFiles}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding FileName}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
