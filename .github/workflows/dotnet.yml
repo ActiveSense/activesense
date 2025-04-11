@@ -1,0 +1,42 @@
+name: Run Unit Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '4.3.0'
+    
+    # - name: Install R packages
+    #   run: |
+    #     Rscript -e 'install.packages(c("GENEAread", "GENEAclassify", "scales", "reshape2", "future", "promises", "versions"), repos="https://cloud.r-project.org/")'
+    
+    - name: Restore dependencies
+      run: |
+        dotnet restore ActiveSense.Desktop/ActiveSense.Desktop.sln
+      
+    - name: Build
+      run: |
+        dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --no-restore
+      
+    - name: Test
+      run: |
+        dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
+      env:
+        R_HOME: ${{ runner.temp }}/R
