@@ -9,8 +9,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop;
@@ -26,14 +24,6 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Configure LiveCharts
-        LiveCharts.Configure(config =>
-            config
-                .AddSkiaSharp()
-                .AddDefaultMappers()
-                .AddLightTheme());
-
-        // Set up dependency injection
         var services = new ServiceCollection();
         
         // Register factories
@@ -46,7 +36,10 @@ public class App : Application
         
         // Register parsers
         services.AddTransient<GeneActiveResultParser>();
-        // Add other parsers as needed
+
+        // Register services
+        services.AddSingleton<IScriptService, RScriptService>();
+        services.AddSingleton<SharedDataService>();
         
         // Register view models
         services.AddTransient<MainWindowViewModel>();
@@ -56,7 +49,6 @@ public class App : Application
         services.AddTransient<GeneralPageViewModel>();
         services.AddTransient<ProcessViewModel>();
         
-        // Build service provider
         Services = services.BuildServiceProvider();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

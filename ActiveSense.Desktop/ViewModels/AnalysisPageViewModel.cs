@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;
+using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ namespace ActiveSense.Desktop.ViewModels;
 public partial class AnalysisPageViewModel : ViewModelBase
 {
     private readonly IResultParserFactory _resultParserFactory;
+    private readonly SharedDataService _sharedDataService;
 
     [ObservableProperty] private string _title = "Sleep";
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
@@ -22,10 +24,10 @@ public partial class AnalysisPageViewModel : ViewModelBase
 
     public AnalysisPageViewModel(
         IResultParserFactory resultParserFactory,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider, SharedDataService sharedDataService)
     {
         _resultParserFactory = resultParserFactory;
-        
+        _sharedDataService = sharedDataService;
         // Create TabItems using dependency injection
         TabItems = new ObservableCollection<TabItemTemplate>
         {
@@ -38,6 +40,11 @@ public partial class AnalysisPageViewModel : ViewModelBase
         };
         
         LoadResultFilesCommand.Execute(null);
+    }
+    
+    partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
+    {
+        _sharedDataService.UpdateSelectedAnalyses(value);
     }
 
     [RelayCommand]

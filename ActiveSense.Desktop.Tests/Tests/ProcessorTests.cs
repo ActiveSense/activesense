@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,9 +79,10 @@ public class ProcessorTests
         var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output");
         var results = await parser.ParseResultsAsync(outputDirectory);
 
-        Assert.That(results.Count(), Is.EqualTo(1), "No results found in the output directory");
+        var enumerable = results as Analysis[] ?? results.ToArray();
+        Assert.That(enumerable.Length, Is.EqualTo(1), "No results found in the output directory");
 
-        foreach (var result in results)
+        foreach (var result in enumerable)
         {
             Console.WriteLine($"Name: {result.FileName}, Type: {result.FileName}");
             foreach (var record in result.ActivityRecords)

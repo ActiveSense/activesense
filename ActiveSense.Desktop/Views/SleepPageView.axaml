@@ -2,7 +2,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ActiveSense.Desktop.Views.SleepPageView">
-    Sleep
+             x:Class="ActiveSense.Desktop.Views.SleepPageView"
+             x:DataType="viewModels:SleepPageViewModel">
+    <StackPanel>
+        <TextBlock>Sleep</TextBlock>
+        <ListBox ItemsSource="{Binding SelectedAnalyses}" MaxHeight="300">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="5">
+                        <TextBlock Text="{Binding FileName}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>    </StackPanel>
 </UserControl>
