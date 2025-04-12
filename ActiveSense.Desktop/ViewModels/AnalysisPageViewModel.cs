@@ -1,35 +1,42 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Threading.Tasks;
-using ActiveSense.Desktop;
+using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
-using Avalonia;
+using ActiveSense.Desktop.Sensors;
 using CommunityToolkit.Mvvm.ComponentModel;
-using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop.ViewModels;
 
 public partial class AnalysisPageViewModel : ViewModelBase
 {
-    private readonly IResultParserService _resultParserService;
+    private readonly IResultParserFactory _resultParserFactory;
 
     [ObservableProperty] private string _title = "Sleep";
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
 
-    public ObservableCollection<TabItemTemplate> TabItems { get; } = new ObservableCollection<TabItemTemplate>
-    {
-        new TabItemTemplate("Sleep", typeof(SleepPageViewModel), new SleepPageViewModel()),
-        new TabItemTemplate("Activity", typeof(ActivityPageViewModel), new ActivityPageViewModel()),
-        new TabItemTemplate("General", typeof(GeneralPageViewModel), new GeneralPageViewModel()),
-    };
+    public ObservableCollection<TabItemTemplate> TabItems { get; } 
 
-    public AnalysisPageViewModel()
+    public AnalysisPageViewModel(
+        IResultParserFactory resultParserFactory,
+        IServiceProvider serviceProvider)
     {
-        _resultParserService = new ResultParserService();
+        _resultParserFactory = resultParserFactory;
+        
+        // Create TabItems using dependency injection
+        TabItems = new ObservableCollection<TabItemTemplate>
+        {
+            new TabItemTemplate("Sleep", typeof(SleepPageViewModel), 
+                serviceProvider.GetRequiredService<SleepPageViewModel>()),
+            new TabItemTemplate("Activity", typeof(ActivityPageViewModel), 
+                serviceProvider.GetRequiredService<ActivityPageViewModel>()),
+            new TabItemTemplate("General", typeof(GeneralPageViewModel), 
+                serviceProvider.GetRequiredService<GeneralPageViewModel>()),
+        };
+        
         LoadResultFilesCommand.Execute(null);
     }
 
@@ -39,7 +46,8 @@ public partial class AnalysisPageViewModel : ViewModelBase
         Console.WriteLine("Loading result files...");
         try
         {
-            var files = await _resultParserService.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+            var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
 
             foreach (var file in files)

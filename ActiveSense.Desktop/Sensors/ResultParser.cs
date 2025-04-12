@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
 
-namespace ActiveSense.Desktop.Services;
+namespace ActiveSense.Desktop.Sensors;
 
-public interface IResultParserService
+public interface IResultParser
 {
     Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory);
 }
 
-public class ResultParserService : IResultParserService
+public class GeneActiveResultParser : IResultParser
 {
     public async Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory)
     {
