@@ -41,7 +41,7 @@ public class App : Application
         collection.AddSingleton<SharedDataService>();
         
         // Register view models
-        collection.AddTransient<MainViewModel>();
+        collection.AddSingleton<MainViewModel>();
         collection.AddTransient<DialogService>();
         collection.AddTransient<DialogViewModel>();
         collection.AddTransient<ProcessDialogViewModel>();
@@ -53,7 +53,7 @@ public class App : Application
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
-            ApplicationPageNames.Analyse => x.GetRequiredService<AnalysisPageViewModel>(),
+            ApplicationPageNames.Analyse => x.GetRequiredService<ViewModels.AnalysisPageViewModel>(),
             ApplicationPageNames.Upload => x.GetRequiredService<ProcessPageViewModel>(),
             ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
             ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),

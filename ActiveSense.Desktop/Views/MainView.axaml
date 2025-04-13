@@ -13,8 +13,9 @@
         Title="ActiveSense.Desktop">
 
     <Design.DataContext>
-        <vm:MainViewModel />
+        <vm:MainViewModel/>
     </Design.DataContext>
+    
     <Grid>
         <controls:NavigationView PaneDisplayMode="LeftCompact"
                                  MenuItemsSource="{Binding Items}"
@@ -32,10 +33,9 @@
                 </DataTemplate>
             </controls:NavigationView.MenuItemTemplate>
         </controls:NavigationView>
-        <Grid IsVisible="{Binding Dialog.IsDialogOpen, FallbackValue=false}">
+        <Grid IsVisible="{Binding Dialog.IsDialogOpen, FallbackValue=False}">
             <Border Background="Transparent" Opacity="2"></Border>
             <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
-
 </Window>

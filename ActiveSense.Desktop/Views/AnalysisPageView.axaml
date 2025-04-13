@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:global="clr-namespace:"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.AnalysisPageView"
              x:DataType="viewModels:AnalysisPageViewModel">

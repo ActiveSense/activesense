@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.ViewModels;

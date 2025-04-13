@@ -14,13 +14,13 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class ProcessPageViewModel : PageViewModel
+public partial class ProcessPageViewModel(
+    ISensorProcessorFactory sensorProcessorFactory,
+    IScriptService scriptService,
+    MainViewModel mainViewModel,
+    DialogService dialogService)
+    : PageViewModel
 {
-    private readonly ISensorProcessorFactory _sensorProcessorFactory;
-    private readonly IScriptService _scriptService;
-    private readonly MainViewModel _mainViewModel;
-    private readonly DialogService _dialogService;
-    
     [ObservableProperty] private bool _isProcessing;
     [ObservableProperty] private string _scriptOutput = string.Empty;
     [ObservableProperty] private SensorType _selectedSensorType = SensorType.GENEActiv;
@@ -30,15 +30,6 @@ public partial class ProcessPageViewModel : PageViewModel
 
     public Interaction<string, string[]?> SelectFilesInteraction { get; } = new();
 
-    public ProcessPageViewModel(ISensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, MainViewModel mainViewModel, DialogService dialogService)
-    {
-        PageName = ApplicationPageNames.Upload;
-        _sensorProcessorFactory = sensorProcessorFactory;
-        _scriptService = scriptService;
-        _mainViewModel = mainViewModel;
-        _dialogService = dialogService;
-        
-    }
     [RelayCommand]
     private async Task SelectFilesAsync()
     {
@@ -56,15 +47,14 @@ public partial class ProcessPageViewModel : PageViewModel
     [RelayCommand]
     public async Task TriggerDialog()
     {
-        
         var dialog = new ProcessDialogViewModel
         {
             Title = "Confirm",
             Message = "Are you sure you want to process the selected files?",
         };
         
-        await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, dialog);
-
+        await dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(mainViewModel, dialog);
+        
         if (!dialog.Confirmed)
         {
             Console.WriteLine("Dialog was cancelled");
@@ -81,14 +71,14 @@ public partial class ProcessPageViewModel : PageViewModel
             return;
         }
 
-        var processor = _sensorProcessorFactory.CreateProcessor(SelectedSensorType);
+        var processor = sensorProcessorFactory.CreateProcessor(SelectedSensorType);
         
         IsProcessing = true;
         StatusMessage = "Processing files...";
 
         try
         {
-            var destinationDirectory = _scriptService.GetScriptInputPath();
+            var destinationDirectory = scriptService.GetScriptInputPath();
             var success = await FileService.CopyFilesToDirectoryAsync(SelectedFiles, destinationDirectory);
 
             if (!success)

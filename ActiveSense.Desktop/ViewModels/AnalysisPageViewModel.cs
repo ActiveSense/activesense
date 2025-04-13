@@ -8,7 +8,6 @@ using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop.ViewModels;
 
@@ -16,34 +15,37 @@ public partial class AnalysisPageViewModel : PageViewModel
 {
     private readonly IResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
+    private readonly PageFactory _pageFactory;
 
     [ObservableProperty] private string _title = "Sleep";
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
 
-    public ObservableCollection<TabItemTemplate> TabItems { get; } 
+    public ObservableCollection<TabItemTemplate> TabItems { get; }
 
     public AnalysisPageViewModel(
         IResultParserFactory resultParserFactory,
-        IServiceProvider serviceProvider, SharedDataService sharedDataService)
+        PageFactory pageFactory,
+        SharedDataService sharedDataService)
     {
         PageName = ApplicationPageNames.Analyse;
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
-        // Create TabItems using dependency injection
+        _pageFactory = pageFactory;
+
         TabItems = new ObservableCollection<TabItemTemplate>
         {
-            new TabItemTemplate("Sleep", typeof(SleepPageViewModel), 
-                serviceProvider.GetRequiredService<SleepPageViewModel>()),
-            new TabItemTemplate("Activity", typeof(ActivityPageViewModel), 
-                serviceProvider.GetRequiredService<ActivityPageViewModel>()),
-            new TabItemTemplate("General", typeof(GeneralPageViewModel), 
-                serviceProvider.GetRequiredService<GeneralPageViewModel>()),
+            new TabItemTemplate("Sleep", ApplicationPageNames.Sleep,
+                _pageFactory.GetPageViewModel(ApplicationPageNames.Sleep)),
+            new TabItemTemplate("Activity", ApplicationPageNames.Activity,
+                _pageFactory.GetPageViewModel(ApplicationPageNames.Activity)),
+            new TabItemTemplate("General", ApplicationPageNames.General,
+                _pageFactory.GetPageViewModel(ApplicationPageNames.General)),
         };
-        
+
         LoadResultFilesCommand.Execute(null);
     }
-    
+
     partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
@@ -73,15 +75,14 @@ public partial class AnalysisPageViewModel : PageViewModel
 
 public class TabItemTemplate
 {
-    public TabItemTemplate(string name, Type modelType, ViewModelBase page)
+    public TabItemTemplate(string name, ApplicationPageNames pageName, ViewModelBase page)
     {
         Name = name;
-        ModelType = modelType;
+        PageName = pageName;
         Page = page;
     }
 
     public string Name { get; set; }
-    public Type ModelType { get; set; }
-
+    public ApplicationPageNames PageName { get; set; }
     public ViewModelBase Page { get; }
 }
