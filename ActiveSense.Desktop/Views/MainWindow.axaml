@@ -15,47 +15,27 @@
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
-
-    <!-- <SplitView IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="200" CompactPaneLength="48" -->
-    <!--            DisplayMode="CompactInline"> -->
-    <!--     <SplitView.Pane> -->
-    <!--         <StackPanel Spacing="5" Margin="5"> -->
-    <!--             <Button Margin="2" Command="{Binding TriggerPaneCommand}"> -->
-    <!--                 <PathIcon Data="{StaticResource AppsListRegular}" /> -->
-    <!--             </Button> -->
-    <!--             <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"> -->
-    <!--                 <ListBox.ItemTemplate> -->
-    <!--                     <DataTemplate> -->
-    <!--                         <StackPanel Spacing="15" Orientation="Horizontal"> -->
-    <!--                             <PathIcon Data="{Binding ListItemIcon}" /> -->
-    <!--                             <TextBlock Text="{Binding Name}" /> -->
-    <!--                         </StackPanel> -->
-    <!--                     </DataTemplate> -->
-    <!--                 </ListBox.ItemTemplate> -->
-    <!--             </ListBox> -->
-    <!--         </StackPanel> -->
-    <!--     </SplitView.Pane> -->
-    <!-- -->
-    <!--     <SplitView.Content> -->
-    <!--         ~1~ <TransitioningContentControl Content="{Binding  ActivePage}" /> @1@ -->
-    <!-- -->
-    <!--     </SplitView.Content> -->
-    <!-- </SplitView> -->
-    <controls:NavigationView PaneDisplayMode="LeftCompact"
-                             MenuItemsSource="{Binding Items}"
-                             Content="{Binding ActivePage}"
-                             SelectedItem="{Binding SelectedItem}"
-                             IsSettingsVisible="False"
-                             PaneTitle="{Binding Title}">
-        <controls:NavigationView.MenuItemTemplate>
-            <DataTemplate DataType="{x:Type vm:ListItemTemplate}">
-                <controls:NavigationViewItem Content="{Binding Name}">
-                    <controls:NavigationViewItem.IconSource>
-                        <controls:PathIconSource Data="{Binding ListItemIcon}" />
-                    </controls:NavigationViewItem.IconSource>
-                </controls:NavigationViewItem>
-            </DataTemplate>
-        </controls:NavigationView.MenuItemTemplate>
-    </controls:NavigationView>
+    <Grid>
+        <controls:NavigationView PaneDisplayMode="LeftCompact"
+                                 MenuItemsSource="{Binding Items}"
+                                 Content="{Binding ActivePage}"
+                                 SelectedItem="{Binding SelectedItem}"
+                                 IsSettingsVisible="False"
+                                 PaneTitle="{Binding Title}">
+            <controls:NavigationView.MenuItemTemplate>
+                <DataTemplate DataType="{x:Type vm:ListItemTemplate}">
+                    <controls:NavigationViewItem Content="{Binding Name}">
+                        <controls:NavigationViewItem.IconSource>
+                            <controls:PathIconSource Data="{Binding ListItemIcon}" />
+                        </controls:NavigationViewItem.IconSource>
+                    </controls:NavigationViewItem>
+                </DataTemplate>
+            </controls:NavigationView.MenuItemTemplate>
+        </controls:NavigationView>
+        <Grid>
+            <Border Background="Black"></Border>
+            <ContentControl Content="{Binding CurrentDialog}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
 
 </Window>
