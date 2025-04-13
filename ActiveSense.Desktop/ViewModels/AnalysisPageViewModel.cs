@@ -13,7 +13,7 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class AnalysisPageViewModel : PageViewModel
 {
-    private readonly IResultParserFactory _resultParserFactory;
+    private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
     private readonly PageFactory _pageFactory;
 
@@ -24,7 +24,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     public ObservableCollection<TabItemTemplate> TabItems { get; }
 
     public AnalysisPageViewModel(
-        IResultParserFactory resultParserFactory,
+        ResultParserFactory resultParserFactory,
         PageFactory pageFactory,
         SharedDataService sharedDataService)
     {
@@ -57,7 +57,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         Console.WriteLine("Loading result files...");
         try
         {
-            var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+            var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
 

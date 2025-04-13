@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
@@ -26,15 +27,26 @@ public class App : Application
         var collection = new ServiceCollection();
         
         // Register factories
-        collection.AddSingleton<IResultParserFactory, ResultParserFactory>();
-        collection.AddSingleton<ISensorProcessorFactory, SensorProcessorFactory>();
+        collection.AddSingleton<ResultParserFactory>();
+        collection.AddSingleton<SensorProcessorFactory>();
         collection.AddSingleton<PageFactory>();
         
         // Register processors
         collection.AddSingleton<GeneActivProcessor>();
         
+        // Register processors 
+        collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
+            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+        });
+
         // Register parsers
-        collection.AddSingleton<GeneActiveResultParser>();
+        collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+        });
 
         // Register services
         collection.AddSingleton<IScriptService, RScriptService>();

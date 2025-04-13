@@ -1,43 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 
 namespace ActiveSense.Desktop.Factories;
 
-public interface ISensorProcessorFactory
+public class SensorProcessorFactory(Func<SensorTypes, ISensorProcessor> processorFactory)
 {
-    ISensorProcessor CreateProcessor(SensorType type);
-    IEnumerable<ISensorProcessor> GetAllProcessors();
-}
-
-public class SensorProcessorFactory : ISensorProcessorFactory
-{
-    private readonly IServiceProvider _serviceProvider;
-    private readonly Dictionary<SensorType, Type> _processorTypes;
-
-    public SensorProcessorFactory(IServiceProvider serviceProvider)
+    public ISensorProcessor CreateProcessor(SensorTypes types)
     {
-        _serviceProvider = serviceProvider;
-        _processorTypes = new Dictionary<SensorType, Type>
-        {
-            { SensorType.GENEActiv, typeof(GeneActivProcessor) },
-        };
-    }
-
-    public ISensorProcessor CreateProcessor(SensorType type)
-    {
-        if (!_processorTypes.TryGetValue(type, out var processorType))
-        {
-            throw new ArgumentException($"No processor found for sensor type {type}");
-        }
-
-        return (ISensorProcessor)_serviceProvider.GetService(processorType);
-    }
-
-    public IEnumerable<ISensorProcessor> GetAllProcessors()
-    {
-        return _processorTypes.Keys
-            .Select(type => CreateProcessor(type));
+        return processorFactory(types);
     }
 }

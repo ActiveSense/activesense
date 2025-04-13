@@ -18,7 +18,7 @@ public class SharedDataService
             SelectedAnalyses.Add(analysis);
         }
         
-        // Notify subscribers that the data has changed
+        // Notify subscribers that the list has changed
         SelectedAnalysesChanged?.Invoke(this, EventArgs.Empty);
     }
 }

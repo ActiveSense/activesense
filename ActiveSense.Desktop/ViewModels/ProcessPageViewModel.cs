@@ -15,7 +15,7 @@ using CommunityToolkit.Mvvm.Input;
 namespace ActiveSense.Desktop.ViewModels;
 
 public partial class ProcessPageViewModel(
-    ISensorProcessorFactory sensorProcessorFactory,
+    SensorProcessorFactory sensorProcessorFactory,
     IScriptService scriptService,
     MainViewModel mainViewModel,
     DialogService dialogService)
@@ -23,7 +23,7 @@ public partial class ProcessPageViewModel(
 {
     [ObservableProperty] private bool _isProcessing;
     [ObservableProperty] private string _scriptOutput = string.Empty;
-    [ObservableProperty] private SensorType _selectedSensorType = SensorType.GENEActiv;
+    [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
     [ObservableProperty] private string[]? _selectedFiles;
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
@@ -71,7 +71,7 @@ public partial class ProcessPageViewModel(
             return;
         }
 
-        var processor = sensorProcessorFactory.CreateProcessor(SelectedSensorType);
+        var processor = sensorProcessorFactory.CreateProcessor(SelectedSensorTypes);
         
         IsProcessing = true;
         StatusMessage = "Processing files...";
