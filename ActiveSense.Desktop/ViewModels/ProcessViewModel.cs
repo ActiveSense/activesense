@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,11 +13,9 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class ProcessViewModel : ViewModelBase
+public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, MainWindowViewModel mainWindowViewModel, DialogService dialogService)
+    : ViewModelBase
 {
-    private readonly ISensorProcessorFactory _sensorProcessorFactory;
-    private readonly IScriptService _rScriptService;
-    
     [ObservableProperty] private bool _isProcessing;
     [ObservableProperty] private string _scriptOutput = string.Empty;
     [ObservableProperty] private SensorType _selectedSensorType = SensorType.GENEActiv;
@@ -25,12 +24,6 @@ public partial class ProcessViewModel : ViewModelBase
     [ObservableProperty] private string _statusMessage = "No files selected";
 
     public Interaction<string, string[]?> SelectFilesInteraction { get; } = new();
-
-    public ProcessViewModel(ISensorProcessorFactory sensorProcessorFactory, IScriptService scriptService)
-    {
-        _sensorProcessorFactory = sensorProcessorFactory;
-        _rScriptService = scriptService;
-    }
 
     [RelayCommand]
     private async Task SelectFilesAsync()
@@ -47,22 +40,36 @@ public partial class ProcessViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task TriggerDialog()
+    {
+        
+        var dialog = new ProcessDialogViewModel
+        {
+            Title = "Confirm",
+            Message = "Are you sure you want to process the selected files?",
+        };
+        
+        await dialogService.ShowDialog<MainWindowViewModel, ProcessDialogViewModel>(mainWindowViewModel, dialog);
+    }
+
+    [RelayCommand]
     private async Task ProcessFiles()
     {
+        
         if (SelectedFiles is null || SelectedFiles.Length == 0)
         {
             StatusMessage = "No files selected";
             return;
         }
 
-        var processor = _sensorProcessorFactory.CreateProcessor(SelectedSensorType);
+        var processor = sensorProcessorFactory.CreateProcessor(SelectedSensorType);
         
         IsProcessing = true;
         StatusMessage = "Processing files...";
 
         try
         {
-            var destinationDirectory = _rScriptService.GetScriptInputPath();
+            var destinationDirectory = scriptService.GetScriptInputPath();
             var success = await FileService.CopyFilesToDirectoryAsync(SelectedFiles, destinationDirectory);
 
             if (!success)

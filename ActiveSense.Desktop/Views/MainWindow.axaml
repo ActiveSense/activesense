@@ -32,9 +32,9 @@
                 </DataTemplate>
             </controls:NavigationView.MenuItemTemplate>
         </controls:NavigationView>
-        <Grid>
-            <Border Background="Black"></Border>
-            <ContentControl Content="{Binding CurrentDialog}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Grid IsVisible="{Binding Dialog.IsDialogOpen, FallbackValue=false}">
+            <Border Background="Transparent" Opacity="2"></Border>
+            <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 

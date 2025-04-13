@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase, IDialogProvider
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -18,7 +19,8 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private ViewModelBase _activePage;
     [ObservableProperty] private ListItemTemplate? _selectedItem;
     [ObservableProperty] private string _title = "ActiveSense";
-    [ObservableProperty] private DialogViewModel _currentDialog = new ProcessDialogViewModel();
+    
+    [ObservableProperty] private DialogViewModel _dialog;
 
     public MainWindowViewModel(IServiceProvider serviceProvider)
     {

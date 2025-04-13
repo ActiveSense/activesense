@@ -17,16 +17,16 @@
         <StackPanel>
             <Border BorderThickness="0,0,0,1" BorderBrush="LightGray">
                 <TextBlock
-                    Text="Dateien Analysieren"
+                    Text="{Binding Title}"
                     Padding="10"
-                    FontSize="18"/>
+                    FontSize="12"/>
             </Border>
 
             <Border Padding="20">
                 <StackPanel Spacing="20">
                     
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock TextWrapping="Wrap" Text="{Binding ConfirmText}" />
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Message}" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">

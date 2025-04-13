@@ -42,7 +42,10 @@ public class App : Application
         services.AddSingleton<SharedDataService>();
         
         // Register view models
-        services.AddTransient<MainWindowViewModel>();
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<DialogService>();
+        services.AddTransient<DialogViewModel>();
+        services.AddTransient<ProcessDialogViewModel>();
         services.AddTransient<AnalysisPageViewModel>();
         services.AddTransient<SleepPageViewModel>();
         services.AddTransient<ActivityPageViewModel>();

@@ -31,6 +31,7 @@
                     </ListBox>
                     <TextBlock Text="{Binding StatusMessage}"></TextBlock>
                     <Button Margin="0 20" Command="{Binding ProcessFilesCommand}">Analysieren</Button>
+                    <Button Command="{Binding TriggerDialog}">Dialog</Button>
                     <!-- Output Window -->
                     <Border Grid.Row="1"
                             BorderBrush="LightGray"
