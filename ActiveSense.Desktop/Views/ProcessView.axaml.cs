@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.ViewModels;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 
 namespace ActiveSense.Desktop.Views;
@@ -16,7 +13,6 @@ public partial class ProcessView : UserControl
     public ProcessView()
     {
         InitializeComponent();
-        DataContext = new ProcessViewModel();
     }
     
     // Stores a reference to the disposable in order to clean it up if needed

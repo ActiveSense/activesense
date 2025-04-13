@@ -6,46 +6,19 @@ using System.Threading.Tasks;
 
 namespace ActiveSense.Desktop.Services;
 
-public interface IFileService
+public static class FileService
 {
-    Task<bool> CopyFilesToDirectoryAsync(IEnumerable<string> sourcePaths, string processingDirectory, string outputsDirectory);
-    IEnumerable<string> GetFilesInDirectory(string directory, string searchPattern);
-}
-
-public class FileService : IFileService
-{
-    private readonly string[] _extensionsToExclude = [".csv"]; //exclude from processing
-    private readonly string[] _extensionsToInclude = [".bin"];
-
-    public async Task<bool> CopyFilesToDirectoryAsync(
-        IEnumerable<string> sourcePaths, string processingDirectory, string outputsDirectory)
+    public static async Task<bool> CopyFilesToDirectoryAsync(
+        IEnumerable<string> sourcePaths, string destinationDirectory)
     {
         try
         {
-            Directory.CreateDirectory(processingDirectory);
-            Directory.CreateDirectory(outputsDirectory);
+            Directory.CreateDirectory(destinationDirectory);
             
             foreach (var sourcePath in sourcePaths)
             {
                 var fileName = Path.GetFileName(sourcePath);
-                var fileExtension = Path.GetExtension(sourcePath);
-                string destinationPath;
-
-                if (_extensionsToExclude.Contains(fileExtension))
-                {
-                    destinationPath = Path.Combine(outputsDirectory, fileName);
-                    Console.WriteLine($"Copying {fileName} to {outputsDirectory}");
-                }
-                else if (_extensionsToInclude.Contains(fileExtension))
-                {
-                    destinationPath = Path.Combine(processingDirectory, fileName);
-                    Console.WriteLine($"Copying {fileName} to {processingDirectory}");
-                }
-                else
-                {
-                    destinationPath = Path.Combine(processingDirectory, fileName);
-                    Console.WriteLine();
-                }
+                string destinationPath = Path.Combine(destinationDirectory, fileName);
 
                 if (File.Exists(destinationPath))
                 {
@@ -59,18 +32,18 @@ public class FileService : IFileService
         }
         catch (Exception e)
         {
-            throw new Exception($"Could not copy files from {processingDirectory} to {outputsDirectory}", e);
+            throw new Exception($"Could not copy files to {destinationDirectory}", e);
         }
     }
 
-    public IEnumerable<string> GetFilesInDirectory(string directory, string searchPattern)
+    public static IEnumerable<string> GetFilesInDirectory(string searchDirectory, string searchPattern)
     {
-        if (!Directory.Exists(directory))
+        if (!Directory.Exists(searchDirectory))
         {
-            Console.WriteLine($"Directory does not exist: {directory}");
+            Console.WriteLine($"Directory does not exist: {searchDirectory}");
             return Array.Empty<string>();
         }
 
-        return Directory.GetFiles(directory, searchPattern);
+        return Directory.GetFiles(searchDirectory, searchPattern);
     }
 }

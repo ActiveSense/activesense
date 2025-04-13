@@ -26,7 +26,7 @@ public static class AppConfig
     /// <summary>
     /// Gets the outputs directory path
     /// </summary>
-    public static string OutputsDirectoryPath => Path.Combine(SolutionBasePath, "outputs");
+    public static string OutputsDirectoryPath => Path.Combine(SolutionBasePath, "AnalysisFiles/");
     
     private static string CalculateSolutionBasePath()
     {
