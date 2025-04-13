@@ -40,7 +40,7 @@ public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFac
     }
 
     [RelayCommand]
-    private async Task TriggerDialog()
+    public async Task TriggerDialog()
     {
         
         var dialog = new ProcessDialogViewModel
@@ -50,6 +50,11 @@ public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFac
         };
         
         await dialogService.ShowDialog<MainWindowViewModel, ProcessDialogViewModel>(mainWindowViewModel, dialog);
+
+        if (!dialog.Confirmed)
+        {
+            Console.WriteLine("Dialog was cancelled");
+        }
     }
 
     [RelayCommand]
