@@ -3,9 +3,9 @@ using FluentAvalonia.UI.Windowing;
 
 namespace ActiveSense.Desktop.Views;
 
-public partial class MainWindow : AppWindow 
+public partial class MainView : AppWindow 
 {
-    public MainWindow()
+    public MainView()
     {
         InitializeComponent();
         

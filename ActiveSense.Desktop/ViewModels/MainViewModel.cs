@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using Avalonia;
@@ -11,34 +12,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase, IDialogProvider
+public partial class MainViewModel(DialogViewModel dialog, PageFactory pageFactory) : ViewModelBase, IDialogProvider
 {
-    private readonly IServiceProvider _serviceProvider;
-
     [ObservableProperty] private bool _isPaneOpen = true;
-    [ObservableProperty] private ViewModelBase _activePage;
+    [ObservableProperty] private PageViewModel _activePage;
     [ObservableProperty] private ListItemTemplate? _selectedItem;
     [ObservableProperty] private string _title = "ActiveSense";
     
-    [ObservableProperty] private DialogViewModel _dialog;
-
-    public MainWindowViewModel(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        ActivePage = _serviceProvider.GetRequiredService<AnalysisPageViewModel>();
-    }
+    [ObservableProperty] private DialogViewModel _dialog = dialog;
 
     partial void OnSelectedItemChanged(ListItemTemplate? value)
     {
         if (value is null) return;
-        ActivePage = (ViewModelBase)
-            _serviceProvider.GetRequiredService(value.ModelType);
+        ActivePage = (PageViewModel)
+            pageFactory.GetPageViewModel(ApplicationPageNames.Upload);
     }
 
     public ObservableCollection<ListItemTemplate> Items { get; } = new ObservableCollection<ListItemTemplate>
     {
         new ListItemTemplate("Analysis", typeof(AnalysisPageViewModel), "DataHistogramRegular"),
-        new ListItemTemplate("Upload", typeof(ProcessViewModel), "DataBarVerticalAddRegular"),
+        new ListItemTemplate("Upload", typeof(ProcessPageViewModel), "DataBarVerticalAddRegular"),
     };
 
     [RelayCommand]

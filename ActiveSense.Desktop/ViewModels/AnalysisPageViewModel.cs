@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class AnalysisPageViewModel : ViewModelBase
+public partial class AnalysisPageViewModel : PageViewModel
 {
     private readonly IResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
@@ -26,6 +27,7 @@ public partial class AnalysisPageViewModel : ViewModelBase
         IResultParserFactory resultParserFactory,
         IServiceProvider serviceProvider, SharedDataService sharedDataService)
     {
+        PageName = ApplicationPageNames.Analyse;
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
         // Create TabItems using dependency injection

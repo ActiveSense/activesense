@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Helpers;
 using ActiveSense.Desktop.Sensors;
@@ -13,9 +14,13 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, MainWindowViewModel mainWindowViewModel, DialogService dialogService)
-    : ViewModelBase
+public partial class ProcessPageViewModel : PageViewModel
 {
+    private readonly ISensorProcessorFactory _sensorProcessorFactory;
+    private readonly IScriptService _scriptService;
+    private readonly MainViewModel _mainViewModel;
+    private readonly DialogService _dialogService;
+    
     [ObservableProperty] private bool _isProcessing;
     [ObservableProperty] private string _scriptOutput = string.Empty;
     [ObservableProperty] private SensorType _selectedSensorType = SensorType.GENEActiv;
@@ -25,6 +30,15 @@ public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFac
 
     public Interaction<string, string[]?> SelectFilesInteraction { get; } = new();
 
+    public ProcessPageViewModel(ISensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, MainViewModel mainViewModel, DialogService dialogService)
+    {
+        PageName = ApplicationPageNames.Upload;
+        _sensorProcessorFactory = sensorProcessorFactory;
+        _scriptService = scriptService;
+        _mainViewModel = mainViewModel;
+        _dialogService = dialogService;
+        
+    }
     [RelayCommand]
     private async Task SelectFilesAsync()
     {
@@ -49,7 +63,7 @@ public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFac
             Message = "Are you sure you want to process the selected files?",
         };
         
-        await dialogService.ShowDialog<MainWindowViewModel, ProcessDialogViewModel>(mainWindowViewModel, dialog);
+        await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, dialog);
 
         if (!dialog.Confirmed)
         {
@@ -67,14 +81,14 @@ public partial class ProcessViewModel(ISensorProcessorFactory sensorProcessorFac
             return;
         }
 
-        var processor = sensorProcessorFactory.CreateProcessor(SelectedSensorType);
+        var processor = _sensorProcessorFactory.CreateProcessor(SelectedSensorType);
         
         IsProcessing = true;
         StatusMessage = "Processing files...";
 
         try
         {
-            var destinationDirectory = scriptService.GetScriptInputPath();
+            var destinationDirectory = _scriptService.GetScriptInputPath();
             var success = await FileService.CopyFilesToDirectoryAsync(SelectedFiles, destinationDirectory);
 
             if (!success)

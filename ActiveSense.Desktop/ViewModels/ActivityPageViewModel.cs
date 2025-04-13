@@ -4,7 +4,7 @@ using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public class ActivityPageViewModel : ViewModelBase
+public class ActivityPageViewModel : PageViewModel
 {
     public ISeries[] Series { get; set; } = [
         new ColumnSeries<int>(3, 4, 2),

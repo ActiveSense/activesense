@@ -8,9 +8,9 @@ using Avalonia.Platform.Storage;
 
 namespace ActiveSense.Desktop.Views;
 
-public partial class ProcessView : UserControl
+public partial class ProcessPageView : UserControl
 {
-    public ProcessView()
+    public ProcessPageView()
     {
         InitializeComponent();
     }
@@ -26,7 +26,7 @@ public partial class ProcessView : UserControl
         // Dispose any old handler
         _selectFilesInteractionDisposable?.Dispose();
 
-        if (DataContext is ProcessViewModel vm)
+        if (DataContext is ProcessPageViewModel vm)
         {
             // register the interaction handler
             _selectFilesInteractionDisposable =
