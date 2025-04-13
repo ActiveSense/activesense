@@ -15,12 +15,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty] private bool _isPaneOpen = true;
-
     [ObservableProperty] private ViewModelBase _activePage;
-
     [ObservableProperty] private ListItemTemplate? _selectedItem;
-
     [ObservableProperty] private string _title = "ActiveSense";
+    [ObservableProperty] private DialogViewModel _currentDialog = new ProcessDialogViewModel();
 
     public MainWindowViewModel(IServiceProvider serviceProvider)
     {
