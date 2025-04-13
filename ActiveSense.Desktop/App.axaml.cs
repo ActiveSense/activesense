@@ -34,19 +34,8 @@ public class App : Application
         // Register processors
         collection.AddSingleton<GeneActivProcessor>();
         
-        // Register processors 
-        collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
-        {
-            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
-            _ => throw new ArgumentException($"No processor found for sensor type {type}")
-        });
-
         // Register parsers
-        collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
-        {
-            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
-            _ => throw new ArgumentException($"No parser found for sensor type {type}")
-        });
+        collection.AddSingleton<GeneActiveResultParser>();
 
         // Register services
         collection.AddSingleton<IScriptService, RScriptService>();
@@ -71,6 +60,20 @@ public class App : Application
             ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
             ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),
             _ => throw new InvalidOperationException(),
+        });
+        
+        // Register processors 
+        collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
+            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+        });
+
+        // Register parsers
+        collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new ArgumentException($"No parser found for sensor type {type}")
         });
         
         var services = collection.BuildServiceProvider();

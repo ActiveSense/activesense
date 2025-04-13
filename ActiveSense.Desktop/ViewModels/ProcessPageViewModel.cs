@@ -71,7 +71,7 @@ public partial class ProcessPageViewModel(
             return;
         }
 
-        var processor = sensorProcessorFactory.CreateProcessor(SelectedSensorTypes);
+        var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
         
         IsProcessing = true;
         StatusMessage = "Processing files...";

@@ -9,7 +9,7 @@ namespace ActiveSense.Desktop.Factories;
 
 public class SensorProcessorFactory(Func<SensorTypes, ISensorProcessor> processorFactory)
 {
-    public ISensorProcessor CreateProcessor(SensorTypes types)
+    public ISensorProcessor GetSensorProcessor(SensorTypes types)
     {
         return processorFactory(types);
     }
