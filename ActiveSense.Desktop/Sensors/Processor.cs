@@ -7,8 +7,6 @@ using ActiveSense.Desktop.Services;
 
 namespace ActiveSense.Desktop.Sensors
 {
- 
-
     public class GeneActivProcessor : ISensorProcessor
     {
         private readonly IScriptService _rScriptService;

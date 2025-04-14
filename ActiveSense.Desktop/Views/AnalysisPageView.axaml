@@ -11,32 +11,35 @@
              x:DataType="viewModels:AnalysisPageViewModel">
     <Grid ColumnDefinitions="3*, *" RowDefinitions="Auto,*">
         <controls:TabView Grid.Row="0" Grid.Column="0"
-                    AddTabButtonCommandParameter="Normal"
-                    IsAddTabButtonVisible="False"
-                    TabItems="{Binding TabItems}"
-                    CanDragTabs="False"
-                    AllowDropTabs="False">
+                          AddTabButtonCommandParameter="Normal"
+                          IsAddTabButtonVisible="False"
+                          TabItems="{Binding TabItems}"
+                          CanDragTabs="False"
+                          AllowDropTabs="False">
             <controls:TabView.TabItemTemplate>
                 <DataTemplate x:DataType="viewModels:TabItemTemplate">
                     <controls:TabViewItem Header="{Binding Name}"
-                                    Content="{Binding Page}"
-                                    IsClosable="False" />
+                                          Content="{Binding Page}"
+                                          IsClosable="False" />
                 </DataTemplate>
             </controls:TabView.TabItemTemplate>
         </controls:TabView>
         <Border Grid.Row="0" Grid.Column="1">
             <StackPanel>
-                <TextBlock>Files</TextBlock>
-                <ListBox ItemsSource="{Binding ResultFiles}" SelectionMode="Multiple"
-                         SelectionChanged="OnSelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding FileName}"></TextBlock>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <TextBlock FontSize="20">Analysen</TextBlock>
+                <Border BorderThickness="1" BorderBrush="LightGray" MinHeight="200" CornerRadius="10"
+                        Margin="0,10,10,20">
+                    <ListBox ItemsSource="{Binding ResultFiles}" SelectionMode="Multiple"
+                             SelectionChanged="OnSelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
                 <TextBlock>Selected</TextBlock>
                 <ListBox ItemsSource="{Binding SelectedAnalyses}">
                     <ListBox.ItemTemplate>
