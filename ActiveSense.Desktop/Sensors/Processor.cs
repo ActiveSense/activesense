@@ -13,7 +13,7 @@ namespace ActiveSense.Desktop.Sensors
     {
         private readonly IScriptService _rScriptService;
 
-        public SensorTypes SupportedTypes => SensorTypes.GENEActiv;
+        public SensorTypes SupportedType => SensorTypes.GENEActiv;
 
         public static string[] SupportedFileTypes => new[] { ".csv", ".bin" };
 

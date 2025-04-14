@@ -6,8 +6,5 @@ namespace ActiveSense.Desktop.Factories;
 
 public class ResultParserFactory(Func<SensorTypes, IResultParser> parserFactory)
 {
-    public IResultParser GetParser(SensorTypes sensorTypes)
-    {
-        return parserFactory(sensorTypes);
-    }
+    public IResultParser GetParser(SensorTypes sensorType) => parserFactory.Invoke(sensorType);
 }

@@ -28,12 +28,12 @@ public partial class ProcessPageViewModel(
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
 
-    public Interaction<string, string[]?> SelectFilesInteraction { get; } = new();
+    public InteractionService<string, string[]?> SelectFilesInteractionService { get; } = new();
 
     [RelayCommand]
     private async Task SelectFilesAsync()
     {
-        SelectedFiles = await SelectFilesInteraction.HandleAsync("Select files to process");
+        SelectedFiles = await SelectFilesInteractionService.HandleAsync("Select files to process");
         if (SelectedFiles != null && SelectedFiles.Length > 0)
         {
             StatusMessage = $"{SelectedFiles.Length} file(s) selected";

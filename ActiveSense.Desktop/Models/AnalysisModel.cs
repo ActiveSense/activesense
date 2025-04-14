@@ -4,13 +4,6 @@ using CsvHelper.Configuration.Attributes;
 
 namespace ActiveSense.Desktop.Models;
 
-public enum AnalysisType
-{
-    Sleep,
-    Activity,
-    Unknown,
-}
-
 public class Analysis
 {
     public string FilePath { get; set; }

@@ -5,6 +5,6 @@ namespace ActiveSense.Desktop.Interfaces;
 
 public interface ISensorProcessor
 {
-    SensorTypes SupportedTypes { get; }
+    SensorTypes SupportedType { get; }
     Task<(bool Success, string Output, string Error)> ProcessAsync(string arguments);
 }

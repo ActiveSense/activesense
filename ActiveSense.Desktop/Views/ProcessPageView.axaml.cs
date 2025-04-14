@@ -30,7 +30,7 @@ public partial class ProcessPageView : UserControl
         {
             // register the interaction handler
             _selectFilesInteractionDisposable =
-                vm.SelectFilesInteraction.RegisterHandler(InteractionHandler);
+                vm.SelectFilesInteractionService.RegisterHandler(InteractionHandler);
         }
 
         base.OnDataContextChanged(e);
