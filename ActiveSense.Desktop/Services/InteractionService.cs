@@ -8,7 +8,7 @@ namespace ActiveSense.Desktop.Helpers;
 /// Simple implementation of Interaction pattern from ReactiveUI framework.
 /// https://www.reactiveui.net/docs/handbook/interactions/
 /// </summary>
-public sealed class Interaction<TInput, TOutput> : IDisposable, ICommand
+public sealed class InteractionService<TInput, TOutput> : IDisposable, ICommand
 {
     // this is a reference to the registered interaction handler.
     private Func<TInput, Task<TOutput>>? _handler;

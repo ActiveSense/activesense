@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class SleepPageViewModel : ViewModelBase
+public partial class SleepPageViewModel : PageViewModel
 {
     private readonly SharedDataService _sharedDataService;
     

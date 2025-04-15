@@ -4,15 +4,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
 
 namespace ActiveSense.Desktop.Sensors;
-
-public interface IResultParser
-{
-    Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory);
-}
 
 public class GeneActiveResultParser : IResultParser
 {

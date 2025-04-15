@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
@@ -15,8 +17,6 @@ namespace ActiveSense.Desktop;
 
 public class App : Application
 {
-    public static IServiceProvider Services { get; private set; }
-
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -24,32 +24,59 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var services = new ServiceCollection();
+        var collection = new ServiceCollection();
         
         // Register factories
-        services.AddSingleton<IResultParserFactory, ResultParserFactory>();
-        services.AddSingleton<ISensorProcessorFactory, SensorProcessorFactory>();
+        collection.AddSingleton<ResultParserFactory>();
+        collection.AddSingleton<SensorProcessorFactory>();
+        collection.AddSingleton<PageFactory>();
         
         // Register processors
-        services.AddTransient<GeneActivProcessor>();
-        // Add other processors as needed
+        collection.AddSingleton<GeneActivProcessor>();
         
         // Register parsers
-        services.AddTransient<GeneActiveResultParser>();
+        collection.AddSingleton<GeneActiveResultParser>();
 
         // Register services
-        services.AddSingleton<IScriptService, RScriptService>();
-        services.AddSingleton<SharedDataService>();
+        collection.AddSingleton<IScriptService, RScriptService>();
+        collection.AddSingleton<SharedDataService>();
         
         // Register view models
-        services.AddTransient<MainWindowViewModel>();
-        services.AddTransient<AnalysisPageViewModel>();
-        services.AddTransient<SleepPageViewModel>();
-        services.AddTransient<ActivityPageViewModel>();
-        services.AddTransient<GeneralPageViewModel>();
-        services.AddTransient<ProcessViewModel>();
+        collection.AddSingleton<MainViewModel>();
+        collection.AddTransient<DialogService>();
+        collection.AddTransient<DialogViewModel>();
+        collection.AddTransient<ProcessDialogViewModel>();
+        collection.AddTransient<AnalysisPageViewModel>();
+        collection.AddTransient<SleepPageViewModel>();
+        collection.AddTransient<ActivityPageViewModel>();
+        collection.AddTransient<GeneralPageViewModel>();
+        collection.AddTransient<ProcessPageViewModel>();
+
+        collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
+        {
+            ApplicationPageNames.Analyse => x.GetRequiredService<ViewModels.AnalysisPageViewModel>(),
+            ApplicationPageNames.Upload => x.GetRequiredService<ProcessPageViewModel>(),
+            ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
+            ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
+            ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),
+            _ => throw new InvalidOperationException(),
+        });
         
-        Services = services.BuildServiceProvider();
+        // Register processors 
+        collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
+            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+        });
+
+        // Register parsers
+        collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+        });
+        
+        var services = collection.BuildServiceProvider();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -57,9 +84,9 @@ public class App : Application
             DisableAvaloniaDataAnnotationValidation();
             
             // Use dependency injection to get MainWindowViewModel
-            desktop.MainWindow = new MainWindow
+            desktop.MainWindow = new MainView
             {
-                DataContext = Services.GetRequiredService<MainWindowViewModel>()
+                DataContext = services.GetRequiredService<MainViewModel>()
             };
         }
 

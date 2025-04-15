@@ -1,7 +1,9 @@
 using System;
 using System.Globalization;
 using System.IO;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Tests.Helpers;
 using CsvHelper;
@@ -14,18 +16,31 @@ namespace ActiveSense.Desktop.Tests.Tests;
 public class ResultParserTests
 {
     private Comparer _comparer;
-    private IResultParserFactory _resultParserFactory;
+    private ResultParserFactory _resultParserFactory;
     private ServiceProvider _serviceProvider;
 
     [SetUp]
     public void Setup()
     {
         var services = new ServiceCollection();
+        
+        // Register parsers
         services.AddTransient<GeneActiveResultParser>();
+        
+        // Register factory method for ResultParserFactory
+        services.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+        });
+        
+        // Register the factory that uses the factory method
+        services.AddSingleton<ResultParserFactory>();
         
         _serviceProvider = services.BuildServiceProvider();
 
-        _resultParserFactory = new ResultParserFactory(_serviceProvider);
+        // Get the properly configured factory
+        _resultParserFactory = _serviceProvider.GetRequiredService<ResultParserFactory>();
         
         _comparer = new Comparer();
     }
@@ -33,7 +48,7 @@ public class ResultParserTests
     [Test]
     public void ParseActivityResults()
     {
-        var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
         
         var outputDirectory = AppConfig.OutputsDirectoryPath;
         var results = parser.ParseResultsAsync(outputDirectory);
@@ -63,7 +78,7 @@ public class ResultParserTests
     [Test]
     public void ParseSleepResults()
     {
-        var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
         var outputDirectory = AppConfig.OutputsDirectoryPath;
         var results = parser.ParseResultsAsync(outputDirectory);
 
@@ -92,7 +107,7 @@ public class ResultParserTests
     [Test]
     public void ParseActivityResults_DifferentFiles()
     {
-        var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
         var outputDirectory = AppConfig.OutputsDirectoryPath;
         var results = parser.ParseResultsAsync(outputDirectory);
 
@@ -116,7 +131,7 @@ public class ResultParserTests
     [Test]
     public void ParseSleepResults_DifferentFiles()
     {
-        var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
         var outputDirectory = AppConfig.OutputsDirectoryPath;
         var results = parser.ParseResultsAsync(outputDirectory);
 

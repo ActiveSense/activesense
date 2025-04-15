@@ -1,26 +1,17 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Services;
 
 namespace ActiveSense.Desktop.Sensors
 {
-    public enum SensorType
-    {
-        GENEActiv,
-    }
-
-    public interface ISensorProcessor
-    {
-        SensorType SupportedType { get; }
-        Task<(bool Success, string Output, string Error)> ProcessAsync(string arguments);
-    }
-
     public class GeneActivProcessor : ISensorProcessor
     {
         private readonly IScriptService _rScriptService;
 
-        public SensorType SupportedType => SensorType.GENEActiv;
+        public SensorTypes SupportedType => SensorTypes.GENEActiv;
 
         public static string[] SupportedFileTypes => new[] { ".csv", ".bin" };
 

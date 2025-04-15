@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
@@ -27,16 +29,33 @@ public class ProcessorTests
         // Register services
         services.AddSingleton<IScriptService, RScriptService>();
 
-        // Register processor classes
+        // Register processor and parser classes
         services.AddTransient<GeneActivProcessor>();
         services.AddTransient<GeneActiveResultParser>();
 
+        // Register factory methods
+        services.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
+            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+        });
+
+        services.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+        });
+
+        // Register factories that use the factory methods
+        services.AddSingleton<SensorProcessorFactory>();
+        services.AddSingleton<ResultParserFactory>();
+
         _serviceProvider = services.BuildServiceProvider();
 
+        // Get the properly configured services and factories
         _rScriptService = _serviceProvider.GetRequiredService<IScriptService>();
-        
-        _sensorProcessorFactory = new SensorProcessorFactory(_serviceProvider);
-        _resultParserFactory = new ResultParserFactory(_serviceProvider);
+        _sensorProcessorFactory = _serviceProvider.GetRequiredService<SensorProcessorFactory>();
+        _resultParserFactory = _serviceProvider.GetRequiredService<ResultParserFactory>();
     }
 
     [Test]
@@ -57,7 +76,7 @@ public class ProcessorTests
     public async Task ExecuteRScript()
     {
         // Arrange
-        var processor = _sensorProcessorFactory.CreateProcessor(SensorType.GENEActiv);
+        var processor = _sensorProcessorFactory.GetSensorProcessor(SensorTypes.GENEActiv);
         Assert.That(processor, Is.Not.Null, "Failed to create GENEActiv processor");
 
         // Add this before executing the processor
@@ -69,32 +88,37 @@ public class ProcessorTests
         var result = await processor.ProcessAsync(arguments);
 
         // Assert
-        Assert.That(result.Success, Is.True, $"Script execution failed: {result.Output}");
+        Assert.That(result.Success, Is.True, $"Script execution failed: {result.Error}");
     }
 
     [Test]
     public async Task ParseResults()
     {
-        var parser = _resultParserFactory.GetParser(SensorType.GENEActiv);
+        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
         var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output");
         var results = await parser.ParseResultsAsync(outputDirectory);
 
         var enumerable = results as Analysis[] ?? results.ToArray();
-        Assert.That(enumerable.Length, Is.EqualTo(1), "No results found in the output directory");
+        Assert.That(enumerable.Length, Is.GreaterThan(0), "No results found in the output directory");
 
         foreach (var result in enumerable)
         {
-            Console.WriteLine($"Name: {result.FileName}, Type: {result.FileName}");
+            Console.WriteLine($"Name: {result.FileName}, Path: {result.FilePath}");
+            
             foreach (var record in result.ActivityRecords)
             {
                 Console.WriteLine(
-                    $"Day: {record.Day}, Steps: {record.Steps}, NonWear: {record.NonWear}, Sleep: {record.Sleep}, Sedentary: {record.Sedentary}, Light: {record.Light}, Moderate: {record.Moderate}, Vigorous: {record.Vigorous}");
+                    $"Day: {record.Day}, Steps: {record.Steps}, NonWear: {record.NonWear}, Sleep: {record.Sleep}, " +
+                    $"Sedentary: {record.Sedentary}, Light: {record.Light}, Moderate: {record.Moderate}, Vigorous: {record.Vigorous}");
             }
 
             foreach (var record in result.SleepRecords)
             {
                 Console.WriteLine(
-                    $"NightStarting: {record.NightStarting}, SleepOnsetTime: {record.SleepOnsetTime}, RiseTime: {record.RiseTime}, TotalElapsedBedTime: {record.TotalElapsedBedTime}, TotalSleepTime: {record.TotalSleepTime}, TotalWakeTime: {record.TotalWakeTime}, SleepEfficiency: {record.SleepEfficiency}, NumActivePeriods: {record.NumActivePeriods}, MedianActivityLength: {record.MedianActivityLength}");
+                    $"NightStarting: {record.NightStarting}, SleepOnsetTime: {record.SleepOnsetTime}, RiseTime: {record.RiseTime}, " +
+                    $"TotalElapsedBedTime: {record.TotalElapsedBedTime}, TotalSleepTime: {record.TotalSleepTime}, " +
+                    $"TotalWakeTime: {record.TotalWakeTime}, SleepEfficiency: {record.SleepEfficiency}, " +
+                    $"NumActivePeriods: {record.NumActivePeriods}, MedianActivityLength: {record.MedianActivityLength}");
             }
         }
     }

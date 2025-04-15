@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop;
+using ActiveSense.Desktop.Data;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Helpers;
 using ActiveSense.Desktop.Sensors;
@@ -12,30 +14,26 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class ProcessViewModel : ViewModelBase
+public partial class ProcessPageViewModel(
+    SensorProcessorFactory sensorProcessorFactory,
+    IScriptService scriptService,
+    MainViewModel mainViewModel,
+    DialogService dialogService)
+    : PageViewModel
 {
-    private readonly ISensorProcessorFactory _sensorProcessorFactory;
-    private readonly IScriptService _rScriptService;
-    
     [ObservableProperty] private bool _isProcessing;
     [ObservableProperty] private string _scriptOutput = string.Empty;
-    [ObservableProperty] private SensorType _selectedSensorType = SensorType.GENEActiv;
+    [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
     [ObservableProperty] private string[]? _selectedFiles;
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
 
-    public Interaction<string, string[]?> SelectFilesInteraction { get; } = new();
-
-    public ProcessViewModel(ISensorProcessorFactory sensorProcessorFactory, IScriptService scriptService)
-    {
-        _sensorProcessorFactory = sensorProcessorFactory;
-        _rScriptService = scriptService;
-    }
+    public InteractionService<string, string[]?> SelectFilesInteractionService { get; } = new();
 
     [RelayCommand]
     private async Task SelectFilesAsync()
     {
-        SelectedFiles = await SelectFilesInteraction.HandleAsync("Select files to process");
+        SelectedFiles = await SelectFilesInteractionService.HandleAsync("Select files to process");
         if (SelectedFiles != null && SelectedFiles.Length > 0)
         {
             StatusMessage = $"{SelectedFiles.Length} file(s) selected";
@@ -47,22 +45,40 @@ public partial class ProcessViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    public async Task TriggerDialog()
+    {
+        var dialog = new ProcessDialogViewModel
+        {
+            Title = "Confirm",
+            Message = "Are you sure you want to process the selected files?",
+        };
+        
+        await dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(mainViewModel, dialog);
+        
+        if (!dialog.Confirmed)
+        {
+            Console.WriteLine("Dialog was cancelled");
+        }
+    }
+
+    [RelayCommand]
     private async Task ProcessFiles()
     {
+        
         if (SelectedFiles is null || SelectedFiles.Length == 0)
         {
             StatusMessage = "No files selected";
             return;
         }
 
-        var processor = _sensorProcessorFactory.CreateProcessor(SelectedSensorType);
+        var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
         
         IsProcessing = true;
         StatusMessage = "Processing files...";
 
         try
         {
-            var destinationDirectory = _rScriptService.GetScriptInputPath();
+            var destinationDirectory = scriptService.GetScriptInputPath();
             var success = await FileService.CopyFilesToDirectoryAsync(SelectedFiles, destinationDirectory);
 
             if (!success)
