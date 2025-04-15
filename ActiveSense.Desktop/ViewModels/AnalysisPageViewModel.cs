@@ -20,6 +20,8 @@ public partial class AnalysisPageViewModel : PageViewModel
     [ObservableProperty] private string _title = "Sleep";
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
+    [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
+    [ObservableProperty] private bool _showSpinner = true;
 
     public ObservableCollection<TabItemTemplate> TabItems { get; }
 
@@ -32,18 +34,8 @@ public partial class AnalysisPageViewModel : PageViewModel
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
         _pageFactory = pageFactory;
-
-        TabItems = new ObservableCollection<TabItemTemplate>
-        {
-            new TabItemTemplate("Sleep", ApplicationPageNames.Sleep,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.Sleep)),
-            new TabItemTemplate("Activity", ApplicationPageNames.Activity,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.Activity)),
-            new TabItemTemplate("General", ApplicationPageNames.General,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.General)),
-        };
-
-        LoadResultFilesCommand.Execute(null);
+        TabItems = [];
+        InitializePageCommand.Execute(null);
     }
 
     partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
@@ -52,19 +44,27 @@ public partial class AnalysisPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private async Task LoadResultFiles()
+    private async Task InitializePage()
     {
         Console.WriteLine("Loading result files...");
         try
         {
-            var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
+            var parser = _resultParserFactory.GetParser(SensorType);
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
 
+            
             foreach (var file in files)
             {
                 ResultFiles.Add(file);
             }
+
+            foreach (var pageName in parser.GetAnalysisPages())
+            {
+                TabItems.Add(new TabItemTemplate($"{pageName.ToString()}", pageName, _pageFactory.GetPageViewModel(pageName)));
+                Console.WriteLine($"Loaded {pageName.ToString()}");
+            }
+            ShowSpinner = false;
         }
         catch (Exception ex)
         {

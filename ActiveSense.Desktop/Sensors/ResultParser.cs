@@ -13,6 +13,17 @@ namespace ActiveSense.Desktop.Sensors;
 
 public class GeneActiveResultParser : IResultParser
 {
+    private readonly ApplicationPageNames[] _analysisPages =
+    [
+        ApplicationPageNames.Activity,
+        ApplicationPageNames.Sleep,
+        ApplicationPageNames.General
+    ];
+    
+    public ApplicationPageNames[] GetAnalysisPages() {
+        return _analysisPages;
+    }
+    
     public async Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory)
     {
         var analyses = new List<Analysis>();
