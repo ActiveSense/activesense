@@ -1,8 +1,8 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 
-namespace ActiveSense.Desktop.Views;
+namespace ActiveSense.Desktop.Views.AnalysisPages;
 
 public partial class SleepPageView : UserControl
 {
@@ -10,4 +10,5 @@ public partial class SleepPageView : UserControl
     {
         InitializeComponent();
     }
+    
 }

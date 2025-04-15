@@ -1,8 +1,6 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
-namespace ActiveSense.Desktop.Views;
+namespace ActiveSense.Desktop.Views.AnalysisPages;
 
 public partial class GeneralPageView : UserControl
 {

@@ -1,4 +1,4 @@
-namespace ActiveSense.Desktop.ViewModels;
+namespace ActiveSense.Desktop.ViewModels.AnalysisPages;
 
 public class GeneralPageViewModel : PageViewModel
 {

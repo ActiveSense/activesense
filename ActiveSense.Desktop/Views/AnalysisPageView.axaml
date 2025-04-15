@@ -26,10 +26,9 @@
                     </DataTemplate>
                 </ui:TabView.TabItemTemplate>
             </ui:TabView>
-            <Border Grid.Row="0" Grid.Column="1">
+            <Border Background="WhiteSmoke" CornerRadius="10" Grid.Row="0" Grid.Column="1" Height="" Margin="10,10,10,20">
                 <StackPanel>
-                    <TextBlock FontSize="20">Analysen</TextBlock>
-                    <Border BorderThickness="1" BorderBrush="LightGray" MinHeight="200" CornerRadius="10"
+                    <Border BorderThickness="0" BorderBrush="LightGray" MinHeight="200" CornerRadius="10"
                             Margin="0,10,10,20">
                         <ListBox ItemsSource="{Binding ResultFiles}" SelectionMode="Multiple"
                                  SelectionChanged="OnSelectionChanged">
@@ -42,16 +41,16 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Border>
-                    <TextBlock>Selected</TextBlock>
-                    <ListBox ItemsSource="{Binding SelectedAnalyses}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding FileName}"></TextBlock>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <!-- <TextBlock>Selected</TextBlock> -->
+                    <!-- <ListBox ItemsSource="{Binding SelectedAnalyses}"> -->
+                    <!--     <ListBox.ItemTemplate> -->
+                    <!--         <DataTemplate> -->
+                    <!--             <StackPanel> -->
+                    <!--                 <TextBlock Text="{Binding FileName}"></TextBlock> -->
+                    <!--             </StackPanel> -->
+                    <!--         </DataTemplate> -->
+                    <!--     </ListBox.ItemTemplate> -->
+                    <!-- </ListBox> -->
                 </StackPanel>
             </Border>
         </Grid>

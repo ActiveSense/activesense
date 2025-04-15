@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ActiveSense.Desktop.Views.AnalysisPages.SleepPageView"
+             x:DataType="analysisPages:SleepPageViewModel">
+    <Design.DataContext>
+        <analysisPages:SleepPageViewModel />
+    </Design.DataContext>
+    <ScrollViewer>
+        <StackPanel>
+            <Border Grid.Row="1" Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium">Total Elapsed Bed Time</TextBlock>
+                    <lvc:CartesianChart
+                        Grid.Row="1"
+                        Series="{Binding Series}"
+                        XAxes="{Binding XAxes}"
+                        YAxes="{Binding YAxes}"
+                        Margin="0,5,0,0"
+                        MinHeight="300">
+                    </lvc:CartesianChart>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

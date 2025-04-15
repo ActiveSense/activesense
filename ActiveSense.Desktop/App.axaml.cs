@@ -6,12 +6,15 @@ using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
+using ActiveSense.Desktop.ViewModels.AnalysisPages;
 using ActiveSense.Desktop.Views;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
+using SleepPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.SleepPageViewModel;
 
 namespace ActiveSense.Desktop;
 
@@ -54,7 +57,7 @@ public class App : Application
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
-            ApplicationPageNames.Analyse => x.GetRequiredService<ViewModels.AnalysisPageViewModel>(),
+            ApplicationPageNames.Analyse => x.GetRequiredService<AnalysisPageViewModel>(),
             ApplicationPageNames.Upload => x.GetRequiredService<ProcessPageViewModel>(),
             ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
             ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
