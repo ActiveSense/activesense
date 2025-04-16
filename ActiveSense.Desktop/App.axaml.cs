@@ -1,10 +1,17 @@
+using System;
 using System.Linq;
+using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Sensors;
+using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
 using ActiveSense.Desktop.Views;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop;
 
@@ -17,14 +24,69 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        var collection = new ServiceCollection();
+        
+        // Register factories
+        collection.AddSingleton<ResultParserFactory>();
+        collection.AddSingleton<SensorProcessorFactory>();
+        collection.AddSingleton<PageFactory>();
+        
+        // Register processors
+        collection.AddSingleton<GeneActivProcessor>();
+        
+        // Register parsers
+        collection.AddSingleton<GeneActiveResultParser>();
+
+        // Register services
+        collection.AddSingleton<IScriptService, RScriptService>();
+        collection.AddSingleton<SharedDataService>();
+        
+        // Register view models
+        collection.AddSingleton<MainViewModel>();
+        collection.AddTransient<DialogService>();
+        collection.AddTransient<DialogViewModel>();
+        collection.AddTransient<ProcessDialogViewModel>();
+        collection.AddTransient<AnalysisPageViewModel>();
+        collection.AddTransient<SleepPageViewModel>();
+        collection.AddTransient<ActivityPageViewModel>();
+        collection.AddTransient<GeneralPageViewModel>();
+        collection.AddTransient<ProcessPageViewModel>();
+
+        collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
+        {
+            ApplicationPageNames.Analyse => x.GetRequiredService<ViewModels.AnalysisPageViewModel>(),
+            ApplicationPageNames.Upload => x.GetRequiredService<ProcessPageViewModel>(),
+            ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
+            ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
+            ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),
+            _ => throw new InvalidOperationException(),
+        });
+        
+        // Register processors 
+        collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
+            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+        });
+
+        // Register parsers
+        collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+        });
+        
+        var services = collection.BuildServiceProvider();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
+            // Avoid duplicate validations from both Avalonia and the CommunityToolkit
             DisableAvaloniaDataAnnotationValidation();
-            desktop.MainWindow = new MainWindow
+            
+            // Use dependency injection to get MainWindowViewModel
+            desktop.MainWindow = new MainView
             {
-                DataContext = new MainWindowViewModel()
+                DataContext = services.GetRequiredService<MainViewModel>()
             };
         }
 

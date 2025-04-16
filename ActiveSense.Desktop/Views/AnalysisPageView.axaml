@@ -2,24 +2,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:global="clr-namespace:"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ActiveSense.Desktop.Views.AnalysisPageView">
-    <StackPanel VerticalAlignment="Top" x:DataType="viewModels:AnalysisPageViewModel">
-        <ui:TabView
-            AddTabButtonCommandParameter="Normal"
-            IsAddTabButtonVisible="False"
-            TabItems="{Binding TabItems}"
-            CanDragTabs="False"
-            AllowDropTabs="False">
-            <ui:TabView.TabItemTemplate>
+             x:Class="ActiveSense.Desktop.Views.AnalysisPageView"
+             x:DataType="viewModels:AnalysisPageViewModel">
+    <Grid ColumnDefinitions="3*, *" RowDefinitions="Auto,*">
+        <controls:TabView Grid.Row="0" Grid.Column="0"
+                          AddTabButtonCommandParameter="Normal"
+                          IsAddTabButtonVisible="False"
+                          TabItems="{Binding TabItems}"
+                          CanDragTabs="False"
+                          AllowDropTabs="False">
+            <controls:TabView.TabItemTemplate>
                 <DataTemplate x:DataType="viewModels:TabItemTemplate">
-                    <ui:TabViewItem Header="{Binding Name}"
-                                    Content="{Binding Page}"
-                                    IsClosable="False"/>
+                    <controls:TabViewItem Header="{Binding Name}"
+                                          Content="{Binding Page}"
+                                          IsClosable="False" />
                 </DataTemplate>
-            </ui:TabView.TabItemTemplate>
-        </ui:TabView>
-    </StackPanel>
+            </controls:TabView.TabItemTemplate>
+        </controls:TabView>
+        <Border Grid.Row="0" Grid.Column="1">
+            <StackPanel>
+                <TextBlock FontSize="20">Analysen</TextBlock>
+                <Border BorderThickness="1" BorderBrush="LightGray" MinHeight="200" CornerRadius="10"
+                        Margin="0,10,10,20">
+                    <ListBox ItemsSource="{Binding ResultFiles}" SelectionMode="Multiple"
+                             SelectionChanged="OnSelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+                <TextBlock>Selected</TextBlock>
+                <ListBox ItemsSource="{Binding SelectedAnalyses}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding FileName}"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+    </Grid>
 </UserControl>

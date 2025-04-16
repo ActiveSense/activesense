@@ -2,7 +2,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             xmlns:global="clr-namespace:"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ActiveSense.Desktop.Views.ActivityPageView">
-    Activity
+             x:Class="ActiveSense.Desktop.Views.ActivityPageView"
+             x:DataType="viewModels:AnalysisPageViewModel">
+    <ScrollViewer>
+        <StackPanel>
+            <TextBox>test</TextBox>
+            <ListBox Grid.Column="1" ItemsSource="{Binding ResultFiles}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding FileName}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

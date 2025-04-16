@@ -3,7 +3,7 @@
 .Rhistory
 .RData
 .Ruserdata
-ActiveSense.RScripts/data/
+ActiveSense.RScripts/data/*
 ActiveSense.RScripts/.idea/
-ActiveSense.RScripts/outputs/
 ActiveSense.RScripts/testing/references/
+ActiveSense.RScripts/outputs/*
