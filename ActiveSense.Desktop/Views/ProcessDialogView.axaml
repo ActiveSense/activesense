@@ -31,15 +31,13 @@
             <Border Padding="20">
                 <StackPanel Spacing="20">
 
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical">
                         <TextBlock TextWrapping="Wrap" Text="{Binding Message}" />
                         <ui:ProgressRing
-                            Width="20"
-                            Height="20"
                             Margin="10,0,0,0" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Spacing="10">
                         <Button
                             Content="Abbrechen"
                             Command="{Binding CancelCommand}"

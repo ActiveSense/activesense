@@ -49,8 +49,8 @@ public partial class ProcessPageViewModel(
     {
         var dialog = new ProcessDialogViewModel
         {
-            Title = "Confirm",
-            Message = "Are you sure you want to process the selected files?",
+            Title = "Analyse läuft",
+            Message = "Bitte warten Sie, während die Analyse durchgeführt wird.",
         };
         
         await dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(mainViewModel, dialog);
@@ -70,6 +70,7 @@ public partial class ProcessPageViewModel(
             StatusMessage = "No files selected";
             return;
         }
+
 
         var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
         
