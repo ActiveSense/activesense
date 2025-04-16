@@ -1,8 +1,8 @@
 # ==================================
-# REGRESSION TEST
+# REGRESSION TESTING
 # ==================================
 
-test_that("regression_test", {
+test_that("regression_test_typical", {
   # set working directory
   setwd(dirname(getwd()))
   
@@ -46,3 +46,19 @@ test_that("regression_test", {
   }
   
 })
+
+#test_that("regression_test_empty", {
+#  
+#}
+
+#test_that("regression_test_single", {
+#  
+#}
+
+#test_that("regression_test_many", {
+#  
+#}
+
+#test_that("test_multiple_files", {
+#  
+#}
