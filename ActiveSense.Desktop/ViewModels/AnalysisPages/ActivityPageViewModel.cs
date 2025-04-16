@@ -42,6 +42,7 @@ public partial class ActivityPageViewModel : PageViewModel
         ChartViewModels = new ObservableCollection<ChartViewModel>
         {
             chartFactory.GetChartViewModel(ChartTypes.Steps),
+            chartFactory.GetChartViewModel(ChartTypes.ActivityDistribution),
         };
         
     }

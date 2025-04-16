@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,6 +18,8 @@ namespace ActiveSense.Desktop.ViewModels.Charts;
 
 public partial class SleepDurationChartViewModel : ChartViewModel
 {
+    private DateToWeekdayConverter _dateToWeekdayConverter;
+    
     [ObservableProperty] private ISeries[] _series;
 
     [ObservableProperty] private ICartesianAxis[] _xAxes;
@@ -25,10 +28,11 @@ public partial class SleepDurationChartViewModel : ChartViewModel
     
     [ObservableProperty] private string[] _labels;
 
-    public SleepDurationChartViewModel()
+    public SleepDurationChartViewModel(DateToWeekdayConverter dateToWeekdayConverter)
     {
         Title = "Sleep Duration";
         Description = "Shows sleep duration across nights";
+        _dateToWeekdayConverter = dateToWeekdayConverter;
     }
 
     public override void UpdateChartData(ObservableCollection<Analysis> analyses)
@@ -52,6 +56,10 @@ public partial class SleepDurationChartViewModel : ChartViewModel
 
         var nightDates = sleepRecords
             .Select(r => r.NightStarting)
+            .ToArray();
+
+        var weekDaysLabel = nightDates
+            .Select(dateStr => _dateToWeekdayConverter.ConvertDateToWeekday(dateStr))
             .ToArray();
 
         var maxValue = Math.Ceiling(sleepTime.Max());
@@ -102,11 +110,11 @@ public partial class SleepDurationChartViewModel : ChartViewModel
         {
             new Axis
             {
-                Labels = nightDates,
+                Labels = weekDaysLabel,
                 LabelsRotation = -45
             }
         };
 
-        Labels = nightDates;
+        Labels = weekDaysLabel;
     }
 }

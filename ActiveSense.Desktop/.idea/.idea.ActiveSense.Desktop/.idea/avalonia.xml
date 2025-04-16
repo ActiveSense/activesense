@@ -11,6 +11,7 @@
         <entry key="Views/AnalysisPages/ActivityPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/AnalysisPages/GeneralPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/AnalysisPages/SleepPageView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/Charts/ActivityDistributionChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Charts/SleepDurationChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Charts/StepsChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/GeneralPageView.axaml" value="ActiveSense.Desktop.csproj" />

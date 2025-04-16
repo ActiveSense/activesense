@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
@@ -58,9 +59,13 @@ public class App : Application
         collection.AddTransient<GeneralPageViewModel>();
         collection.AddTransient<ProcessPageViewModel>();
         
+        // Register converters
+        collection.AddTransient<DateToWeekdayConverter>();
+        
         // Register charts
         collection.AddTransient<SleepDurationChartViewModel>();
         collection.AddTransient<StepsChartViewModel>();
+        collection.AddTransient<ActivityDistributionChartViewModel>();
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
@@ -91,6 +96,7 @@ public class App : Application
         {
             ChartTypes.SleepEfficiency => sp.GetRequiredService<SleepDurationChartViewModel>(),
             ChartTypes.Steps => sp.GetRequiredService<StepsChartViewModel>(),
+            ChartTypes.ActivityDistribution => sp.GetRequiredService<ActivityDistributionChartViewModel>(),
             _ => throw new InvalidOperationException(),
         });
         

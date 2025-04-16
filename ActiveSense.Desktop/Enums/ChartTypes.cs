@@ -4,4 +4,5 @@ public enum ChartTypes
 {
     SleepEfficiency,
     Steps,
+    ActivityDistribution,
 }
