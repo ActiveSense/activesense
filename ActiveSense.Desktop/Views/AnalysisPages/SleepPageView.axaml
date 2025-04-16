@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
              xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -12,10 +11,56 @@
         <analysisPages:SleepPageViewModel />
     </Design.DataContext>
     <ScrollViewer>
-        <ItemsControl ItemsSource="{Binding ChartViewModels}">
-            <ItemsControl.ItemTemplate>
-                
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!-- <ItemsControl ItemsSource="{Binding ChartViewModels}"> -->
+        <!--     <ItemsControl.ItemTemplate> -->
+        <!--          -->
+        <!--     </ItemsControl.ItemTemplate> -->
+        <!-- </ItemsControl> -->
+        <Grid>
+            <StackPanel>
+
+                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium">Total Elapsed Bed Time</TextBlock>
+                        <lvc:CartesianChart
+                            Grid.Row="1"
+                            Series="{Binding TotalSleepSeries}"
+                            XAxes="{Binding XAxes}"
+                            YAxes="{Binding YAxes}"
+                            LegendPosition="Bottom"
+                            Margin="0,5,0,0"
+                            MinHeight="300" />
+                    </Grid>
+                </Border>
+
+                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                    <ItemsControl ItemsSource="{Binding PieCharts}" IsVisible="{Binding !!PieCharts.Count}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" /> <!-- Adjust columns as needed -->
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <lvc:PieChart
+                                            Grid.Row="1"
+                                            Series="{Binding PieSeries}"
+                                            MinHeight="250"
+                                            MaxWidth="350"
+                                            IsClockwise="false"
+                                            InitialRotation="-90"
+                                            LegendPosition="Bottom" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </StackPanel>
+        </Grid>
     </ScrollViewer>
 </UserControl>

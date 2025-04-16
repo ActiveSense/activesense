@@ -1,32 +1,28 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using ActiveSense.Desktop.Converters;
-using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LiveChartsCore;
-using LiveChartsCore.Defaults;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using LiveChartsCore.SkiaSharpView.VisualElements;
 using SkiaSharp;
 
 namespace ActiveSense.Desktop.ViewModels.Charts;
 
 public partial class SleepDurationChartViewModel : ChartViewModel
 {
-    private DateToWeekdayConverter _dateToWeekdayConverter;
-    
+    private readonly DateToWeekdayConverter _dateToWeekdayConverter;
+
+    [ObservableProperty] private string[] _labels;
+
     [ObservableProperty] private ISeries[] _series;
 
     [ObservableProperty] private ICartesianAxis[] _xAxes;
 
     [ObservableProperty] private ICartesianAxis[] _yAxes;
-    
-    [ObservableProperty] private string[] _labels;
 
     public SleepDurationChartViewModel(DateToWeekdayConverter dateToWeekdayConverter)
     {
@@ -37,84 +33,42 @@ public partial class SleepDurationChartViewModel : ChartViewModel
 
     public override void UpdateChartData(ObservableCollection<Analysis> analyses)
     {
-        var analysesCount = analyses.Count;
-        
-        var sleepRecords = analyses
-            .SelectMany(a => a.SleepRecords)
-            .ToList();
-
+        // Extract all sleep records and convert to necessary data
+        var sleepRecords = analyses.SelectMany(a => a.SleepRecords).ToList();
+    
         var sleepTime = sleepRecords
-            .Select(r =>
-            {
-                if (double.TryParse(r.TotalSleepTime, out var time))
-                {
-                    return time / 3600;
-                }
-                return 0;
-            })
+            .Select(r => double.TryParse(r.TotalSleepTime, out var time) ? time / 3600 : 0)
             .ToArray();
-
-        var nightDates = sleepRecords
-            .Select(r => r.NightStarting)
+    
+        var weekDaysLabel = sleepRecords
+            .Select(r => _dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
             .ToArray();
-
-        var weekDaysLabel = nightDates
-            .Select(dateStr => _dateToWeekdayConverter.ConvertDateToWeekday(dateStr))
-            .ToArray();
-
-        var maxValue = Math.Ceiling(sleepTime.Max());
-        var backgroundValues = Enumerable.Repeat(maxValue, sleepTime.Length).ToArray();
-        
-        double meanSleep = sleepTime.Average();
-        var meanValues = Enumerable.Repeat(meanSleep, sleepTime.Length).ToArray();
-
+    
+        // Calculate values for chart display
+        var maxValue = Math.Ceiling(sleepTime.Any() ? sleepTime.Max() : 0);
+        var meanSleep = sleepTime.Any() ? sleepTime.Average() : 0;
+    
+        // Set up series
         Series = new ISeries[]
         {
             new ColumnSeries<double>
             {
-                IsHoverable = false,
-                Values = backgroundValues,
-                Stroke = null,
-                Fill = new SolidColorPaint(new SKColor(30, 30, 30, 30)),
-                IgnoresBarPosition = true
-            },
-            new ColumnSeries<double>
-            {
                 Values = sleepTime,
-                Stroke = null,
                 Fill = new SolidColorPaint(SKColors.CornflowerBlue),
-                IgnoresBarPosition = true,
                 Name = "Schlafzeit"
             },
             new LineSeries<double>
             {
-                Values = meanValues,
+                Values = Enumerable.Repeat(meanSleep, sleepTime.Length).ToArray(),
                 Stroke = new SolidColorPaint(SKColors.Red, 2),
-                Fill = null,
-                GeometrySize = 0,
                 Name = "Durchschnitt",
-                LineSmoothness = 0 // Straight line
+                LineSmoothness = 0
             }
         };
-
-        YAxes = new ICartesianAxis[]
-        {
-            new Axis
-            {
-                MinLimit = 0,
-                MaxLimit = maxValue + 1, // Add some padding
-            }
-        };
-
-        XAxes = new ICartesianAxis[]
-        {
-            new Axis
-            {
-                Labels = weekDaysLabel,
-                LabelsRotation = -45
-            }
-        };
-
+    
+        // Set up axes
+        YAxes = new[] { new Axis { MinLimit = 0, MaxLimit = maxValue + 1 } };
+        XAxes = new[] { new Axis { Labels = weekDaysLabel, LabelsRotation = -45 } };
         Labels = weekDaysLabel;
     }
 }

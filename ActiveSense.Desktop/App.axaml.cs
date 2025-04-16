@@ -31,6 +31,9 @@ public class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var collection = new ServiceCollection();
+
+        collection.AddTransient<BarChartGenerator>();
+        collection.AddTransient<PieChartGenerator>();
         
         // Register factories
         collection.AddSingleton<ResultParserFactory>();

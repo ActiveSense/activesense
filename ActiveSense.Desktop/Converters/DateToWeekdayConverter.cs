@@ -25,7 +25,7 @@ public class DateToWeekdayConverter
         }
         catch (Exception e)
         {
-            return "could not convert";
+            throw new Exception($"Unable to convert date {date} to weekday", e);
         }
     }
 }
