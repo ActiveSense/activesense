@@ -12,20 +12,10 @@
         <analysisPages:SleepPageViewModel />
     </Design.DataContext>
     <ScrollViewer>
-        <StackPanel>
-            <Border Grid.Row="1" Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
-                <Grid RowDefinitions="Auto,*">
-                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium">Total Elapsed Bed Time</TextBlock>
-                    <lvc:CartesianChart
-                        Grid.Row="1"
-                        Series="{Binding Series}"
-                        XAxes="{Binding XAxes}"
-                        YAxes="{Binding YAxes}"
-                        Margin="0,5,0,0"
-                        MinHeight="300">
-                    </lvc:CartesianChart>
-                </Grid>
-            </Border>
-        </StackPanel>
+        <ItemsControl ItemsSource="{Binding ChartViewModels}">
+            <ItemsControl.ItemTemplate>
+                
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </ScrollViewer>
 </UserControl>

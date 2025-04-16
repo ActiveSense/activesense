@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using Avalonia;

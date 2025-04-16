@@ -1,4 +1,4 @@
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Enums;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ActiveSense.Desktop.ViewModels;

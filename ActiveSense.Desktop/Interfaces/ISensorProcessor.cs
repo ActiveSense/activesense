@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Enums;
 
 namespace ActiveSense.Desktop.Interfaces;
 

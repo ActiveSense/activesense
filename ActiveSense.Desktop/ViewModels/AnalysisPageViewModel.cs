@@ -1,7 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;

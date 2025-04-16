@@ -1,17 +1,19 @@
 using System;
 using System.Linq;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
 using ActiveSense.Desktop.ViewModels.AnalysisPages;
+using ActiveSense.Desktop.ViewModels.Charts;
 using ActiveSense.Desktop.Views;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
 using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
 using SleepPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.SleepPageViewModel;
@@ -33,6 +35,7 @@ public class App : Application
         collection.AddSingleton<ResultParserFactory>();
         collection.AddSingleton<SensorProcessorFactory>();
         collection.AddSingleton<PageFactory>();
+        collection.AddSingleton<ChartFactory>();
         
         // Register processors
         collection.AddSingleton<GeneActivProcessor>();
@@ -54,6 +57,10 @@ public class App : Application
         collection.AddTransient<ActivityPageViewModel>();
         collection.AddTransient<GeneralPageViewModel>();
         collection.AddTransient<ProcessPageViewModel>();
+        
+        // Register charts
+        collection.AddTransient<SleepDurationChartViewModel>();
+        collection.AddTransient<StepsChartViewModel>();
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
@@ -69,14 +76,22 @@ public class App : Application
         collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
-            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+            _ => throw new InvalidOperationException(),
         });
 
         // Register parsers
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
-            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+            _ => throw new InvalidOperationException(),
+        });
+        
+        // Register charts
+        collection.AddSingleton<Func<ChartTypes, ChartViewModel>>(sp => type => type switch
+        {
+            ChartTypes.SleepEfficiency => sp.GetRequiredService<SleepDurationChartViewModel>(),
+            ChartTypes.Steps => sp.GetRequiredService<StepsChartViewModel>(),
+            _ => throw new InvalidOperationException(),
         });
         
         var services = collection.BuildServiceProvider();
