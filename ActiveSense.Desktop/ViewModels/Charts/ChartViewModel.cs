@@ -13,8 +13,4 @@ public abstract partial class ChartViewModel : PageViewModel
     [ObservableProperty]
     private string _description = string.Empty;
     
-    [ObservableProperty]
-    private ChartTypes _chartType;
-    
-    public abstract void UpdateChartData(ObservableCollection<Analysis> analyses);
 }

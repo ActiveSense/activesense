@@ -1,15 +1,29 @@
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using CsvHelper.Configuration.Attributes;
 
 namespace ActiveSense.Desktop.Models;
 
 public class Analysis
 {
+    public List<ActivityRecord> ActivityRecords = new();
+    public List<SleepRecord> SleepRecords = new();
     public string FilePath { get; set; }
     public string FileName { get; set; }
-    public List<SleepRecord> SleepRecords = new List<SleepRecord>();
-    public List<ActivityRecord> ActivityRecords = new List<ActivityRecord>();
+
+    public double TotalSleepTime => SleepRecords
+        .Sum(record => double.TryParse(record.TotalSleepTime, out var time) ? time : 0);
+
+    public double TotalWakeTime => SleepRecords
+        .Sum(record => double.TryParse(record.TotalWakeTime, out var time) ? time : 0);
+
+    public double AverageSleepTime => SleepRecords.Any()
+        ? SleepRecords.Average(record => double.TryParse(record.TotalSleepTime, out var time) ? time : 0)
+        : 0;
+
+    public double AverageWakeTime => SleepRecords.Any()
+        ? SleepRecords.Average(record => double.TryParse(record.TotalWakeTime, out var time) ? time : 0)
+        : 0;
 }
 
 public class SleepRecord

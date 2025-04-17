@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using ActiveSense.Desktop.Charts.Generators;
+using ActiveSense.Desktop.Charts.ViewModels;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -31,15 +33,11 @@ public class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var collection = new ServiceCollection();
-
-        collection.AddTransient<BarChartGenerator>();
-        collection.AddTransient<PieChartGenerator>();
         
         // Register factories
         collection.AddSingleton<ResultParserFactory>();
         collection.AddSingleton<SensorProcessorFactory>();
         collection.AddSingleton<PageFactory>();
-        collection.AddSingleton<ChartFactory>();
         
         // Register processors
         collection.AddSingleton<GeneActivProcessor>();
@@ -66,9 +64,8 @@ public class App : Application
         collection.AddTransient<DateToWeekdayConverter>();
         
         // Register charts
-        collection.AddTransient<SleepDurationChartViewModel>();
-        collection.AddTransient<StepsChartViewModel>();
-        collection.AddTransient<ActivityDistributionChartViewModel>();
+        collection.AddTransient<BarChartViewModel>();
+        collection.AddTransient<PieChartViewModel>();
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
@@ -91,15 +88,6 @@ public class App : Application
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
-            _ => throw new InvalidOperationException(),
-        });
-        
-        // Register charts
-        collection.AddSingleton<Func<ChartTypes, ChartViewModel>>(sp => type => type switch
-        {
-            ChartTypes.SleepEfficiency => sp.GetRequiredService<SleepDurationChartViewModel>(),
-            ChartTypes.Steps => sp.GetRequiredService<StepsChartViewModel>(),
-            ChartTypes.ActivityDistribution => sp.GetRequiredService<ActivityDistributionChartViewModel>(),
             _ => throw new InvalidOperationException(),
         });
         

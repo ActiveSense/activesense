@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using ActiveSense.Desktop.Enums;
+using System.Linq;
+using ActiveSense.Desktop.Charts.DTOs;
+using ActiveSense.Desktop.Charts.Generators;
+using ActiveSense.Desktop.Charts.ViewModels;
+using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;
@@ -9,58 +14,100 @@ using ActiveSense.Desktop.ViewModels.Charts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
+using LiveChartsCore.SkiaSharpView;
 
 namespace ActiveSense.Desktop.ViewModels.AnalysisPages;
 
 public partial class SleepPageViewModel : PageViewModel
 {
     private readonly SharedDataService _sharedDataService;
-    private readonly BarChartGenerator _barChartGenerator;
-    private readonly PieChartGenerator _pieChartGenerator;
+    private readonly DateToWeekdayConverter _dateToWeekdayConverter;
 
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
-    [ObservableProperty] private ObservableCollection<AnalysisPieChartViewModel> _pieCharts = new();
+    [ObservableProperty] private ObservableCollection<PieChartViewModel> _pieCharts = new();
+    [ObservableProperty] private BarChartViewModel _totalSleepChart = new();
     [ObservableProperty] private ISeries[] _totalSleepSeries;
     [ObservableProperty] private ICartesianAxis[] _xAxes;
     [ObservableProperty] private ICartesianAxis[] _yAxes;
 
     [ObservableProperty] private ISeries[] _pieSeries;
 
-    public SleepPageViewModel(SharedDataService sharedDataService, ChartFactory chartFactory, BarChartGenerator barChartGenerator, PieChartGenerator pieChartGenerator)
+    public SleepPageViewModel(SharedDataService sharedDataService, DateToWeekdayConverter dateToWeekdayConverter)
     {
         _sharedDataService = sharedDataService;
-        _barChartGenerator = barChartGenerator;
-        _pieChartGenerator = pieChartGenerator;
+        _dateToWeekdayConverter = dateToWeekdayConverter;
 
         _sharedDataService.SelectedAnalysesChanged += OnSelectedAnalysesChanged;
 
         UpdateSelectedAnalyses();
-
-        // ChartViewModels = new ObservableCollection<ChartViewModel>
-        // {
-        //     chartFactory.GetChartViewModel(ChartTypes.SleepEfficiency)
-        // };
     }
-
-    // public ObservableCollection<ChartViewModel> ChartViewModels { get; }
 
 
     private void OnSelectedAnalysesChanged(object? sender, EventArgs e)
     {
         UpdateSelectedAnalyses();
-        (TotalSleepSeries, XAxes, YAxes) = _barChartGenerator.GetSleepTimeChart(SelectedAnalyses);
+
+        // Only update charts if there are selected analyses
+        if (SelectedAnalyses.Count > 0)
+        {
+            // Initialize chart data
+            InitializeCharts();
+        }
+        else
+        {
+            // Reset charts when no analyses are selected
+            TotalSleepChart = new BarChartViewModel { Title = "Total Sleep Time" };
+            PieCharts.Clear();
+        }
+    }
+
+    public void InitializeCharts()
+    {
+        // Create chart data DTOs from selected analyses
+        var chartDataDtos = CreateSleepChartDataDtos();
         
-        // Generate pie charts for each analysis
-        PieCharts.Clear();
+        // Initialize the bar chart generator with DTOs and axes
+        var barChartGenerator = new BarChartGenerator(chartDataDtos);
+
+        // Generate the chart view model
+        TotalSleepChart = barChartGenerator.GenerateChart();
+        TotalSleepChart.Title = "Total Sleep Time";
+        TotalSleepChart.Description = "Sleep duration across nights";
+    }
+
+    private ChartDataDTO[] CreateSleepChartDataDtos()
+    {
+        var chartDataDtos = new List<ChartDataDTO>();
+
         foreach (var analysis in SelectedAnalyses)
         {
-            var pieSeries = _pieChartGenerator.GetPieChartForAnalysis(analysis);
-            PieCharts.Add(new AnalysisPieChartViewModel
+            // Skip analyses with no sleep records
+            if (analysis.SleepRecords.Count == 0)
+                continue;
+
+            // Extract data from sleep records
+            var labels = analysis.SleepRecords
+                .Select(r => _dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
+                .ToArray();
+
+            var sleepTimes = analysis.SleepRecords
+                .Select(r =>
+                {
+                    double.TryParse(r.TotalSleepTime, out var time);
+                    return time / 3600; // Convert to hours
+                })
+                .ToArray();
+
+            // Create DTO
+            chartDataDtos.Add(new ChartDataDTO
             {
-                Title = analysis.FileName,
-                PieSeries = pieSeries
+                Labels = labels,
+                Data = sleepTimes,
+                Title = analysis.FileName
             });
         }
+
+        return chartDataDtos.ToArray();
     }
 
     private void UpdateSelectedAnalyses()
@@ -68,9 +115,4 @@ public partial class SleepPageViewModel : PageViewModel
         SelectedAnalyses.Clear();
         foreach (var analysis in _sharedDataService.SelectedAnalyses) SelectedAnalyses.Add(analysis);
     }
-}
-public class AnalysisPieChartViewModel : ViewModelBase
-{
-    public string Title { get; set; }
-    public ISeries[] PieSeries { get; set; }
 }

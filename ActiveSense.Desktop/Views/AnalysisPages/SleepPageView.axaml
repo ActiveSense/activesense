@@ -21,45 +21,19 @@
 
                 <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
                     <Grid RowDefinitions="Auto,*">
-                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium">Total Elapsed Bed Time</TextBlock>
+                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium" Text="{Binding TotalSleepChart.Title}"/>
                         <lvc:CartesianChart
                             Grid.Row="1"
-                            Series="{Binding TotalSleepSeries}"
-                            XAxes="{Binding XAxes}"
-                            YAxes="{Binding YAxes}"
-                            LegendPosition="Bottom"
+                            Series="{Binding TotalSleepChart.Series}"
+                            XAxes="{Binding TotalSleepChart.XAxes}"
+                            YAxes="{Binding TotalSleepChart.YAxes}"
+                            LegendPosition="{Binding TotalSleepChart.LegendPosition}"
                             Margin="0,5,0,0"
-                            MinHeight="300" />
+                            MinHeight="300">
+                        </lvc:CartesianChart>
                     </Grid>
                 </Border>
 
-                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
-                    <ItemsControl ItemsSource="{Binding PieCharts}" IsVisible="{Binding !!PieCharts.Count}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="2" /> <!-- Adjust columns as needed -->
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
-                                    <Grid RowDefinitions="Auto,*">
-                                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
-                                                   Text="{Binding Title}" />
-                                        <lvc:PieChart
-                                            Grid.Row="1"
-                                            Series="{Binding PieSeries}"
-                                            MinHeight="250"
-                                            MaxWidth="350"
-                                            IsClockwise="false"
-                                            InitialRotation="-90"
-                                            LegendPosition="Bottom" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
             </StackPanel>
         </Grid>
     </ScrollViewer>
