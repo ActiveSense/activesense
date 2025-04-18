@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
@@ -11,7 +12,7 @@ using CsvHelper;
 
 namespace ActiveSense.Desktop.Sensors;
 
-public class GeneActiveResultParser : IResultParser
+public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverter) : IResultParser
 {
     private readonly ApplicationPageNames[] _analysisPages =
     [
@@ -39,10 +40,10 @@ public class GeneActiveResultParser : IResultParser
         foreach (var directory in directories)
         {
             Console.WriteLine("Processing directory: " + directory);
-            var analysis = new Analysis
+            var analysis = new Analysis(dateToWeekdayConverter)
             {
                 FilePath = directory,
-                FileName = Path.GetFileName(directory)
+                FileName = Path.GetFileName(directory),
             };
 
             var csvFiles = Directory.GetFiles(directory, "*.csv");

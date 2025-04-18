@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
@@ -28,6 +29,7 @@ public class GeneActiveResultParserTests
         var services = new ServiceCollection();
 
         services.AddTransient<GeneActiveResultParser>();
+        services.AddTransient<DateToWeekdayConverter>();
 
         services.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
@@ -129,30 +131,48 @@ public class GeneActiveResultParserTests
             Assert.That(comparison, Is.True);
         }
     }
+    
+    [Test]
+    public void WeekdaysTest()
+    {
+        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
+        var results = parser.ParseResultsAsync(_filesPath);
 
-    // [TearDown]
-    // public void Cleanup()
-    // {
-    //     var sleepFile = Path.Combine(_outputPath, "sleep1.csv");
-    //     var activityFile = Path.Combine(_outputPath, "activity1.csv");
-    //     
-    //     try
-    //     {
-    //         if (File.Exists(sleepFile))
-    //         {
-    //             File.Delete(sleepFile);
-    //             Console.WriteLine($"Deleted: {sleepFile}");
-    //         }
-    //     
-    //         if (File.Exists(activityFile))
-    //         {
-    //             File.Delete(activityFile);
-    //             Console.WriteLine($"Deleted: {activityFile}");
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"Error during cleanup: {ex.Message}");
-    //     }
-    // }
+        Assert.That(results.Result.Count(), Is.EqualTo(1));
+        
+        foreach (var result in results.Result)
+        {
+            var weekdays = result.SleepWeekdays();
+            foreach (var weekday in weekdays)
+            {
+                Console.WriteLine(weekday);
+            }
+        }
+    } 
+
+    [TearDown]
+    public void Cleanup()
+    {
+        var sleepFile = Path.Combine(_outputPath, "sleep1.csv");
+        var activityFile = Path.Combine(_outputPath, "activity1.csv");
+        
+        try
+        {
+            if (File.Exists(sleepFile))
+            {
+                File.Delete(sleepFile);
+                Console.WriteLine($"Deleted: {sleepFile}");
+            }
+        
+            if (File.Exists(activityFile))
+            {
+                File.Delete(activityFile);
+                Console.WriteLine($"Deleted: {activityFile}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during cleanup: {ex.Message}");
+        }
+    }
 }

@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
+using ActiveSense.Desktop.ViewModels.Charts;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
-using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
 
 namespace ActiveSense.Desktop.Charts.Generators;
 
-public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartColors)
+public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartColors)
 {
     public BarChartViewModel GenerateChart(string title, string description)
     {
@@ -26,7 +26,6 @@ public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartCo
 
         var allLabels = chartDataDtos
             .SelectMany(dto => dto.Labels)
-            .Distinct()
             .ToArray();
 
         var series = new List<ISeries>();
@@ -35,55 +34,22 @@ public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartCo
 
         foreach (var dto in chartDataDtos)
         {
-            var valueMap = new Dictionary<string, double>();
-
-            foreach (var label in allLabels)
+            series.Add(new StackedColumnSeries<double>
             {
-                valueMap[label] = 0;
-            }
-
-            for (int i = 0; i < dto.Labels.Length; i++)
-            {
-                if (i < dto.Data.Length)
-                {
-                    valueMap[dto.Labels[i]] = dto.Data[i];
-                }
-            }
-
-            var normalizedValues = allLabels
-                .Select(label => valueMap[label])
-                .ToArray();
-
-            series.Add(new ColumnSeries<double>
-            {
-                Values = normalizedValues,
+                Values = dto.Data,
                 Stroke = null,
                 Fill = new SolidColorPaint(colors[colorIndex++]),
                 MaxBarWidth = 15,
-                Name = dto.Title ?? $"Series {colorIndex}"
+                Name = dto.Title
             });
         }
-        
-        // Add mean line
-        var allValues = chartDataDtos.SelectMany(dto => dto.Data);
-        double meanValue = allValues.Any() ? allValues.Average() : 0;
-        var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
-        series.Add(new LineSeries<double>
-        {
-            Values = meanValues,
-            Stroke = new SolidColorPaint(SKColors.Gray, 2),
-            Fill = null,
-            GeometrySize = 0,
-            Name = "Durchschnitt",
-            LineSmoothness = 0
-        });
 
         var xAxis = new Axis
         {
             Labels = allLabels,
             LabelsRotation = -45,
-            ForceStepToMin = true, 
-            MinStep = 1 
+            ForceStepToMin = true,
+            MinStep = 1
         };
 
         return new BarChartViewModel
@@ -95,5 +61,4 @@ public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartCo
             YAxes = new[] { new Axis() }
         };
     }
-
 }

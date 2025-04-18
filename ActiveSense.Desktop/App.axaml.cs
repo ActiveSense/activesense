@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using ActiveSense.Desktop.Charts.Generators;
-using ActiveSense.Desktop.Charts.ViewModels;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -19,6 +18,7 @@ using Avalonia.Markup.Xaml;
 using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
 using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
+using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
 using SleepPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.SleepPageViewModel;
 
 namespace ActiveSense.Desktop;
@@ -66,6 +66,7 @@ public class App : Application
         // Register charts
         collection.AddTransient<BarChartViewModel>();
         collection.AddTransient<PieChartViewModel>();
+        collection.AddTransient<ChartColors>();
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {

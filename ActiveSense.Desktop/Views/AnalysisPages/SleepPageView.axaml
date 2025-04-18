@@ -11,17 +11,16 @@
         <analysisPages:SleepPageViewModel />
     </Design.DataContext>
     <ScrollViewer>
-        <!-- <ItemsControl ItemsSource="{Binding ChartViewModels}"> -->
-        <!--     <ItemsControl.ItemTemplate> -->
-        <!--          -->
-        <!--     </ItemsControl.ItemTemplate> -->
-        <!-- </ItemsControl> -->
         <Grid>
             <StackPanel>
-
-                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                <!-- Bar Chart -->
+                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5"
+                        BoxShadow="0 2 8 0 #15000000">
                     <Grid RowDefinitions="Auto,*">
-                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium" Text="{Binding TotalSleepChart.Title}"/>
+                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                   Text="{Binding TotalSleepChart.Title}" />
+                        <TextBlock Grid.Row="1" Margin="10,2,10,0" Opacity="0.7" TextWrapping="Wrap"
+                                   Text="{Binding TotalSleepChart.Description}" />
                         <lvc:CartesianChart
                             Grid.Row="1"
                             Series="{Binding TotalSleepChart.Series}"
@@ -29,11 +28,36 @@
                             YAxes="{Binding TotalSleepChart.YAxes}"
                             LegendPosition="{Binding TotalSleepChart.LegendPosition}"
                             Margin="0,5,0,0"
-                            MinHeight="300">
-                        </lvc:CartesianChart>
+                            MinHeight="300" />
                     </Grid>
                 </Border>
 
+                <!-- Pie Charts -->
+                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5"
+                        BoxShadow="0 2 8 0 #15000000">
+                    <ItemsControl ItemsSource="{Binding PieCharts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid RowDefinitions="Auto,*">
+                                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                               Text="{Binding Title}" />
+                                    <lvc:PieChart
+                                        Grid.Row="1"
+                                        Series="{Binding PieSeries}"
+                                        MinHeight="300"
+                                        MinWidth="300"
+                                        LegendPosition="Bottom"
+                                        Margin="0,5,0,0" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Border>
             </StackPanel>
         </Grid>
     </ScrollViewer>

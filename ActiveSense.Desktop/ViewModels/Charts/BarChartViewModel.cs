@@ -1,11 +1,9 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
-using System.Collections.ObjectModel;
-using ActiveSense.Desktop.ViewModels.Charts;
-using CommunityToolkit.Mvvm.ComponentModel;
 using LiveChartsCore.Measure;
 
-namespace ActiveSense.Desktop.Charts.ViewModels
+namespace ActiveSense.Desktop.ViewModels.Charts
 {
     public partial class BarChartViewModel : ChartViewModel
     {
