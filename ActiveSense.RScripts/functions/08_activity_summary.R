@@ -11,7 +11,9 @@
 #'
 
 activity_detect <- function(segment_data,
-                            boundarys) {
+                            boundarys,
+                            first_time,
+                            no_days) {
 
   # Called tmp1. The data between the boundaries
   len <- length(boundarys[, 1])
@@ -30,7 +32,6 @@ activity_detect <- function(segment_data,
 
     Steps[i] <- sum(day_data$Step.GENEAcount.current[day_data$Step.mean.current > 20], na.rm = T)
     
-    DayNum[i] <- i
     #### The numbers are: ####
     #'  0. Non-Wear
     #'  1. Sleep
@@ -48,6 +49,8 @@ activity_detect <- function(segment_data,
     Vigorous[i]  <- sum(day_data[day_data$Class.current == 5, ]$Segment.Duration.current)
   }
 
+  DayNum <- as.character(as.Date((as.Date(first_time)):(as.Date(first_time) - 1 + no_days)))
+  
   Activity_df <- data.frame(
     "Day Number" = DayNum,
     "Steps" = Steps,

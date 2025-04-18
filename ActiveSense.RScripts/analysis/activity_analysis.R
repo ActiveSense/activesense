@@ -86,7 +86,6 @@ activity_analysis <- function(binfile, summary_name) {
   last_time = file_times[length(file_times)]
   no_days = as.numeric(ceiling((last_time - first_time) / 86400)) + 1
   
-  
   # ==================================
   # BED RISE DETECTION
   # ==================================
@@ -138,7 +137,9 @@ activity_analysis <- function(binfile, summary_name) {
   
   activity_df = activity_detect(
     segment_data1,
-    boundarys
+    boundarys,
+    first_time,
+    no_days
   )
   
   new_path <- paste0(output_dir, getSummaryName(""), "/")
