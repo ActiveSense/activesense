@@ -18,7 +18,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     [ObservableProperty] private PageViewModel _activePage;
     [ObservableProperty] private ListItemTemplate? _selectedItem;
     [ObservableProperty] private string _title = "ActiveSense";
-    
+
     [ObservableProperty] private DialogViewModel _dialog;
     private readonly PageFactory _pageFactory;
 
@@ -27,6 +27,22 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     {
         _pageFactory = pageFactory;
         _dialog = dialog;
+    }
+
+    [RelayCommand]
+    private void SelectItem(ListItemTemplate item)
+    {
+        // First, set all items to not selected
+        foreach (var menuItem in Items)
+        {
+            menuItem.IsSelected = false;
+        }
+
+        // Set the selected item
+        item.IsSelected = true;
+
+        // Update the SelectedItem property (which should trigger ActivePage update via OnSelectedItemChanged)
+        SelectedItem = item;
     }
 
     partial void OnSelectedItemChanged(ListItemTemplate? value)
@@ -57,9 +73,11 @@ public class ListItemTemplate
         PageName = pageName;
         Application.Current!.TryFindResource(icon, out var res);
         ListItemIcon = (StreamGeometry)res;
+        IsSelected = false;  // Add this line
     }
 
     public string Name { get; set; }
     public ApplicationPageNames PageName { get; set; }
     public StreamGeometry ListItemIcon { get; }
+    public bool IsSelected { get; set; }  // Add this property
 }

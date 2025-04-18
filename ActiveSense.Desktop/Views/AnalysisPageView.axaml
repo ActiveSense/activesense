@@ -27,72 +27,79 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Padding" Value="0" />
         </Style>
-
-        <Style Selector="ui|TabView">
-            <Setter Property="TabWidthMode" Value="SizeToContent" />
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
-
-        <Style Selector="ui|TabViewItem">
-            <Setter Property="FontWeight" Value="Medium" />
-        </Style>
     </UserControl.Styles>
 
-    <Grid Margin="24">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, 24, 280">
+        <!-- Tab buttons using RadioButtonGroup style -->
+        <Border Grid.Row="0"
+                Margin="0,0,0,16"
+                HorizontalAlignment="Left"
+                Theme="{StaticResource RadioButtonGroupBorder}">
+            <ListBox Name="tabSelector"
+                     Theme="{StaticResource ButtonRadioGroupListBox}"
+                     ItemsSource="{Binding TabItems}"
+                     SelectedItem="{Binding SelectedTabItem}"
+                     DisplayMemberBinding="{Binding Name}">
+            </ListBox>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <!-- Main content area - will resize when expander changes -->
+                <ColumnDefinition Width="*" />
+                <!-- Expander area - will use as much space as needed -->
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Main content area -->
             <Border Classes="card" Grid.Column="0">
-                <ui:TabView Grid.Row="0" Grid.Column="0"
-                            AddTabButtonCommandParameter="Normal"
-                            IsAddTabButtonVisible="False"
-                            TabItems="{Binding TabItems}"
-                            CanDragTabs="False"
-                            AllowDropTabs="False">
-                    <ui:TabView.TabItemTemplate>
-                        <DataTemplate x:DataType="viewModels:TabItemTemplate">
-                            <ui:TabViewItem Header="{Binding Name}"
-                                            Content="{Binding Page}"
-                                            IsClosable="False" />
-                        </DataTemplate>
-                    </ui:TabView.TabItemTemplate>
-                </ui:TabView>
+                <ContentControl Content="{Binding SelectedTabItem.Page}" />
             </Border>
 
-            <Rectangle Grid.Column="1" Fill="Transparent" />
+            <!-- Expander with file selection -->
+            <Border Grid.Column="1">
+                <Expander
+                    ExpandDirection="Left"
+                    Header="Files"
+                    Margin="8,0,0,0"
+                    MinWidth="50">
+                    <Border
+                        Margin="0">
+                        <Grid RowDefinitions="Auto, *">
+                            <Border Grid.Row="1"
+                                    CornerRadius="4"
+                                    Padding="8">
+                                <ListBox ItemsSource="{Binding ResultFiles}"
+                                         SelectionMode="Multiple,Toggle"
+                                         SelectionChanged="OnSelectionChanged"
+                                         Theme="{DynamicResource CheckGroupListBox}"
+                                         MinHeight="300"
+                                         MaxWidth="300">
+                                    <!-- Ensure proper ItemsPanel for vertical layout -->
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
 
-            <Border Classes="card" Grid.Column="2">
-                <Grid RowDefinitions="Auto, *">
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
-                        <ui:SymbolIcon Symbol="Document" VerticalAlignment="Center" />
-                        <TextBlock Classes="heading" Text="Dateien" VerticalAlignment="Center" Margin="0" />
-                    </StackPanel>
-
-                    <Border Grid.Row="1"
-                            Background="#F8F8F8"
-                            CornerRadius="4"
-                            Padding="8">
-                        <ListBox ItemsSource="{Binding ResultFiles}"
-                                 SelectionMode="Multiple"
-                                 SelectionChanged="OnSelectionChanged"
-                                 MinHeight="300">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate x:DataType="models:Analysis">
-                                    <Grid ColumnDefinitions="Auto, *" Margin="0,4">
-                                        <ui:SymbolIcon Grid.Column="0" Symbol="Document" VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding FileName}"
-                                                   TextWrapping="Wrap"
-                                                   VerticalAlignment="Center" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Analysis">
+                                            <TextBlock Text="{Binding FileName}"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center"
+                                                       Margin="4" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Border>
+                        </Grid>
                     </Border>
-                </Grid>
+                </Expander>
             </Border>
         </Grid>
 

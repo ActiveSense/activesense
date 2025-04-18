@@ -3,7 +3,6 @@
         xmlns:vm="using:ActiveSense.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ActiveSense.Desktop.Views.MainView"
         x:DataType="vm:MainViewModel"
@@ -16,26 +15,81 @@
         <vm:MainViewModel/>
     </Design.DataContext>
     
+    <Window.Styles>
+        <!-- Sidebar styles -->
+        <Style Selector="Border.sidebar">
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="Width" Value="55"/>
+        </Style>
+        
+        <!-- Button styles for sidebar items -->
+        <Style Selector="Button.sidebar-item">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="55"/>
+            <Setter Property="Height" Value="55"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        
+        <!-- Hover state for sidebar buttons -->
+        <Style Selector="Button.sidebar-item:pointerover">
+            <Setter Property="Background" Value="#3A3A3A"/>
+        </Style>
+        
+        <!-- Selected state for sidebar buttons -->
+        <Style Selector="Button.sidebar-item.selected">
+            <Setter Property="Background" Value="#0078D4"/>
+        </Style>
+        
+        <!-- Icon style -->
+        <Style Selector="Path.icon">
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Fill" Value="Gray"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+        </Style>
+    </Window.Styles>
+    
     <Grid>
-        <controls:NavigationView PaneDisplayMode="LeftCompact"
-                                 MenuItemsSource="{Binding Items}"
-                                 Content="{Binding ActivePage}"
-                                 SelectedItem="{Binding SelectedItem}"
-                                 IsSettingsVisible="False"
-                                 PaneTitle="{Binding Title}">
-            <controls:NavigationView.MenuItemTemplate>
-                <DataTemplate DataType="{x:Type vm:ListItemTemplate}">
-                    <controls:NavigationViewItem Content="{Binding Name}">
-                        <controls:NavigationViewItem.IconSource>
-                            <controls:PathIconSource Data="{Binding ListItemIcon}" />
-                        </controls:NavigationViewItem.IconSource>
-                    </controls:NavigationViewItem>
-                </DataTemplate>
-            </controls:NavigationView.MenuItemTemplate>
-        </controls:NavigationView>
+        <!-- Main layout with sidebar and content -->
+        <Grid ColumnDefinitions="Auto,*">
+            <!-- Sidebar -->
+            <Border Grid.Column="0" Classes="sidebar">
+                <StackPanel>
+                    <!-- Navigation Items -->
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Classes="sidebar-item"
+                                        Classes.selected="{Binding IsSelected}"
+                                        Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).SelectItemCommand}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip.Tip="{Binding Name}">
+                                    <Path Classes="icon"
+                                          Data="{Binding ListItemIcon}"/>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            
+            <!-- Content area -->
+            <ContentControl Grid.Column="1" 
+                            Content="{Binding ActivePage}"
+                            Margin="5"/>
+        </Grid>
+        
+        <!-- Dialog overlay -->
         <Grid IsVisible="{Binding Dialog.IsDialogOpen, FallbackValue=False}">
-            <Border Background="Transparent" Opacity="2"></Border>
-            <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Border Background="#80000000" Opacity="0.7"/>
+            <ContentControl Content="{Binding Dialog}" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </Window>

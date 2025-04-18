@@ -20,7 +20,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showSpinner = true;
-
+    [ObservableProperty] private TabItemTemplate _selectedTabItem;
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
         PageFactory pageFactory,

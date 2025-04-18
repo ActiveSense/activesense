@@ -3,15 +3,16 @@
              x:Class="ActiveSense.Desktop.App"
              xmlns:local="using:ActiveSense.Desktop"
              xmlns:style="using:FluentAvalonia.Styling"
-             RequestedThemeVariant="Default">
-    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             RequestedThemeVariant="Default"
+             xmlns:semi="https://irihi.tech/semi">
 
     <Application.DataTemplates>
         <local:ViewLocator />
     </Application.DataTemplates>
 
     <Application.Styles>
-        <style:FluentAvaloniaTheme PreferUserAccentColor="True"/>
+        <semi:SemiTheme />
+        <!-- <style:FluentAvaloniaTheme PreferUserAccentColor="True"/> -->
         <StyleInclude Source="Assets/Icons.axaml"></StyleInclude>
     </Application.Styles>
 </Application>
