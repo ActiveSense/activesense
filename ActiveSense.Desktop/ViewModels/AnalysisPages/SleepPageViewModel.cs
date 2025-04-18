@@ -81,11 +81,9 @@ public partial class SleepPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            // Skip analyses with no sleep records
             if (analysis.SleepRecords.Count == 0)
                 continue;
 
-            // Extract data from sleep records
             var labels = analysis.SleepRecords
                 .Select(r => _dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
                 .ToArray();
@@ -98,7 +96,6 @@ public partial class SleepPageViewModel : PageViewModel
                 })
                 .ToArray();
 
-            // Create DTO
             chartDataDtos.Add(new ChartDataDTO
             {
                 Labels = labels,
