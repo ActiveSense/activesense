@@ -16,9 +16,8 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class ProcessPageViewModel(
     SensorProcessorFactory sensorProcessorFactory,
-    IScriptService scriptService,
-    MainViewModel mainViewModel,
-    DialogService dialogService)
+    IScriptService scriptService
+)
     : PageViewModel
 {
     [ObservableProperty] private bool _isProcessing;
@@ -44,27 +43,10 @@ public partial class ProcessPageViewModel(
         }
     }
 
-    [RelayCommand]
-    public async Task TriggerDialog()
-    {
-        var dialog = new ProcessDialogViewModel
-        {
-            Title = "Analyse läuft",
-            Message = "Bitte warten Sie, während die Analyse durchgeführt wird.",
-        };
-        
-        await dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(mainViewModel, dialog);
-        
-        if (!dialog.Confirmed)
-        {
-            Console.WriteLine("Dialog was cancelled");
-        }
-    }
 
     [RelayCommand]
     private async Task ProcessFiles()
     {
-        
         if (SelectedFiles is null || SelectedFiles.Length == 0)
         {
             StatusMessage = "No files selected";
@@ -73,7 +55,7 @@ public partial class ProcessPageViewModel(
 
 
         var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
-        
+
         IsProcessing = true;
         StatusMessage = "Processing files...";
 

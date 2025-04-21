@@ -16,20 +16,36 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly PageFactory _pageFactory;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
+    private readonly DialogService _dialogService;
+    private readonly MainViewModel _mainViewModel;
+    private readonly ProcessDialogViewModel _processDialogViewModel;
+    private bool _isInitialized = false;
+    
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showSpinner = true;
     [ObservableProperty] private TabItemTemplate _selectedTabItem;
+
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
         PageFactory pageFactory,
-        SharedDataService sharedDataService)
+        SharedDataService sharedDataService,
+        DialogService dialogService,
+        MainViewModel mainViewModel,
+        ProcessDialogViewModel processDialogViewModel)
     {
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
         _pageFactory = pageFactory;
+        _dialogService = dialogService;
+        _mainViewModel = mainViewModel;
+        _processDialogViewModel = processDialogViewModel;
         InitializePageCommand.Execute(null);
+    }
+
+    public AnalysisPageViewModel()
+    {
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
@@ -65,6 +81,15 @@ public partial class AnalysisPageViewModel : PageViewModel
         {
             Console.WriteLine(ex.Message);
         }
+    }
+
+
+    [RelayCommand]
+    public async Task TriggerDialog()
+    {
+
+        await _dialogService.ShowDialog<MainViewModel, ProcessPageViewModel>(_mainViewModel, _processDialogViewModel);
+
     }
 }
 
