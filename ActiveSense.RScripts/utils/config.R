@@ -56,7 +56,8 @@ librarys <- c(
   "future",
   "promises",
   "versions",
-  "optparse"
+  "optparse",
+  "testthat"
 )
 
 library_installer(librarys)
@@ -68,6 +69,7 @@ library(reshape2)
 library(future)
 library(promises)
 library(optparse)
+library(testthat)
 
 # ==================================
 # PARAMETERS
