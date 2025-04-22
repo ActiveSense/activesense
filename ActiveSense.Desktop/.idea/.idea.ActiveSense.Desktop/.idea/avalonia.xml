@@ -5,6 +5,7 @@
       <map>
         <entry key="App.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Assets/Icons.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Assets/Styles.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ActivityPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Analysis.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/AnalysisPageView.axaml" value="ActiveSense.Desktop.csproj" />

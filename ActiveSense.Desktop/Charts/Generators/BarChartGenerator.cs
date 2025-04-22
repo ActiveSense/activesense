@@ -10,11 +10,11 @@ using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewMode
 
 namespace ActiveSense.Desktop.Charts.Generators;
 
-public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartColors)
+public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, ChartDataDTO[] lineData = null)
 {
     public BarChartViewModel GenerateChart(string title, string description)
     {
-        if (chartDataDtos == null || chartDataDtos.Length == 0)
+        if (barData == null || barData.Length == 0)
         {
             return new BarChartViewModel
             {
@@ -24,16 +24,16 @@ public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartCo
             };
         }
 
-        var allLabels = chartDataDtos
+        var allLabels = barData
             .SelectMany(dto => dto.Labels)
             .Distinct()
             .ToArray();
 
         var series = new List<ISeries>();
-        var colors = chartColors.GetColorPalette(chartDataDtos.Length);
+        var colors = chartColors.GetColorPalette(barData.Length);
         int colorIndex = 0;
 
-        foreach (var dto in chartDataDtos)
+        foreach (var dto in barData)
         {
             var valueMap = new Dictionary<string, double>();
 
@@ -64,8 +64,27 @@ public class BarChartGenerator(ChartDataDTO[] chartDataDtos, ChartColors chartCo
             });
         }
         
+        // Add line series if provided
+        if (lineData != null)
+        {
+            foreach (var dto in lineData)
+            {
+                var lineValues = dto.Data;
+
+                series.Add(new LineSeries<double>
+                {
+                    Values = lineValues,
+                    Stroke = new SolidColorPaint(SKColors.Red, 2),
+                    Fill = null,
+                    GeometrySize = 0,
+                    Name = dto.Title ?? "Line Series",
+                    LineSmoothness = 0
+                });
+            }
+        }
+        
         // Add mean line
-        var allValues = chartDataDtos.SelectMany(dto => dto.Data);
+        var allValues = barData.SelectMany(dto => dto.Data);
         double meanValue = allValues.Any() ? allValues.Average() : 0;
         var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
         series.Add(new LineSeries<double>

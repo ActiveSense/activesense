@@ -12,7 +12,7 @@
 
     <Application.Styles>
         <semi:SemiTheme />
-        <!-- <style:FluentAvaloniaTheme PreferUserAccentColor="True"/> -->
         <StyleInclude Source="Assets/Icons.axaml"></StyleInclude>
+        <StyleInclude Source="Assets/Styles.axaml"></StyleInclude>
     </Application.Styles>
 </Application>

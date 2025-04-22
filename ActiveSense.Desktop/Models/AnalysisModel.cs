@@ -48,6 +48,15 @@ public class Analysis(DateToWeekdayConverter dateToWeekdayConverter)
         .Select(record => double.TryParse(record.Light, out var steps) ? steps : 0)
         .ToArray();
     
+    public double[] SleepEfficiency => SleepRecords
+        .Select(record => double.TryParse(record.SleepEfficiency, out var steps) ? steps : 0)
+        .ToArray();
+    
+    public double[] StepsPercentage => ActivityRecords
+        .Select(record => double.TryParse(record.Steps, out var steps) ? steps : 0)
+        .Select(steps => steps / 10000 * 100)
+        .ToArray();
+    
     public string[] SleepWeekdays()
     {
       var weekdays = SleepRecords 

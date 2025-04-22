@@ -2,7 +2,70 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="analysisPages:GeneralPageViewModel"
              x:Class="ActiveSense.Desktop.Views.AnalysisPages.GeneralPageView">
-    General
+    <Design.DataContext>
+        <analysisPages:GeneralPageViewModel />
+    </Design.DataContext>
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Visible"
+                  HorizontalScrollBarVisibility="Disabled">
+
+        <StackPanel>
+            <!-- Bar Chart -->
+            <TextBlock Classes="header" Text="Tägliche Schritte" />
+            <TextBlock Classes="description"
+                       Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen." />
+
+            <Border Margin="10">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                               Text="Test" />
+                    <TextBlock Grid.Row="1" Margin="10,2,10,0" Opacity="0.7" TextWrapping="Wrap"
+                               Text="Test" />
+                    <Border Classes="Shadow" Theme="{DynamicResource CardBorder}" />
+                </Grid>
+            </Border>
+
+            <!-- Pie Charts -->
+            <TextBlock Classes="header" Text="Tägliche Schritte" />
+            <TextBlock Classes="description"
+                       Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen." />
+
+
+            <Border Margin="10">
+                <ItemsControl ItemsSource="{Binding GeneralCharts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Margin="10,10,10,0" FontWeight="Medium"
+                                           Text="{Binding Title}" />
+                                <TextBlock Margin="10,2,10,10" Opacity="0.7" TextWrapping="Wrap"
+                                           Text="{Binding Description}" />
+                                <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                    <avalonia:CartesianChart
+                                        Series="{Binding Series}"
+                                        XAxes="{Binding XAxes}"
+                                        YAxes="{Binding YAxes}"
+                                        LegendPosition="{Binding LegendPosition}"
+                                        Margin="0,5,0,0"
+                                        MinHeight="500" />
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <!-- StackPanel arranges items vertically -->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

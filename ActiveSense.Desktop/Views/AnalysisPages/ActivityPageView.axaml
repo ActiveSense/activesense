@@ -3,47 +3,60 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
-             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
-             xmlns:global="clr-namespace:"
              xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.AnalysisPages.ActivityPageView"
              x:DataType="analysisPages:ActivityPageViewModel">
-    <ScrollViewer>
+    
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Visible"
+                  HorizontalScrollBarVisibility="Disabled">
         <Grid>
             <StackPanel>
-                <!-- Steps Chart -->
-                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                <!-- Steps Chart Section -->
+                <TextBlock Classes="header" Text="Tägliche Schritte"/>
+                <TextBlock Classes="description" 
+                           Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen."/>
+                
+                <Border Margin="10">
                     <Grid RowDefinitions="Auto,*">
                         <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
                                    Text="{Binding StepsChart.Title}" />
-                        <lvc:CartesianChart
-                            Grid.Row="1"
-                            Series="{Binding StepsChart.Series}"
-                            XAxes="{Binding StepsChart.XAxes}"
-                            YAxes="{Binding StepsChart.YAxes}"
-                            LegendPosition="{Binding StepsChart.LegendPosition}"
-                            Margin="0,5,0,0"
-                            MinHeight="300" />
+                        <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                            <lvc:CartesianChart
+                                Series="{Binding StepsChart.Series}"
+                                XAxes="{Binding StepsChart.XAxes}"
+                                YAxes="{Binding StepsChart.YAxes}"
+                                LegendPosition="{Binding StepsChart.LegendPosition}"
+                                Margin="0,5,0,0"
+                                MinHeight="300" />
+                        </Border>
                     </Grid>
                 </Border>
+
+                <!-- Activity Distribution Charts Section -->
+                <TextBlock Classes="header" Text="Aktivitätsverteilung"/>
+                <TextBlock Classes="description" 
+                           Text="Analyse der Aktivitätsintensität über verschiedene Tage. Die Diagramme zeigen die Verteilung von leichter, mittlerer und intensiver körperlicher Aktivität, um ein vollständiges Bild des Aktivitätsprofils zu erhalten."/>
                 
-                <!-- Activity Distribution Charts -->
-                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5"
-                        BoxShadow="0 2 8 0 #15000000">
+                <Border Margin="10">
                     <ItemsControl ItemsSource="{Binding ActivityDistribtionChart}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
-                                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                    <TextBlock Margin="10,10,10,0" FontWeight="Medium"
                                                Text="{Binding Title}" />
-                                    <lvc:CartesianChart
-                                        Series="{Binding Series}"
-                                        XAxes="{Binding XAxes}"
-                                        YAxes="{Binding YAxes}"
-                                        LegendPosition="{Binding LegendPosition}"
-                                        Margin="0,5,0,0"
-                                        MinHeight="300" />
+                                    <TextBlock Margin="10,2,10,10" Opacity="0.7" TextWrapping="Wrap"
+                                               Text="{Binding Description}" />
+                                    <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                        <lvc:CartesianChart
+                                            Series="{Binding Series}"
+                                            XAxes="{Binding XAxes}"
+                                            YAxes="{Binding YAxes}"
+                                            LegendPosition="{Binding LegendPosition}"
+                                            Margin="0,5,0,0"
+                                            MinHeight="300" />
+                                    </Border>
                                 </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

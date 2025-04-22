@@ -10,55 +10,65 @@
     <Design.DataContext>
         <analysisPages:SleepPageViewModel />
     </Design.DataContext>
-    <ScrollViewer>
-        <Grid>
-            <StackPanel>
-                <!-- Bar Chart -->
-                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5"
-                        BoxShadow="0 2 8 0 #15000000">
-                    <Grid RowDefinitions="Auto,*">
-                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
-                                   Text="{Binding TotalSleepChart.Title}" />
-                        <TextBlock Grid.Row="1" Margin="10,2,10,0" Opacity="0.7" TextWrapping="Wrap"
-                                   Text="{Binding TotalSleepChart.Description}" />
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Visible"
+                  HorizontalScrollBarVisibility="Disabled">
+
+        <StackPanel>
+            <!-- Bar Chart -->
+            <TextBlock Classes="header" Text="Tägliche Schritte" />
+            <TextBlock Classes="description"
+                       Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen." />
+
+            <Border Margin="10">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                               Text="{Binding TotalSleepChart.Title}" />
+                    <TextBlock Grid.Row="1" Margin="10,2,10,0" Opacity="0.7" TextWrapping="Wrap"
+                               Text="{Binding TotalSleepChart.Description}" />
+                    <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
                         <lvc:CartesianChart
-                            Grid.Row="1"
                             Series="{Binding TotalSleepChart.Series}"
                             XAxes="{Binding TotalSleepChart.XAxes}"
                             YAxes="{Binding TotalSleepChart.YAxes}"
                             LegendPosition="{Binding TotalSleepChart.LegendPosition}"
                             Margin="0,5,0,0"
-                            MinHeight="300" />
-                    </Grid>
-                </Border>
+                            MinHeight="500"
+                           />
+                    </Border>
+                </Grid>
+            </Border>
 
-                <!-- Pie Charts -->
-                <Border Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5"
-                        BoxShadow="0 2 8 0 #15000000">
-                    <ItemsControl ItemsSource="{Binding PieCharts}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid RowDefinitions="Auto,*">
-                                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
-                                               Text="{Binding Title}" />
+            <!-- Pie Charts -->
+            <TextBlock Classes="header" Text="Tägliche Schritte" />
+            <TextBlock Classes="description"
+                       Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen." />
+
+            <Border Margin="10">
+                <ItemsControl ItemsSource="{Binding PieCharts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid RowDefinitions="Auto,*">
+                                <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                           Text="{Binding Title}" />
+                                <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
                                     <lvc:PieChart
-                                        Grid.Row="1"
                                         Series="{Binding PieSeries}"
                                         MinHeight="300"
                                         MinWidth="300"
                                         LegendPosition="Bottom"
                                         Margin="0,5,0,0" />
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </Border>
-            </StackPanel>
-        </Grid>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Border>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>
