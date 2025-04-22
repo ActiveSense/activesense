@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Helpers;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -35,26 +34,12 @@ public partial class ProcessDialogViewModel(
     [ObservableProperty] private string[]? _selectedFiles;
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
-    public InteractionService<string, string[]?> SelectFilesInteractionService { get; } = new();
     public event Action<string[]?>? FilesSelected;
 
     public void SetSelectedFiles(string[]? files)
     {
         SelectedFiles = files;
         FilesSelected?.Invoke(files);
-    }
-    [RelayCommand]
-    private async Task SelectFilesAsync()
-    {
-        SelectedFiles = await SelectFilesInteractionService.HandleAsync("Select files to process");
-        if (SelectedFiles != null && SelectedFiles.Length > 0)
-        {
-            StatusMessage = $"{SelectedFiles.Length} file(s) selected";
-        }
-        else
-        {
-            StatusMessage = "No files selected";
-        }
     }
 
 

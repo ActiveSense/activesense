@@ -64,6 +64,7 @@ public partial class AnalysisPageViewModel : PageViewModel
             var parser = _resultParserFactory.GetParser(SensorType);
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
+            TabItems.Clear();
 
 
             foreach (var file in files) ResultFiles.Add(file);
@@ -96,7 +97,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     [RelayCommand]
     public async Task TriggerDialog()
     {
-        await _dialogService.ShowDialog<MainViewModel, ProcessPageViewModel>(_mainViewModel, _processDialogViewModel);
+        await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
         
         // Refresh data after dialog closes
         await InitializePage();

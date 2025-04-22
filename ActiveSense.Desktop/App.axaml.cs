@@ -58,7 +58,6 @@ public class App : Application
         collection.AddTransient<SleepPageViewModel>();
         collection.AddTransient<ActivityPageViewModel>();
         collection.AddTransient<GeneralPageViewModel>();
-        collection.AddTransient<ProcessPageViewModel>();
         
         // Register converters
         collection.AddTransient<DateToWeekdayConverter>();
@@ -71,7 +70,6 @@ public class App : Application
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
             ApplicationPageNames.Analyse => x.GetRequiredService<AnalysisPageViewModel>(),
-            ApplicationPageNames.Upload => x.GetRequiredService<ProcessPageViewModel>(),
             ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
             ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
             ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),

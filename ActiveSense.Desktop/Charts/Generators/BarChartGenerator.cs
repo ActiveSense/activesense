@@ -12,6 +12,35 @@ namespace ActiveSense.Desktop.Charts.Generators;
 
 public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, ChartDataDTO[] lineData = null)
 {
+    /// <summary>
+    /// Normalizes chart data to make sure that all series have values for each label
+    /// </summary>
+    /// <returns>An array of values corresponding to each label in allLabels</returns>
+    public double[] NormalizeChartData(ChartDataDTO dto, string[] allLabels)
+    {
+        var valueMap = new Dictionary<string, double>();
+
+        // Initialize all labels with zero
+        foreach (var label in allLabels)
+        {
+            valueMap[label] = 0;
+        }
+
+        // Map the actual values from the DTO to their corresponding labels
+        for (int i = 0; i < dto.Labels.Length; i++)
+        {
+            if (i < dto.Data.Length)
+            {
+                valueMap[dto.Labels[i]] = dto.Data[i];
+            }
+        }
+
+        // Create a new array with values in the same order as allLabels
+        return allLabels
+            .Select(label => valueMap[label])
+            .ToArray();
+    }
+
     public BarChartViewModel GenerateChart(string title, string description)
     {
         if (barData == null || barData.Length == 0)
@@ -26,6 +55,7 @@ public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, 
 
         var allLabels = barData
             .SelectMany(dto => dto.Labels)
+            .Concat(lineData?.SelectMany(dto => dto.Labels) ?? Enumerable.Empty<string>())
             .Distinct()
             .ToArray();
 
@@ -35,24 +65,7 @@ public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, 
 
         foreach (var dto in barData)
         {
-            var valueMap = new Dictionary<string, double>();
-
-            foreach (var label in allLabels)
-            {
-                valueMap[label] = 0;
-            }
-
-            for (int i = 0; i < dto.Labels.Length; i++)
-            {
-                if (i < dto.Data.Length)
-                {
-                    valueMap[dto.Labels[i]] = dto.Data[i];
-                }
-            }
-
-            var normalizedValues = allLabels
-                .Select(label => valueMap[label])
-                .ToArray();
+            var normalizedValues = NormalizeChartData(dto, allLabels);
 
             series.Add(new ColumnSeries<double>
             {
@@ -63,17 +76,17 @@ public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, 
                 Name = dto.Title ?? $"Series {colorIndex}"
             });
         }
-        
+
         // Add line series if provided
         if (lineData != null)
         {
             foreach (var dto in lineData)
             {
-                var lineValues = dto.Data;
+                var normalizedValues = NormalizeChartData(dto, allLabels);
 
                 series.Add(new LineSeries<double>
                 {
-                    Values = lineValues,
+                    Values = normalizedValues,
                     Stroke = new SolidColorPaint(SKColors.Red, 2),
                     Fill = null,
                     GeometrySize = 0,
@@ -82,7 +95,7 @@ public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, 
                 });
             }
         }
-        
+
         // Add mean line
         var allValues = barData.SelectMany(dto => dto.Data);
         double meanValue = allValues.Any() ? allValues.Average() : 0;
@@ -101,8 +114,8 @@ public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, 
         {
             Labels = allLabels,
             LabelsRotation = -45,
-            ForceStepToMin = true, 
-            MinStep = 1 
+            ForceStepToMin = true,
+            MinStep = 1
         };
 
         return new BarChartViewModel
@@ -114,5 +127,4 @@ public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, 
             YAxes = new[] { new Axis() }
         };
     }
-
 }
