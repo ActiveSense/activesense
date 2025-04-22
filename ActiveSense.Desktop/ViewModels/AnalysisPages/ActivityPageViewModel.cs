@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Models;
@@ -18,7 +19,7 @@ public partial class ActivityPageViewModel : PageViewModel
 
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
     [ObservableProperty] private BarChartViewModel _stepsChart = new();
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _activityDistribtionChart = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _activityDistributionChart = new();
 
     public ActivityPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
     {
@@ -52,33 +53,13 @@ public partial class ActivityPageViewModel : PageViewModel
 
     private void CreateActivityDistributionChart()
     {
-        ActivityDistribtionChart.Clear();
+        ActivityDistributionChart.Clear();
         
         foreach (var analysis in SelectedAnalyses)
         {
-            var dto = new ChartDataDTO[]
-            {
-                new ChartDataDTO()
-                {
-                    Data = analysis.LightActivity,
-                    Labels = analysis.ActivityWeekdays(),
-                    Title = "Leichte Aktivität",
-                },
-                new ChartDataDTO()
-                {
-                    Data = analysis.ModerateActivity,
-                    Labels = analysis.ActivityWeekdays(),
-                    Title = "Mittlere Aktivität",
-                },
-                new ChartDataDTO()
-                {
-                    Data = analysis.VigorousActivity,
-                    Labels = analysis.ActivityWeekdays(),
-                    Title = "Intensive Aktivität",
-                }
-            };
+            var dto = analysis.GetActivityDistributionChartData().ToArray();
             var chartGenerator = new StackedBarGenerator(dto, _chartColors);
-            ActivityDistribtionChart.Add(chartGenerator.GenerateChart($"Aktivitätsverteilung {analysis.FileName}", "Aktivitätsverteilung pro Tag"));
+            ActivityDistributionChart.Add(chartGenerator.GenerateChart($"Aktivitätsverteilung {analysis.FileName}", "Aktivitätsverteilung pro Tag"));
         }
     }
 
@@ -87,16 +68,8 @@ public partial class ActivityPageViewModel : PageViewModel
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
         {
-            var data = analysis.StepsPerDay;
-            var labels = analysis.ActivityWeekdays();
-
-            dtos.Add(new ChartDataDTO()
-            {
-                Data = data,
-                Labels = labels,
-            });
+            dtos.Add(analysis.GetStepsChartData());
         }
-
 
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
         StepsChart = chartGenerator.GenerateChart("Schritte pro Tag", "Durchschnittliche Schritte pro Tag");

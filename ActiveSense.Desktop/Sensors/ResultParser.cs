@@ -64,11 +64,11 @@ public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverte
 
                     if (analysisType == AnalysisType.Activity)
                     {
-                        analysis.ActivityRecords = csv.GetRecords<ActivityRecord>().ToList();
+                        analysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
                     }
                     else if (analysisType == AnalysisType.Sleep)
                     {
-                        analysis.SleepRecords = csv.GetRecords<SleepRecord>().ToList();
+                        analysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
                     }
                 }
                 catch (Exception e)

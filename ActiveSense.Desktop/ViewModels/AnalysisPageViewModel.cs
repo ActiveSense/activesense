@@ -70,9 +70,17 @@ public partial class AnalysisPageViewModel : PageViewModel
             
             foreach (var pageName in parser.GetAnalysisPages())
             {
-                TabItems.Add(new TabItemTemplate($"{pageName.ToString()}", pageName,
+                TabItems.Add(new TabItemTemplate(
+                    $"{pageName.ToString()}", 
+                    pageName,
                     _pageFactory.GetPageViewModel(pageName)));
                 Console.WriteLine($"Loaded {pageName.ToString()}");
+            }
+
+            // Select the first tab if available
+            if (TabItems.Count > 0 && SelectedTabItem == null)
+            {
+                SelectedTabItem = TabItems[0];
             }
 
             ShowSpinner = false;
@@ -80,6 +88,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            ShowSpinner = false;
         }
     }
 
@@ -87,9 +96,10 @@ public partial class AnalysisPageViewModel : PageViewModel
     [RelayCommand]
     public async Task TriggerDialog()
     {
-
         await _dialogService.ShowDialog<MainViewModel, ProcessPageViewModel>(_mainViewModel, _processDialogViewModel);
-
+        
+        // Refresh data after dialog closes
+        await InitializePage();
     }
 }
 

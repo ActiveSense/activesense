@@ -40,7 +40,7 @@
                            Text="Analyse der Aktivitätsintensität über verschiedene Tage. Die Diagramme zeigen die Verteilung von leichter, mittlerer und intensiver körperlicher Aktivität, um ein vollständiges Bild des Aktivitätsprofils zu erhalten."/>
                 
                 <Border Margin="10">
-                    <ItemsControl ItemsSource="{Binding ActivityDistribtionChart}">
+                    <ItemsControl ItemsSource="{Binding ActivityDistributionChart}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>

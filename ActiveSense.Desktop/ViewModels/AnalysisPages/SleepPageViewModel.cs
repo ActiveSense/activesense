@@ -73,22 +73,7 @@ public partial class SleepPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            var labels = analysis.SleepWeekdays();
-
-            var sleepTimes = analysis.SleepRecords
-                .Select(r =>
-                {
-                    double.TryParse(r.TotalSleepTime, out var time);
-                    return time / 3600; // Convert to hours
-                })
-                .ToArray();
-
-            chartDataDtos.Add(new ChartDataDTO
-            {
-                Labels = labels,
-                Data = sleepTimes,
-                Title = analysis.FileName
-            });
+            chartDataDtos.Add(analysis.GetTotalSleepTimePerDayChartData());
         }
 
         var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors);
@@ -101,9 +86,7 @@ public partial class SleepPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            var dto = new ChartDataDTO();
-            dto.Labels = new[] { "Total Sleep Time", "Total Wake Time" };
-            dto.Data = new[] { analysis.TotalSleepTime, analysis.TotalWakeTime };
+            var dto = analysis.GetSleepChartData();
             var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
             PieCharts.Add(pieChartGenerator.GenerateChart($"Schlafverteilung {analysis.FileName}", "Verteilung der Schlaf- und Wachzeiten"));
         }
