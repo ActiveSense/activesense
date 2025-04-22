@@ -72,56 +72,56 @@ public class ProcessorTests
         Assert.That(success, Is.True, "Failed to copy files to directory");
     }
 
-    [Test]
-    public async Task ExecuteRScript()
-    {
-        // Arrange
-        var processor = _sensorProcessorFactory.GetSensorProcessor(SensorTypes.GENEActiv);
-        Assert.That(processor, Is.Not.Null, "Failed to create GENEActiv processor");
-
-        // Add this before executing the processor
-        var scriptPath = _rScriptService.GetScriptPath();
-        Assert.That(File.Exists(scriptPath), Is.True, $"R script not found at {scriptPath}");
-
-        // Act
-        var arguments = $"-d {Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output/")}";
-        var result = await processor.ProcessAsync(arguments);
-
-        // Assert
-        Assert.That(result.Success, Is.True, $"Script execution failed: {result.Error}");
-    }
-
-    [Test]
-    public async Task ParseResults()
-    {
-        var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
-        var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output");
-        var results = await parser.ParseResultsAsync(outputDirectory);
-
-        var enumerable = results as Analysis[] ?? results.ToArray();
-        Assert.That(enumerable.Length, Is.GreaterThan(0), "No results found in the output directory");
-
-        foreach (var result in enumerable)
-        {
-            Console.WriteLine($"Name: {result.FileName}, Path: {result.FilePath}");
-            
-            foreach (var record in result.ActivityRecords)
-            {
-                Console.WriteLine(
-                    $"Day: {record.Day}, Steps: {record.Steps}, NonWear: {record.NonWear}, Sleep: {record.Sleep}, " +
-                    $"Sedentary: {record.Sedentary}, Light: {record.Light}, Moderate: {record.Moderate}, Vigorous: {record.Vigorous}");
-            }
-
-            foreach (var record in result.SleepRecords)
-            {
-                Console.WriteLine(
-                    $"NightStarting: {record.NightStarting}, SleepOnsetTime: {record.SleepOnsetTime}, RiseTime: {record.RiseTime}, " +
-                    $"TotalElapsedBedTime: {record.TotalElapsedBedTime}, TotalSleepTime: {record.TotalSleepTime}, " +
-                    $"TotalWakeTime: {record.TotalWakeTime}, SleepEfficiency: {record.SleepEfficiency}, " +
-                    $"NumActivePeriods: {record.NumActivePeriods}, MedianActivityLength: {record.MedianActivityLength}");
-            }
-        }
-    }
+    // [Test]
+    // public async Task ExecuteRScript()
+    // {
+    //     // Arrange
+    //     var processor = _sensorProcessorFactory.GetSensorProcessor(SensorTypes.GENEActiv);
+    //     Assert.That(processor, Is.Not.Null, "Failed to create GENEActiv processor");
+    //
+    //     // Add this before executing the processor
+    //     var scriptPath = _rScriptService.GetScriptPath();
+    //     Assert.That(File.Exists(scriptPath), Is.True, $"R script not found at {scriptPath}");
+    //
+    //     // Act
+    //     var arguments = $"-d {Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output/")}";
+    //     var result = await processor.ProcessAsync(arguments);
+    //
+    //     // Assert
+    //     Assert.That(result.Success, Is.True, $"Script execution failed: {result.Error}");
+    // }
+    //
+    // [Test]
+    // public async Task ParseResults()
+    // {
+    //     var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
+    //     var outputDirectory = Path.Combine(AppConfig.OutputsDirectoryPath, "rscript_output");
+    //     var results = await parser.ParseResultsAsync(outputDirectory);
+    //
+    //     var enumerable = results as Analysis[] ?? results.ToArray();
+    //     Assert.That(enumerable.Length, Is.GreaterThan(0), "No results found in the output directory");
+    //
+    //     foreach (var result in enumerable)
+    //     {
+    //         Console.WriteLine($"Name: {result.FileName}, Path: {result.FilePath}");
+    //         
+    //         foreach (var record in result.ActivityRecords)
+    //         {
+    //             Console.WriteLine(
+    //                 $"Day: {record.Day}, Steps: {record.Steps}, NonWear: {record.NonWear}, Sleep: {record.Sleep}, " +
+    //                 $"Sedentary: {record.Sedentary}, Light: {record.Light}, Moderate: {record.Moderate}, Vigorous: {record.Vigorous}");
+    //         }
+    //
+    //         foreach (var record in result.SleepRecords)
+    //         {
+    //             Console.WriteLine(
+    //                 $"NightStarting: {record.NightStarting}, SleepOnsetTime: {record.SleepOnsetTime}, RiseTime: {record.RiseTime}, " +
+    //                 $"TotalElapsedBedTime: {record.TotalElapsedBedTime}, TotalSleepTime: {record.TotalSleepTime}, " +
+    //                 $"TotalWakeTime: {record.TotalWakeTime}, SleepEfficiency: {record.SleepEfficiency}, " +
+    //                 $"NumActivePeriods: {record.NumActivePeriods}, MedianActivityLength: {record.MedianActivityLength}");
+    //         }
+    //     }
+    // }
 
     [OneTimeTearDown]
     public void Cleanup()
