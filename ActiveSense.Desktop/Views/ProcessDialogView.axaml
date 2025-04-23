@@ -3,8 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             Width="650"
-             MaxHeight="600"
+             Width="850"
+             MaxHeight="800"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              x:DataType="viewModels:ProcessDialogViewModel"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
@@ -112,9 +112,8 @@
                             <StackPanel Spacing="8">
                                 <TextBlock Classes="subheading">Processing Settings</TextBlock>
 
-                                <ui:SettingsExpander Header="Sleep Cut-Off"
-                                                     Description="Threshold for sleep detection"
-                                                     IconSource="Bed">
+                                <ui:SettingsExpander Header="Sedentary Threshold"
+                                                     >
                                     <ui:SettingsExpander.Footer>
                                         <ui:NumberBox Value="6.2"
                                                       SimpleNumberFormat="F2"
@@ -125,9 +124,32 @@
                                     </ui:SettingsExpander.Footer>
                                 </ui:SettingsExpander>
 
-                                <ui:SettingsExpander Header="Activity Cut-Off"
-                                                     Description="Threshold for activity detection"
-                                                     IconSource="Walk">
+                                <ui:SettingsExpander Header="Light Threshold"
+                                                     >
+                                    <ui:SettingsExpander.Footer>
+                                        <ui:NumberBox Value="3.4"
+                                                      SimpleNumberFormat="F2"
+                                                      ValidationMode="InvalidInputOverwritten"
+                                                      SpinButtonPlacementMode="Compact"
+                                                      SmallChange="0.1"
+                                                      Width="120" />
+                                    </ui:SettingsExpander.Footer>
+                                </ui:SettingsExpander>
+                                
+                                <ui:SettingsExpander Header="Medium Threshold"
+                                                    >
+                                    <ui:SettingsExpander.Footer>
+                                        <ui:NumberBox Value="3.4"
+                                                      SimpleNumberFormat="F2"
+                                                      ValidationMode="InvalidInputOverwritten"
+                                                      SpinButtonPlacementMode="Compact"
+                                                      SmallChange="0.1"
+                                                      Width="120" />
+                                    </ui:SettingsExpander.Footer>
+                                </ui:SettingsExpander>
+                                
+                                <ui:SettingsExpander Header="Vigorous Threshold"
+                                                   >
                                     <ui:SettingsExpander.Footer>
                                         <ui:NumberBox Value="3.4"
                                                       SimpleNumberFormat="F2"
