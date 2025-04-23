@@ -17,8 +17,8 @@
         <Grid>
             <!-- Empty state message when no charts are visible -->
             <Border IsVisible="{Binding !ChartsVisible}"
-                    Background="#F8F8F8" 
-                    CornerRadius="8" 
+                    Background="#F8F8F8"
+                    CornerRadius="8"
                     Padding="20"
                     Margin="20"
                     HorizontalAlignment="Center"
@@ -26,18 +26,18 @@
                     MaxWidth="400">
                 <StackPanel Spacing="15" HorizontalAlignment="Center">
                     <!-- Message -->
-                    <TextBlock Text="Keine Daten ausgewählt" 
-                               FontSize="20" 
+                    <TextBlock Text="Keine Daten ausgewählt"
+                               FontSize="20"
                                FontWeight="SemiBold"
-                               HorizontalAlignment="Center"/>
-                    
-                    <TextBlock Text="Bitte wählen Sie eine oder mehrere Analysen aus der rechten Seitenleiste aus, um die allgemeine Übersicht anzuzeigen."
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"
-                               Foreground="#666666"/>
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock
+                        Text="Bitte wählen Sie eine oder mehrere Analysen aus der rechten Seitenleiste aus, um die allgemeine Übersicht anzuzeigen."
+                        TextWrapping="Wrap"
+                        TextAlignment="Center"
+                        Foreground="#666666" />
                 </StackPanel>
             </Border>
-            
             <!-- Charts content -->
             <StackPanel IsVisible="{Binding ChartsVisible}">
                 <!-- Bar Chart -->
@@ -45,7 +45,6 @@
                 <TextBlock Classes="description"
                            Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen." />
 
-                <!-- Remove test placeholder content -->
                 <Border Margin="10">
                     <ItemsControl ItemsSource="{Binding GeneralCharts}">
                         <ItemsControl.ItemTemplate>
@@ -53,8 +52,6 @@
                                 <StackPanel>
                                     <TextBlock Margin="10,10,10,0" FontWeight="Medium"
                                                Text="{Binding Title}" />
-                                    <TextBlock Margin="10,2,10,10" Opacity="0.7" TextWrapping="Wrap"
-                                               Text="{Binding Description}" />
                                     <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
                                         <avalonia:CartesianChart
                                             Series="{Binding Series}"
@@ -71,6 +68,42 @@
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Activity Distribution Charts Section -->
+                <TextBlock Classes="header" Text="{Binding MovementTitle}" />
+                <TextBlock Classes="description"
+                           Text="{Binding MovementDescription}" />
+
+                <Border Margin="10,10,10,20">
+                    <ItemsControl ItemsSource="{Binding MovementPieCharts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                               Text="{Binding Title}" />
+                                    <Border Grid.Row="1" Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                        <avalonia:PieChart
+                                            Series="{Binding PieSeries}"
+                                            MinHeight="300"
+                                            MinWidth="200"
+                                            LegendPosition="Bottom"
+                                            Margin="0,5,0,0" />
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>

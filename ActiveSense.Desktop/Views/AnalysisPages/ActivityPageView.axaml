@@ -77,8 +77,6 @@
                                 <StackPanel>
                                     <TextBlock Margin="10,10,10,0" FontWeight="Medium"
                                                Text="{Binding Title}" />
-                                    <TextBlock Margin="10,2,10,10" Opacity="0.7" TextWrapping="Wrap"
-                                               Text="{Binding Description}" />
                                     <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
                                         <lvc:CartesianChart
                                             Series="{Binding Series}"

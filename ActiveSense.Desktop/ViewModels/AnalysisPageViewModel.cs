@@ -66,10 +66,7 @@ public partial class AnalysisPageViewModel : PageViewModel
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
 
-
             foreach (var file in files) ResultFiles.Add(file);
-
-
 
             foreach (var pageName in parser.GetAnalysisPages())
             {

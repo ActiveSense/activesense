@@ -73,6 +73,7 @@ public class Analysis
             ? _sleepRecords.Average(record => TryParseDouble(record.TotalWakeTime)) 
             : 0);
 
+    
     public double[] SleepEfficiency => GetCachedValue(() => 
         _sleepRecords
             .Select(record => TryParseDouble(record.SleepEfficiency))
@@ -123,6 +124,24 @@ public class Analysis
             .Select(steps => steps / 10000 * 100)
             .ToArray());
 
+    public double AverageSedentaryTime => GetCachedValue(() => 
+        _activityRecords.Any() 
+            ? _activityRecords.Average(record => TryParseDouble(record.Sedentary)) 
+            : 0);
+    
+    public double AverageLightActivity => GetCachedValue(() => 
+        _activityRecords.Any() 
+            ? _activityRecords.Average(record => TryParseDouble(record.Light)) 
+            : 0);
+    public double AverageModerateActivity => GetCachedValue(() => 
+        _activityRecords.Any() 
+            ? _activityRecords.Average(record => TryParseDouble(record.Moderate)) 
+            : 0);
+    
+    public double AverageVigorousActivity => GetCachedValue(() => 
+        _activityRecords.Any() 
+            ? _activityRecords.Average(record => TryParseDouble(record.Vigorous)) 
+            : 0);
     #endregion
 
     #region Data Access Methods
@@ -181,6 +200,16 @@ public class Analysis
             Labels = new[] { "Total Sleep Time", "Total Wake Time" },
             Data = new[] { TotalSleepTime, TotalWakeTime },
             Title = $"Schlafverteilung {FileName}"
+        };
+    }
+
+    public ChartDataDTO GetMovementPatternChartData()
+    {
+        return new ChartDataDTO()
+        {
+            Labels = new[] { "Aktivität", "Schlaf", "Sitzzeit" },
+            Data = new[] { (AverageLightActivity + AverageModerateActivity + AverageVigorousActivity), AverageSleepTime, AverageSedentaryTime },
+            Title = $"Aktivitätsverteilung {FileName}",
         };
     }
     

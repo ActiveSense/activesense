@@ -87,7 +87,7 @@ public partial class SleepPageViewModel : PageViewModel
             var dto = analysis.GetSleepChartData();
             var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
             if (SelectedAnalyses.Any())
-                PieCharts.Add(pieChartGenerator.GenerateChart($"Schlafverteilung {analysis.FileName}",
+                PieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
                     "Verteilung der Schlaf- und Wachzeiten"));
         }
     }

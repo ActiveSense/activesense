@@ -15,9 +15,16 @@ public partial class GeneralPageViewModel : PageViewModel
 {
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
-    [ObservableProperty] private bool _chartsVisible = false;
+    [ObservableProperty] private bool _chartsVisible;
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _generalCharts = new();
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _generalCharts2 = new();
+
+    [ObservableProperty]
+    private string _movementDescription = "Die durchschnittliche Verteilung der Aktivität über 24h";
+
+    [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = new();
+
+    [ObservableProperty] private string _movementTitle = "Aktivitätsverteilung";
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
 
     public GeneralPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
@@ -33,6 +40,7 @@ public partial class GeneralPageViewModel : PageViewModel
     {
         UpdateSelectedAnalyses();
         CreateStepsChart();
+        CreateMovementPieChart();
     }
 
     private void UpdateSelectedAnalyses()
@@ -42,6 +50,21 @@ public partial class GeneralPageViewModel : PageViewModel
         ChartsVisible = SelectedAnalyses.Any();
     }
 
+    #region Chart generation
+
+    private void CreateMovementPieChart()
+    {
+        MovementPieCharts.Clear();
+        foreach (var analysis in SelectedAnalyses)
+        {
+            var dto = analysis.GetMovementPatternChartData();
+            var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
+            if (SelectedAnalyses.Any())
+                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                    "Die durchschnittliche Verteilung der Aktivität über 24h"));
+        }
+    }
+
     private void CreateStepsChart()
     {
         GeneralCharts.Clear();
@@ -49,7 +72,7 @@ public partial class GeneralPageViewModel : PageViewModel
         {
             var line = new List<ChartDataDTO>();
             var bar = new List<ChartDataDTO>();
-            
+
             var labels = analysis.ActivityWeekdays();
 
             bar.Add(new ChartDataDTO
@@ -65,7 +88,9 @@ public partial class GeneralPageViewModel : PageViewModel
                 Title = "Schlaf-Effizienz"
             });
             var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
-            GeneralCharts.Add(chartGenerator.GenerateChart("Schritte pro Tag", "Durchschnittliche Schritte pro Tag"));
+            GeneralCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
         }
     }
+
+    #endregion
 }
