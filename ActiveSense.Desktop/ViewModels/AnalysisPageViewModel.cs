@@ -19,6 +19,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly ProcessDialogViewModel _processDialogViewModel;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
+    private readonly ExportDialogViewModel _exportDialogViewModel;
     private bool _isInitialized = false;
 
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
@@ -33,7 +34,8 @@ public partial class AnalysisPageViewModel : PageViewModel
         SharedDataService sharedDataService,
         DialogService dialogService,
         MainViewModel mainViewModel,
-        ProcessDialogViewModel processDialogViewModel)
+        ProcessDialogViewModel processDialogViewModel,
+        ExportDialogViewModel exportDialogViewModel)
     {
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
@@ -41,10 +43,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         _dialogService = dialogService;
         _mainViewModel = mainViewModel;
         _processDialogViewModel = processDialogViewModel;
-    }
-
-    public AnalysisPageViewModel()
-    {
+        _exportDialogViewModel = exportDialogViewModel;
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
@@ -85,12 +84,18 @@ public partial class AnalysisPageViewModel : PageViewModel
 
 
     [RelayCommand]
-    public async Task TriggerDialog()
+    public async Task TriggerProcessDialog()
     {
         await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
 
         // Refresh data after dialog closes
         await Initialize();
+    }
+    
+    [RelayCommand]
+    public async Task TriggerExportDialog()
+    {
+        await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);
     }
 }
 

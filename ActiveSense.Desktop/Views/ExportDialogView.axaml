@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ActiveSense.Desktop.Views.ExportDialogView"
+             x:DataType="viewModels:ExportDialogViewModel">
+ <Border
+        CornerRadius="16"
+        BorderThickness="0"
+        Background="#F0F6F9"
+        BoxShadow="0 4 24 0 #20000000">
+        <Grid RowDefinitions="Auto, *, Auto">
+            
+            <!-- Footer -->
+            <Grid Grid.Row="2"
+                  Margin="24,20"
+                  ColumnDefinitions="Auto, *, Auto">
+
+                <Button Grid.Column="0"
+                        Classes="action"
+                        HorizontalAlignment="Left"
+                        Command="{Binding CancelCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock>Abbrechen</TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

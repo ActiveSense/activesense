@@ -82,7 +82,8 @@
                             CornerRadius="12"
                             Background="#E8EFF1"
                             BorderThickness="0"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            Command="{Binding TriggerExportDialogCommand}">
                         <ui:SymbolIcon Symbol="Download" FontSize="16" Foreground="#333333" />
                     </Button>
 
@@ -93,7 +94,7 @@
                             CornerRadius="10"
                             Classes="Secondary"
                             Theme="{DynamicResource SolidButton}"
-                            Command="{Binding TriggerDialogCommand}">
+                            Command="{Binding TriggerProcessDialogCommand}">
                         <ui:SymbolIcon Symbol="Add" FontSize="16" Foreground="White" />
                     </Button>
                 </StackPanel>
