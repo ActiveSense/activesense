@@ -3,13 +3,17 @@ using FluentAvalonia.UI.Windowing;
 
 namespace ActiveSense.Desktop.Views;
 
-public partial class MainView : AppWindow 
+public partial class MainView : AppWindow
 {
     public MainView()
     {
         InitializeComponent();
-        
-        TitleBar.ExtendsContentIntoTitleBar = true;
-        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+        this.Loaded += (s, e) =>
+        {
+            if (DataContext is MainViewModel viewModel)
+            {
+                viewModel.Initialize();
+            }
+        };
     }
 }

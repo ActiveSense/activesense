@@ -1,17 +1,25 @@
 using System;
 using System.Linq;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Charts.Generators;
+using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
+using ActiveSense.Desktop.ViewModels.AnalysisPages;
+using ActiveSense.Desktop.ViewModels.Charts;
 using ActiveSense.Desktop.Views;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
+using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
+using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
+using SleepPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.SleepPageViewModel;
 
 namespace ActiveSense.Desktop;
 
@@ -50,12 +58,18 @@ public class App : Application
         collection.AddTransient<SleepPageViewModel>();
         collection.AddTransient<ActivityPageViewModel>();
         collection.AddTransient<GeneralPageViewModel>();
-        collection.AddTransient<ProcessPageViewModel>();
+        
+        // Register converters
+        collection.AddTransient<DateToWeekdayConverter>();
+        
+        // Register charts
+        collection.AddTransient<BarChartViewModel>();
+        collection.AddTransient<PieChartViewModel>();
+        collection.AddTransient<ChartColors>();
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
-            ApplicationPageNames.Analyse => x.GetRequiredService<ViewModels.AnalysisPageViewModel>(),
-            ApplicationPageNames.Upload => x.GetRequiredService<ProcessPageViewModel>(),
+            ApplicationPageNames.Analyse => x.GetRequiredService<AnalysisPageViewModel>(),
             ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
             ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
             ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),
@@ -66,14 +80,14 @@ public class App : Application
         collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
-            _ => throw new ArgumentException($"No processor found for sensor type {type}")
+            _ => throw new InvalidOperationException(),
         });
 
         // Register parsers
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
-            _ => throw new ArgumentException($"No parser found for sensor type {type}")
+            _ => throw new InvalidOperationException(),
         });
         
         var services = collection.BuildServiceProvider();

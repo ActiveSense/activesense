@@ -3,55 +3,159 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
-             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
-             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:global="clr-namespace:"
+             xmlns:models="clr-namespace:ActiveSense.Desktop.Models"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.AnalysisPageView"
              x:DataType="viewModels:AnalysisPageViewModel">
-    <Grid ColumnDefinitions="3*, *" RowDefinitions="Auto,*">
-        <controls:TabView Grid.Row="0" Grid.Column="0"
-                          AddTabButtonCommandParameter="Normal"
-                          IsAddTabButtonVisible="False"
-                          TabItems="{Binding TabItems}"
-                          CanDragTabs="False"
-                          AllowDropTabs="False">
-            <controls:TabView.TabItemTemplate>
-                <DataTemplate x:DataType="viewModels:TabItemTemplate">
-                    <controls:TabViewItem Header="{Binding Name}"
-                                          Content="{Binding Page}"
-                                          IsClosable="False" />
-                </DataTemplate>
-            </controls:TabView.TabItemTemplate>
-        </controls:TabView>
-        <Border Grid.Row="0" Grid.Column="1">
-            <StackPanel>
-                <TextBlock FontSize="20">Analysen</TextBlock>
-                <Border BorderThickness="1" BorderBrush="LightGray" MinHeight="200" CornerRadius="10"
-                        Margin="0,10,10,20">
-                    <ListBox ItemsSource="{Binding ResultFiles}" SelectionMode="Multiple"
-                             SelectionChanged="OnSelectionChanged">
+
+    <Design.DataContext>
+        <viewModels:AnalysisPageViewModel />
+    </Design.DataContext>
+
+    <Grid>
+        <Grid IsVisible="{Binding !ShowSpinner}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Tab buttons using RadioButtonGroup style -->
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="5">
+                <!-- Pill-shaped segmented control tab bar -->
+                <Border Grid.Column="0"
+                        Background="#f5f5f5"
+                        CornerRadius="12"
+                        BorderThickness="0"
+                        Padding="4"
+                        HorizontalAlignment="Left">
+                    <ListBox Name="tabSelector"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ItemsSource="{Binding TabItems}"
+                             SelectedItem="{Binding SelectedTabItem}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding FileName}"></TextBlock>
-                                </StackPanel>
+                                <TextBlock Text="{Binding Name}"
+                                           Padding="16,8"
+                                           FontWeight="Medium" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="CornerRadius" Value="12" />
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Background" Duration="0:0:0.2" />
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#D8E5E9" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#A9A9A9" />
+                                <Setter Property="TextBlock.Foreground" Value="White" />
+                            </Style>
+                        </ListBox.Styles>
                     </ListBox>
                 </Border>
-                <TextBlock>Selected</TextBlock>
-                <ListBox ItemsSource="{Binding SelectedAnalyses}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding FileName}"></TextBlock>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-        </Border>
 
+                <!-- Styled action buttons -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <!-- Import/Download button - light style -->
+                    <Button Padding="0"
+                            Width="36"
+                            Height="36"
+                            CornerRadius="12"
+                            Background="#E8EFF1"
+                            BorderThickness="0"
+                            Cursor="Hand">
+                        <ui:SymbolIcon Symbol="Download" FontSize="16" Foreground="#333333" />
+                    </Button>
+
+                    <!-- Add/Plus button - dark style -->
+                    <Button Padding="0"
+                            Width="36"
+                            Height="36"
+                            CornerRadius="10"
+                            Classes="Secondary"
+                            Theme="{DynamicResource SolidButton}"
+                            Command="{Binding TriggerDialogCommand}">
+                        <ui:SymbolIcon Symbol="Add" FontSize="16" Foreground="White" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="3*, 1*" Margin="5">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,8,0">
+                    <ContentControl Content="{Binding SelectedTabItem.Page}" />
+                </Border>
+                <Border Grid.Column="1" Classes="card">
+                    <Grid RowDefinitions="Auto, *">
+                        <Border Grid.Row="1"
+                                CornerRadius="4"
+                                Padding="8">
+                            <ListBox ItemsSource="{Binding ResultFiles}"
+                                     SelectionMode="Multiple,Toggle"
+                                     SelectionChanged="OnSelectionChanged"
+                                     Theme="{DynamicResource CheckGroupListBox}"
+                                     MinHeight="300"
+                                     MaxWidth="300">
+                                <!-- Ensure proper ItemsPanel for vertical layout -->
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Analysis">
+                                        <TextBlock Text="{Binding FileName}"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Center"
+                                                   Margin="4" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Grid IsVisible="{Binding ShowSpinner}"
+              Grid.Row="1"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+            <Border Background="#80FFFFFF"
+                    CornerRadius="8"
+                    Padding="24"
+                    BoxShadow="0 4 16 0 #20000000">
+                <StackPanel Spacing="12">
+                    <ProgressBar
+                        Width="100"
+                        Height="100"
+                        IsIndeterminate="True"
+                        Theme="{DynamicResource ProgressRing}"
+                        ShowProgressText="False" />
+                    <TextBlock Text="Daten werden geladen..."
+                               HorizontalAlignment="Center"
+                               FontWeight="Medium" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

@@ -4,15 +4,27 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
 
 namespace ActiveSense.Desktop.Sensors;
 
-public class GeneActiveResultParser : IResultParser
+public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverter) : IResultParser
 {
+    private readonly ApplicationPageNames[] _analysisPages =
+    [
+        ApplicationPageNames.Activity,
+        ApplicationPageNames.Sleep,
+        ApplicationPageNames.General
+    ];
+    
+    public ApplicationPageNames[] GetAnalysisPages() {
+        return _analysisPages;
+    }
+    
     public async Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory)
     {
         var analyses = new List<Analysis>();
@@ -28,10 +40,10 @@ public class GeneActiveResultParser : IResultParser
         foreach (var directory in directories)
         {
             Console.WriteLine("Processing directory: " + directory);
-            var analysis = new Analysis
+            var analysis = new Analysis(dateToWeekdayConverter)
             {
                 FilePath = directory,
-                FileName = Path.GetFileName(directory)
+                FileName = Path.GetFileName(directory),
             };
 
             var csvFiles = Directory.GetFiles(directory, "*.csv");
@@ -52,11 +64,11 @@ public class GeneActiveResultParser : IResultParser
 
                     if (analysisType == AnalysisType.Activity)
                     {
-                        analysis.ActivityRecords = csv.GetRecords<ActivityRecord>().ToList();
+                        analysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
                     }
                     else if (analysisType == AnalysisType.Sleep)
                     {
-                        analysis.SleepRecords = csv.GetRecords<SleepRecord>().ToList();
+                        analysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
                     }
                 }
                 catch (Exception e)

@@ -1,4 +1,4 @@
-namespace ActiveSense.Desktop.Data;
+namespace ActiveSense.Desktop.Enums;
 
 public enum ApplicationPageNames
 {

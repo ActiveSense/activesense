@@ -1,11 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
-using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -13,38 +13,41 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class AnalysisPageViewModel : PageViewModel
 {
+    private readonly DialogService _dialogService;
+    private readonly MainViewModel _mainViewModel;
+    private readonly PageFactory _pageFactory;
+    private readonly ProcessDialogViewModel _processDialogViewModel;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
-    private readonly PageFactory _pageFactory;
+    private bool _isInitialized = false;
 
-    [ObservableProperty] private string _title = "Sleep";
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
-
-    public ObservableCollection<TabItemTemplate> TabItems { get; }
+    [ObservableProperty] private TabItemTemplate _selectedTabItem;
+    [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
+    [ObservableProperty] private bool _showSpinner = true;
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
         PageFactory pageFactory,
-        SharedDataService sharedDataService)
+        SharedDataService sharedDataService,
+        DialogService dialogService,
+        MainViewModel mainViewModel,
+        ProcessDialogViewModel processDialogViewModel)
     {
-        PageName = ApplicationPageNames.Analyse;
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
         _pageFactory = pageFactory;
-
-        TabItems = new ObservableCollection<TabItemTemplate>
-        {
-            new TabItemTemplate("Sleep", ApplicationPageNames.Sleep,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.Sleep)),
-            new TabItemTemplate("Activity", ApplicationPageNames.Activity,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.Activity)),
-            new TabItemTemplate("General", ApplicationPageNames.General,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.General)),
-        };
-
-        LoadResultFilesCommand.Execute(null);
+        _dialogService = dialogService;
+        _mainViewModel = mainViewModel;
+        _processDialogViewModel = processDialogViewModel;
     }
+
+    public AnalysisPageViewModel()
+    {
+    }
+
+    public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
 
     partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
     {
@@ -52,37 +55,48 @@ public partial class AnalysisPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private async Task LoadResultFiles()
+    public async Task Initialize()
     {
         Console.WriteLine("Loading result files...");
-        try
+        TabItems.Clear();
+        var parser = _resultParserFactory.GetParser(SensorType);
+        
+        await Task.Run(async () =>
         {
-            var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
 
-            foreach (var file in files)
+            foreach (var file in files) ResultFiles.Add(file);
+
+            foreach (var pageName in parser.GetAnalysisPages())
             {
-                ResultFiles.Add(file);
+                TabItems.Add(new TabItemTemplate(
+                    $"{pageName.ToString()}",
+                    pageName,
+                    _pageFactory.GetPageViewModel(pageName)));
+                Console.WriteLine($"Loaded {pageName.ToString()}");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+            
+            // Select the first tab
+            if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
+        });
+        ShowSpinner = false;
+    }
+
+
+    [RelayCommand]
+    public async Task TriggerDialog()
+    {
+        await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
+
+        // Refresh data after dialog closes
+        await Initialize();
     }
 }
 
-public class TabItemTemplate
+public class TabItemTemplate(string name, ApplicationPageNames pageName, ViewModelBase page)
 {
-    public TabItemTemplate(string name, ApplicationPageNames pageName, ViewModelBase page)
-    {
-        Name = name;
-        PageName = pageName;
-        Page = page;
-    }
-
-    public string Name { get; set; }
-    public ApplicationPageNames PageName { get; set; }
-    public ViewModelBase Page { get; }
+    public string Name { get; set; } = name;
+    public ApplicationPageNames PageName { get; set; } = pageName;
+    public ViewModelBase Page { get; } = page;
 }

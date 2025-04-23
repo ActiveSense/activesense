@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ActiveSense.Desktop.Views.AnalysisPages.ActivityPageView"
+             x:DataType="analysisPages:ActivityPageViewModel">
+
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Visible"
+                  HorizontalScrollBarVisibility="Disabled">
+        <Grid>
+            <!-- Empty state message when no charts are visible -->
+            <Border IsVisible="{Binding !ChartsVisible}"
+                    CornerRadius="8" 
+                    Padding="20"
+                    Margin="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="400">
+                <StackPanel Spacing="15" HorizontalAlignment="Center">
+                    <!-- Message -->
+                    <TextBlock Text="Keine Daten ausgewählt" 
+                               FontSize="20" 
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="Bitte wählen Sie eine oder mehrere Analysen aus der rechten Seitenleiste aus, um Aktivitätsanalysen anzuzeigen."
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Foreground="#666666"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Charts content -->
+            <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
+                <!-- Steps Chart Section -->
+                <Expander Header="{Binding StepsTitle}" 
+                          IsExpanded="True"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding StepsDescription}"
+                                   Margin="0,0,0,10"/>
+                                   
+                        <ItemsControl ItemsSource="{Binding StepsCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Margin="4,10,4,4" 
+                                                   FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Classes="Shadow" 
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Activity Distribution Charts Section -->
+                <Expander Header="{Binding ActivityDistributionTitle}" 
+                          IsExpanded="True"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding ActivityDistributionDescription}"
+                                   Margin="0,0,0,10"/>
+                                   
+                        <ItemsControl ItemsSource="{Binding ActivityDistributionChart}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Margin="4,10,4,4" 
+                                                   FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Classes="Shadow" 
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
