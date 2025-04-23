@@ -15,6 +15,7 @@ public partial class GeneralPageViewModel : PageViewModel
 {
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
+    [ObservableProperty] private bool _chartsVisible = false;
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _generalCharts = new();
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _generalCharts2 = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
@@ -26,26 +27,24 @@ public partial class GeneralPageViewModel : PageViewModel
 
         // Subscribe to changes in the shared data
         _sharedDataService.SelectedAnalysesChanged += OnSelectedAnalysesChanged;
-
-        // Load initial data
-        CreateStepsChart();
     }
 
     private void OnSelectedAnalysesChanged(object? sender, EventArgs e)
     {
-        GeneralCharts.Clear();
         UpdateSelectedAnalyses();
+        CreateStepsChart();
     }
 
     private void UpdateSelectedAnalyses()
     {
         SelectedAnalyses.Clear();
         foreach (var analysis in _sharedDataService.SelectedAnalyses) SelectedAnalyses.Add(analysis);
-        CreateStepsChart();
+        ChartsVisible = SelectedAnalyses.Any();
     }
 
     private void CreateStepsChart()
     {
+        GeneralCharts.Clear();
         foreach (var analysis in SelectedAnalyses)
         {
             var line = new List<ChartDataDTO>();

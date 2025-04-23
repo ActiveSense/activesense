@@ -23,7 +23,7 @@ public partial class SleepPageView : UserControl
         {
             // Apply scroll manually
             var delta = e.Delta.Y;
-            MainScrollViewer.Offset = MainScrollViewer.Offset.WithY(MainScrollViewer.Offset.Y - delta * 20);
+            MainScrollViewer.Offset = MainScrollViewer.Offset.WithY(MainScrollViewer.Offset.Y - delta * 50);
             e.Handled = true;
         }
     }

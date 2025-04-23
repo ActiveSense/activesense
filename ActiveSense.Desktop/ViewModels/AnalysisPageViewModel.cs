@@ -1,11 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -13,19 +13,19 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class AnalysisPageViewModel : PageViewModel
 {
-    private readonly PageFactory _pageFactory;
-    private readonly ResultParserFactory _resultParserFactory;
-    private readonly SharedDataService _sharedDataService;
     private readonly DialogService _dialogService;
     private readonly MainViewModel _mainViewModel;
+    private readonly PageFactory _pageFactory;
     private readonly ProcessDialogViewModel _processDialogViewModel;
+    private readonly ResultParserFactory _resultParserFactory;
+    private readonly SharedDataService _sharedDataService;
     private bool _isInitialized = false;
-    
+
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
+    [ObservableProperty] private TabItemTemplate _selectedTabItem;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showSpinner = true;
-    [ObservableProperty] private TabItemTemplate _selectedTabItem;
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
@@ -41,7 +41,6 @@ public partial class AnalysisPageViewModel : PageViewModel
         _dialogService = dialogService;
         _mainViewModel = mainViewModel;
         _processDialogViewModel = processDialogViewModel;
-        InitializePageCommand.Execute(null);
     }
 
     public AnalysisPageViewModel()
@@ -56,41 +55,35 @@ public partial class AnalysisPageViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private async Task InitializePage()
+    public async Task Initialize()
     {
         Console.WriteLine("Loading result files...");
-        try
+        TabItems.Clear();
+        var parser = _resultParserFactory.GetParser(SensorType);
+        
+        await Task.Run(async () =>
         {
-            var parser = _resultParserFactory.GetParser(SensorType);
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
-            TabItems.Clear();
 
 
             foreach (var file in files) ResultFiles.Add(file);
-            
+
+
+
             foreach (var pageName in parser.GetAnalysisPages())
             {
                 TabItems.Add(new TabItemTemplate(
-                    $"{pageName.ToString()}", 
+                    $"{pageName.ToString()}",
                     pageName,
                     _pageFactory.GetPageViewModel(pageName)));
                 Console.WriteLine($"Loaded {pageName.ToString()}");
             }
-
-            // Select the first tab if available
-            if (TabItems.Count > 0 && SelectedTabItem == null)
-            {
-                SelectedTabItem = TabItems[0];
-            }
-
-            ShowSpinner = false;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            ShowSpinner = false;
-        }
+            
+            // Select the first tab
+            if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
+        });
+        ShowSpinner = false;
     }
 
 
@@ -98,9 +91,9 @@ public partial class AnalysisPageViewModel : PageViewModel
     public async Task TriggerDialog()
     {
         await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
-        
+
         // Refresh data after dialog closes
-        await InitializePage();
+        await Initialize();
     }
 }
 

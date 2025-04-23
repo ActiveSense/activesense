@@ -23,7 +23,7 @@
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
         <PackageReference Include="CsvHelper" Version="33.0.1" />
-        <PackageReference Include="FluentAvaloniaUI" Version="2.3.0" />
+        <PackageReference Include="FluentAvaloniaUI" Version="2.4.0-preview1" />
         <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
         <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
@@ -46,5 +46,15 @@
         <DependentUpon>SleepPageView.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="publish\linux\libSkiaSharp.so" />
+      <None Remove="publish\linux\NUnit3.TestAdapter.pdb" />
+      <None Remove="publish\linux\ActiveSense.Desktop.pdb" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="publish\linux\" />
     </ItemGroup>
 </Project>

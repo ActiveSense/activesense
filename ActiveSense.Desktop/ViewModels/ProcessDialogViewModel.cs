@@ -12,14 +12,21 @@ public partial class ProcessDialogViewModel(
     SensorProcessorFactory sensorProcessorFactory,
     IScriptService scriptService) : DialogViewModel
 {
-    [ObservableProperty] private string _title = "Confirm";
-    [ObservableProperty] private string _message = "Are you sure?";
-    [ObservableProperty] private string _confirmText = "Yes";
     [ObservableProperty] private string _cancelText = "No";
-    [ObservableProperty] private string _test = "TestText";
-    [ObservableProperty] private string _iconText = "\xe4e0";
 
     [ObservableProperty] private bool _confirmed;
+    [ObservableProperty] private string _confirmText = "Yes";
+    [ObservableProperty] private string _iconText = "\xe4e0";
+
+    [ObservableProperty] private bool _isProcessing;
+    [ObservableProperty] private string _message = "Are you sure?";
+    [ObservableProperty] private string _scriptOutput = string.Empty;
+    [ObservableProperty] private string[]? _selectedFiles;
+    [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
+    [ObservableProperty] private bool _showScriptOutput;
+    [ObservableProperty] private string _statusMessage = "No files selected";
+    [ObservableProperty] private string _test = "TestText";
+    [ObservableProperty] private string _title = "Confirm";
 
     [RelayCommand]
     public void Cancel()
@@ -28,12 +35,6 @@ public partial class ProcessDialogViewModel(
         Close();
     }
 
-    [ObservableProperty] private bool _isProcessing;
-    [ObservableProperty] private string _scriptOutput = string.Empty;
-    [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
-    [ObservableProperty] private string[]? _selectedFiles;
-    [ObservableProperty] private bool _showScriptOutput;
-    [ObservableProperty] private string _statusMessage = "No files selected";
     public event Action<string[]?>? FilesSelected;
 
     public void SetSelectedFiles(string[]? files)

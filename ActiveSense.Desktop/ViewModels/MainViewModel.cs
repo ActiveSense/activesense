@@ -1,7 +1,9 @@
-﻿using ActiveSense.Desktop.Enums;
+﻿using System.Threading.Tasks;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.ViewModels;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -22,9 +24,12 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     }
 
 
-    public void Initialize()
+    public async Task Initialize()
     {
-        ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
+        await Task.Run(() => {
+            ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
+        });
+    
     }
 
     [RelayCommand]

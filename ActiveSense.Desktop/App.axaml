@@ -12,6 +12,7 @@
 
     <Application.Styles>
         <semi:SemiTheme />
+        <!-- <style:FluentAvaloniaTheme></style:FluentAvaloniaTheme> -->
         <StyleInclude Source="Assets/Icons.axaml"></StyleInclude>
         <StyleInclude Source="Assets/Styles.axaml"></StyleInclude>
     </Application.Styles>
