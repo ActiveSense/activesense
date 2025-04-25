@@ -7,18 +7,13 @@ using ActiveSense.Desktop.Services;
 
 namespace ActiveSense.Desktop.Sensors
 {
-    public class GeneActivProcessor : ISensorProcessor
+    public class GeneActivProcessor(IScriptService rScriptService) : ISensorProcessor
     {
-        private readonly IScriptService _rScriptService;
+        private readonly IScriptService _rScriptService = rScriptService ?? new RScriptService();
 
         public SensorTypes SupportedType => SensorTypes.GENEActiv;
 
         public static string[] SupportedFileTypes => new[] { ".csv", ".bin" };
-
-        public GeneActivProcessor(IScriptService rScriptService)
-        {
-            _rScriptService = rScriptService ?? new RScriptService();
-        }
 
         public async Task<(bool Success, string Output, string Error)> ProcessAsync(string arguments = "")
         {

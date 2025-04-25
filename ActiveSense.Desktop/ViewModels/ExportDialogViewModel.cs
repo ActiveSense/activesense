@@ -1,5 +1,6 @@
 using System;
-using System.Collections.ObjectModel;
+using System.IO.Compression;
+using System.Text;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -7,6 +8,8 @@ using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace ActiveSense.Desktop.ViewModels;
 
@@ -92,4 +95,5 @@ public partial class ExportDialogViewModel : DialogViewModel
             IsExporting = false;
         }
     }
+
 }

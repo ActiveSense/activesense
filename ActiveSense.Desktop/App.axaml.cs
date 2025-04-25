@@ -33,6 +33,8 @@ public class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var collection = new ServiceCollection();
+
+        collection.AddTransient<AnalysisSerializer>();
         
         // Register factories
         collection.AddSingleton<ResultParserFactory>();

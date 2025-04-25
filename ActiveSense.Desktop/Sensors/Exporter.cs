@@ -1,5 +1,8 @@
 using System;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Enums;
@@ -9,6 +12,7 @@ using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.SKCharts;
+using Newtonsoft.Json;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -17,25 +21,17 @@ using SkiaSharp;
 
 namespace ActiveSense.Desktop.Sensors;
 
-public class GeneActiveExporter : IExporter
+public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer serializer) : IExporter
 {
-    private readonly ChartColors _chartColors;
-
-    public GeneActiveExporter(ChartColors chartColors)
-    {
-        _chartColors = chartColors;
-    }
-
     public SensorTypes SupportedType => SensorTypes.GENEActiv;
 
     public async Task<bool> ExportAsync(Analysis analysis, string outputPath)
     {
         try
         {
-            // Set license to Community for free usage
             Settings.License = LicenseType.Community;
+            string exportData = serializer.ExportToBase64(analysis);
 
-            // Create and generate the document
             Document.Create(container =>
             {
                 container.Page(page =>
@@ -50,7 +46,6 @@ public class GeneActiveExporter : IExporter
                         .Bold()
                         .FontSize(16);
 
-                    // Content
                     // Content
                     page.Content()
                         .Column(column =>
@@ -187,6 +182,26 @@ public class GeneActiveExporter : IExporter
                             column.Item().PaddingVertical(10)
                                 .Height(200)
                                 .Image(GenerateActivityDistributionChartImage(analysis));
+                            
+                            // Separator
+                            column.Item().PaddingVertical(10)
+                                .LineHorizontal(1)
+                                .LineColor(Colors.Grey.Medium);
+
+                            // Add the encoded data in the footer
+                            column.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
+                                .PaddingTop(10).PaddingBottom(5)
+                                .Text("ANALYSIS_DATA_BEGIN")
+                                .FontSize(6)
+                                .FontColor(Colors.Grey.Medium);
+                        
+                            column.Item().Text(exportData)
+                                .FontSize(4)
+                                .FontColor(Colors.Grey.Medium);
+                            
+                            column.Item().Text("ANALYSIS_DATA_END")
+                                .FontSize(6)
+                                .FontColor(Colors.Grey.Medium);
                         });
 
                     // Footer
@@ -224,7 +239,7 @@ public class GeneActiveExporter : IExporter
         try
         {
             var dto = analysis.GetSleepChartData();
-            var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
+            var pieChartGenerator = new PieChartGenerator(dto, chartColors);
             var pieChartViewModel = pieChartGenerator.GenerateChart("Sleep Distribution", "");
 
             foreach (var series in pieChartViewModel.PieSeries.Cast<PieSeries<double>>())
@@ -262,7 +277,7 @@ public class GeneActiveExporter : IExporter
         {
             // Use your existing generator
             var dto = analysis.GetStepsChartData();
-            var barChartGenerator = new BarChartGenerator(new[] { dto }, _chartColors);
+            var barChartGenerator = new BarChartGenerator(new[] { dto }, chartColors);
             var barChartViewModel = barChartGenerator.GenerateChart("Steps per Day", "");
 
             // Modify column series to display values
@@ -300,12 +315,10 @@ public class GeneActiveExporter : IExporter
     {
         try
         {
-            // Use your existing generator
             var dtos = analysis.GetActivityDistributionChartData().ToArray();
-            var stackedBarGenerator = new StackedBarGenerator(dtos, _chartColors);
+            var stackedBarGenerator = new StackedBarGenerator(dtos, chartColors);
             var chartViewModel = stackedBarGenerator.GenerateChart("Activity Distribution", "");
 
-            // Modify stacked column series to display values
             foreach (var series in chartViewModel.Series.OfType<StackedColumnSeries<double>>())
             {
                 series.DataLabelsSize = 10;
@@ -314,7 +327,6 @@ public class GeneActiveExporter : IExporter
                 series.DataLabelsRotation = -90; // Rotate labels to fit better in narrow columns
             }
 
-            // Create a SkiaSharp chart from the view model
             var barChart = new SKCartesianChart
             {
                 Series = chartViewModel.Series,
@@ -325,7 +337,6 @@ public class GeneActiveExporter : IExporter
                 LegendPosition = LegendPosition.Bottom
             };
 
-            // Get the image
             using var image = barChart.GetImage();
             using var data = image.Encode(SKEncodedImageFormat.Png, 100);
             return data.ToArray();
@@ -339,17 +350,14 @@ public class GeneActiveExporter : IExporter
 
     private byte[] CreateErrorImage(string errorMessage)
     {
-        // Create a simple error image with text
         var width = 700;
         var height = 400;
 
         using var bitmap = new SKBitmap(width, height);
         using var canvas = new SKCanvas(bitmap);
 
-        // Clear with white background
         canvas.Clear(SKColors.White);
 
-        // Draw error message
         using var paint = new SKPaint
         {
             Color = SKColors.Red,
@@ -360,9 +368,9 @@ public class GeneActiveExporter : IExporter
 
         canvas.DrawText(errorMessage, width / 2, height / 2, paint);
 
-        // Convert to PNG
         using var image = SKImage.FromBitmap(bitmap);
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         return data.ToArray();
     }
+
 }

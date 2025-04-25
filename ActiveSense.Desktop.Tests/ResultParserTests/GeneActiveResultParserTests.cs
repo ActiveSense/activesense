@@ -30,6 +30,7 @@ public class GeneActiveResultParserTests
 
         services.AddTransient<GeneActiveResultParser>();
         services.AddTransient<DateToWeekdayConverter>();
+        services.AddTransient<AnalysisSerializer>();
 
         services.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
