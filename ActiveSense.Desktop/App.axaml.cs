@@ -43,6 +43,9 @@ public class App : Application
         // Register processors
         collection.AddSingleton<GeneActivProcessor>();
         
+        // Register exporters
+        collection.AddSingleton<GeneActiveExporter>();
+        
         // Register parsers
         collection.AddSingleton<GeneActiveResultParser>();
 

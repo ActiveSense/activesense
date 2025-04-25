@@ -4,7 +4,7 @@ using ActiveSense.Desktop.Interfaces;
 
 namespace ActiveSense.Desktop.Factories;
 
-public class ExporterFactory(Func<SensorTypes, IResultParser> exporterFactory)
+public class ExporterFactory(Func<SensorTypes, IExporter> exporterFactory)
 {
-    public IResultParser GetExporter(SensorTypes sensorType) => exporterFactory.Invoke(sensorType);
+    public IExporter GetExporter(SensorTypes sensorType) => exporterFactory.Invoke(sensorType);
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -27,6 +28,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     [ObservableProperty] private TabItemTemplate _selectedTabItem;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showSpinner = true;
+    [ObservableProperty] private bool _showExportOption = true;
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
@@ -51,6 +53,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
+        ShowExportOption = SelectedAnalyses.Any();
     }
 
     [RelayCommand]
