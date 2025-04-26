@@ -6,51 +6,25 @@
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              x:Class="ActiveSense.Desktop.Views.ExportDialogView"
              x:DataType="viewModels:ExportDialogViewModel">
+
+    <!-- Reference to centralized styles -->
+    <UserControl.Styles>
+        <StyleInclude Source="/Assets/DialogStyles.axaml"/>
+    </UserControl.Styles>
  
- <!-- <UserControl.Styles> -->
- <!--        <Style Selector="Button.action"> -->
- <!--            <Setter Property="Background" Value="White" /> -->
- <!--            <Setter Property="Foreground" Value="Black" /> -->
- <!--            <Setter Property="BorderThickness" Value="1" /> -->
- <!--            <Setter Property="BorderBrush" Value="#E5E5E5" /> -->
- <!--            <Setter Property="CornerRadius" Value="20" /> -->
- <!--            <Setter Property="Padding" Value="16,10" /> -->
- <!--            <Setter Property="HorizontalContentAlignment" Value="Center" /> -->
- <!--            <Setter Property="VerticalContentAlignment" Value="Center" /> -->
- <!--            <Setter Property="MinWidth" Value="150" /> -->
- <!--        </Style> -->
- <!-- -->
- <!--        <Style Selector="Button.primary"> -->
- <!--            <Setter Property="Background" Value="#0078D4" /> -->
- <!--            <Setter Property="Foreground" Value="White" /> -->
- <!--            <Setter Property="BorderThickness" Value="0" /> -->
- <!--            <Setter Property="CornerRadius" Value="20" /> -->
- <!--            <Setter Property="Padding" Value="16,10" /> -->
- <!--            <Setter Property="HorizontalContentAlignment" Value="Center" /> -->
- <!--            <Setter Property="VerticalContentAlignment" Value="Center" /> -->
- <!--            <Setter Property="MinWidth" Value="150" /> -->
- <!--        </Style> -->
- <!--    </UserControl.Styles> -->
- 
- <Border
-        CornerRadius="16"
-        BorderThickness="0"
-        Background="#F0F6F9"
-        Width="500"
-        BoxShadow="0 4 24 0 #20000000">
+    <Border Classes="dialog-container" Width="500">
         <Grid RowDefinitions="Auto, *, Auto">
             <!-- Header -->
             <Grid Grid.Row="0"
                   Margin="24,24,24,0">
                 <StackPanel>
-                    <TextBlock Text="Export Analyses"
-                               FontSize="24"
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,8" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="Export Analyses"
+                                   Classes="dialog-title"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
                     <TextBlock Text="Save analyses as PDF files"
-                               FontSize="16"
-                               Opacity="0.6"
-                               Margin="0,4,0,20" />
+                               Classes="dialog-subtitle" />
                 </StackPanel>
             </Grid>
 
@@ -58,16 +32,13 @@
             <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*">
                 <!-- Path Selection Section -->
                 <Border Grid.Row="0" 
-                        Background="White"
-                        CornerRadius="8"
-                        BorderBrush="#E5E5E5"
-                        BorderThickness="1"
+                        Classes="dialog-content-panel"
                         Padding="16"
                         Margin="0,10,0,20">
                     <Grid RowDefinitions="Auto,Auto">
                         <TextBlock Grid.Row="0" 
                                    Text="Output Location" 
-                                   FontWeight="Medium"
+                                   Classes="dialog-section-title"
                                    Margin="0,0,0,10"/>
                         
                         <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
@@ -79,6 +50,8 @@
                             
                             <Button x:Name="SaveAnalysesButton"
                                     Grid.Column="1"
+                                    Classes="Primary"
+                                    Theme="{DynamicResource OutlineButton}"
                                     Padding="10"
                                     Background="#F0F0F0"
                                     BorderThickness="0"
@@ -95,19 +68,17 @@
                 
                 <!-- Status Section -->
                 <Border Grid.Row="1" 
-                        Background="White"
-                        CornerRadius="8"
-                        BorderBrush="#E5E5E5"
-                        BorderThickness="1"
+                        Classes="dialog-content-panel"
                         Padding="16"
                         Margin="0,0,0,10">
                     <StackPanel>
                         <TextBlock Text="Status" 
-                                   FontWeight="Medium"
+                                   Classes="dialog-section-title"
                                    Margin="0,0,0,10"/>
                         
                         <TextBlock Text="{Binding StatusMessage}" 
-                                   TextWrapping="Wrap"/>
+                                   Classes="dialog-content-text"
+                                   Margin="0,0,0,10"/>
                         
                         <ProgressBar IsIndeterminate="{Binding IsExporting}"
                                      IsVisible="{Binding IsExporting}"
@@ -120,10 +91,10 @@
                                     Margin="0,10,0,0"
                                     Spacing="8">
                             <ui:SymbolIcon Symbol="Checkmark" 
-                                           Foreground="Green"
+                                           Classes="dialog-success-icon"
                                            FontSize="16"/>
                             <TextBlock Text="Export completed successfully" 
-                                       Foreground="Green"/>
+                                       Foreground="#107C10"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -135,23 +106,18 @@
                   ColumnDefinitions="Auto, *, Auto">
 
                 <Button Grid.Column="0"
-                        HorizontalAlignment="Left"
+                        Classes="Secondary"
                         Command="{Binding CancelCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock>Cancel</TextBlock>
-                    </StackPanel>
+                    <TextBlock>Cancel</TextBlock>
                 </Button>
-
-                <Button Grid.Column="2"
-                        Classes="primary"
+                <Button Grid.Column="2" Classes="Primary" Theme="{DynamicResource SolidButton}"
                         Command="{Binding ExportAnalysesCommand}"
-                        IsEnabled="{Binding !IsExporting}"
-                        HorizontalAlignment="Right">
+                        IsEnabled="{Binding !IsExporting}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ui:SymbolIcon Symbol="Save" FontSize="16" />
                         <TextBlock>Export</TextBlock>
                     </StackPanel>
-                </Button>
+</Button>
             </Grid>
         </Grid>
     </Border>
