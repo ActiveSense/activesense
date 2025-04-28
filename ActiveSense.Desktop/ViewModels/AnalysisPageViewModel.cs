@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using Avalonia.Threading;
@@ -23,8 +24,8 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly ExportDialogViewModel _exportDialogViewModel;
     private bool _isInitialized = false;
 
-    [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
-    [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
     [ObservableProperty] private TabItemTemplate _selectedTabItem;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showSpinner = true;
@@ -57,7 +58,7 @@ public partial class AnalysisPageViewModel : PageViewModel
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
 
-    partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
+    partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
         ShowExportOption = SelectedAnalyses.Any();

@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using System.IO;
+using ActiveSense.Desktop.Interfaces;
 
 namespace ActiveSense.Desktop.ViewModels;
 
@@ -63,7 +64,7 @@ public partial class ExportDialogViewModel : DialogViewModel
         {
             var exporter = _exporterFactory.GetExporter(_selectedSensorType);
             var totalExports = 0;
-            var exportedAnalyses = new List<Analysis>();
+            var exportedAnalyses = new List<IAnalysis>();
             
             foreach (var analysis in _sharedDataService.SelectedAnalyses)
             {

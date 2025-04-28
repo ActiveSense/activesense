@@ -5,6 +5,7 @@ using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels.Charts;
@@ -18,14 +19,14 @@ public partial class SleepPageViewModel : PageViewModel
 {
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
-    [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
-    
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
+
     [ObservableProperty] private bool _chartsVisible = false;
-    
+
     [ObservableProperty] private string _sleepDistributionTitle = "Schlafverteilung";
     [ObservableProperty] private string _sleepDistributionDescription = "Verteilung der Schlaf- und Wachzeiten";
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _pieCharts = new();
-    
+
     [ObservableProperty] private string _totalSleepTitle = "Schlafzeit";
     [ObservableProperty] private string _totalSleepDescription = "Durchschnittliche Schlafzeit pro Nacht";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _totalSleepCharts = new();
@@ -67,10 +68,17 @@ public partial class SleepPageViewModel : PageViewModel
     private void CreateTotalSleepChart()
     {
         TotalSleepCharts.Clear();
-        
+
         var chartDataDtos = new List<ChartDataDTO>();
 
-        foreach (var analysis in SelectedAnalyses) chartDataDtos.Add(analysis.GetTotalSleepTimePerDayChartData());
+        foreach (var analysis in SelectedAnalyses)
+        {
+            if (analysis is ISleepAnalysis sleepAnalysis &&
+                analysis is IChartDataProvider chartProvider)
+            {
+                chartDataDtos.Add(chartProvider.GetTotalSleepTimePerDayChartData());
+            }
+        }
 
         var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors);
         if (SelectedAnalyses.Any())
@@ -84,11 +92,14 @@ public partial class SleepPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            var dto = analysis.GetSleepChartData();
-            var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
-            if (SelectedAnalyses.Any())
-                PieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
-                    "Verteilung der Schlaf- und Wachzeiten"));
+            if (analysis is IChartDataProvider chartProvider)
+            {
+                var dto = chartProvider.GetSleepChartData();
+                var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
+                if (SelectedAnalyses.Any())
+                    PieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                        "Verteilung der Schlaf- und Wachzeiten"));
+            }
         }
     }
 

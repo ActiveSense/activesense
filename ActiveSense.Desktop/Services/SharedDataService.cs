@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 
 namespace ActiveSense.Desktop.Services;
 
 public class SharedDataService
 {
-    public ObservableCollection<Analysis> SelectedAnalyses { get; } = new ObservableCollection<Analysis>();
-    public ObservableCollection<Analysis> AllAnalyses { get; } = new();
+    public ObservableCollection<IAnalysis> SelectedAnalyses { get; } = new ObservableCollection<IAnalysis>();
+    public ObservableCollection<IAnalysis> AllAnalyses { get; } = new();
     
     public event EventHandler? SelectedAnalysesChanged;
     public event EventHandler? AllAnalysesChanged;
     
-    public void UpdateSelectedAnalyses(ObservableCollection<Analysis> analyses)
+    public void UpdateSelectedAnalyses(ObservableCollection<IAnalysis> analyses)
     {
         SelectedAnalyses.Clear();
         foreach (var analysis in analyses)
@@ -24,7 +25,7 @@ public class SharedDataService
         
         SelectedAnalysesChanged?.Invoke(this, EventArgs.Empty);
     }
-    public void UpdateAllAnalyses(IEnumerable<Analysis> newAnalyses)
+    public void UpdateAllAnalyses(IEnumerable<IAnalysis> newAnalyses)
     {
         var existingFilenames = new HashSet<string>(AllAnalyses.Select(a => a.FileName));
     

@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -8,7 +9,6 @@ using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Tests.Helpers;
 using CsvHelper;
-using FluentAvalonia.Core;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -67,7 +67,10 @@ public class GeneActiveResultParserTests
 
         foreach (var result in results.Result)
         {
-            var records = result.ActivityRecords;
+            // Verify result implements IActivityAnalysis and get activity records
+            Assert.That(result is IActivityAnalysis, Is.True, "Result should implement IActivityAnalysis");
+            var activityAnalysis = (IActivityAnalysis)result;
+            var records = activityAnalysis.ActivityRecords;
 
             // Create new csv file in the dedicated output directory
             var csvFile = Path.Combine(_outputPath, "activity1.csv");
@@ -105,7 +108,10 @@ public class GeneActiveResultParserTests
         
         foreach (var result in results.Result)
         {
-            var records = result.SleepRecords;
+            // Verify result implements ISleepAnalysis and get sleep records
+            Assert.That(result is ISleepAnalysis, Is.True, "Result should implement ISleepAnalysis");
+            var sleepAnalysis = (ISleepAnalysis)result;
+            var records = sleepAnalysis.SleepRecords;
 
             // Create new csv file in the dedicated output directory
             var csvFile = Path.Combine(_outputPath, "sleep1.csv");
@@ -143,7 +149,11 @@ public class GeneActiveResultParserTests
         
         foreach (var result in results.Result)
         {
-            var weekdays = result.SleepWeekdays();
+            // Verify result implements ISleepAnalysis before accessing SleepWeekdays
+            Assert.That(result is ISleepAnalysis, Is.True, "Result should implement ISleepAnalysis");
+            var sleepAnalysis = (ISleepAnalysis)result;
+            
+            var weekdays = sleepAnalysis.SleepWeekdays();
             foreach (var weekday in weekdays)
             {
                 Console.WriteLine(weekday);

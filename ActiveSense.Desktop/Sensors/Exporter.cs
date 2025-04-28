@@ -25,8 +25,15 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
 {
     public SensorTypes SupportedType => SensorTypes.GENEActiv;
 
-    public async Task<bool> ExportAsync(Analysis analysis, string outputPath)
+    public async Task<bool> ExportAsync(IAnalysis analysis, string outputPath)
     {
+        if (analysis is not IActivityAnalysis activityAnalysis || 
+            analysis is not ISleepAnalysis sleepAnalysis ||
+            analysis is not IChartDataProvider chartProvider)
+        {
+            Console.WriteLine("Analysis does not provide required capabilities for GeneActive export");
+            return false;
+        }
         try
         {
             Settings.License = LicenseType.Community;
@@ -62,7 +69,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                             .Bold()
                             .FontSize(16);
 
-                        if (analysis.SleepRecords == null || !analysis.SleepRecords.Any())
+                        if (sleepAnalysis.SleepRecords == null || sleepAnalysis.SleepRecords.Count == 0)
                         {
                             column.Item().Text("No sleep data available").Italic().FontSize(12);
                         }
@@ -79,14 +86,14 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                                     });
 
                                     AddTableRow(table, "Average Sleep Time",
-                                        $"{analysis.AverageSleepTime / 3600:F2} hours");
+                                        $"{sleepAnalysis.AverageSleepTime / 3600:F2} hours");
                                     AddTableRow(table, "Average Sleep Efficiency",
-                                        $"{analysis.SleepEfficiency.Average():F1}%");
+                                        $"{sleepAnalysis.SleepEfficiency.Average():F1}%");
                                 });
 
                             column.Item().PaddingVertical(10)
                                 .Height(200)
-                                .Image(GeneratePieChartImage(analysis));
+                                .Image(GeneratePieChartImage(chartProvider));
                         }
 
                         // Activity Data Section
@@ -95,7 +102,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                             .Bold()
                             .FontSize(16);
 
-                        if (analysis.ActivityRecords == null || !analysis.ActivityRecords.Any())
+                        if (activityAnalysis.ActivityRecords == null || !activityAnalysis.ActivityRecords.Any())
                         {
                             column.Item().Text("No activity data available").Italic().FontSize(12);
                         }
@@ -112,14 +119,14 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                                     });
 
                                     AddTableRow(table, "Average Steps",
-                                        $"{analysis.StepsPerDay.Average():F0} steps");
+                                        $"{activityAnalysis.StepsPerDay.Average():F0} steps");
                                     AddTableRow(table, "Average Light Activity",
-                                        $"{analysis.AverageLightActivity / 60:F1} minutes");
+                                        $"{activityAnalysis.AverageLightActivity / 60:F1} minutes");
                                 });
 
                             column.Item().PaddingVertical(10)
                                 .Height(200)
-                                .Image(GenerateStepsChartImage(analysis));
+                                .Image(GenerateStepsChartImage(chartProvider));
                             
                             // insert encoded data 
                             column.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
@@ -169,7 +176,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         table.Cell().Text(value);
     }
 
-    private byte[] GeneratePieChartImage(Analysis analysis)
+    private byte[] GeneratePieChartImage(IChartDataProvider analysis)
     {
         try
         {
@@ -206,7 +213,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         }
     }
 
-    private byte[] GenerateStepsChartImage(Analysis analysis)
+    private byte[] GenerateStepsChartImage(IChartDataProvider analysis)
     {
         try
         {
@@ -246,7 +253,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         }
     }
 
-    private byte[] GenerateActivityDistributionChartImage(Analysis analysis)
+    private byte[] GenerateActivityDistributionChartImage(IChartDataProvider analysis)
     {
         try
         {

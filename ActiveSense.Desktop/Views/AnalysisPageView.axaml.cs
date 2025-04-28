@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.ViewModels;
 using Avalonia.Controls;
@@ -20,7 +21,7 @@ public partial class AnalysisPageView : UserControl
     private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (DataContext is AnalysisPageViewModel viewModel && sender is ListBox listBox)
-            viewModel.SelectedAnalyses = new ObservableCollection<Analysis>(
-                listBox.SelectedItems.Cast<Analysis>());
+            viewModel.SelectedAnalyses = new ObservableCollection<IAnalysis>(
+                listBox.SelectedItems.Cast<IAnalysis>());
     }
 }

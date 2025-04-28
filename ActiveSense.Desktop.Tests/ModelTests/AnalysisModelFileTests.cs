@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ namespace ActiveSense.Desktop.Tests.ModelTests;
 [TestFixture]
 public class AnalysisModeFileTests
 {
-    private Analysis _analysis;
+    private GeneActiveAnalysis _analysis;
     private DateToWeekdayConverter _dateToWeekdayConverter;
     private string _testsDirectory;
     
@@ -24,7 +25,7 @@ public class AnalysisModeFileTests
         _dateToWeekdayConverter = new DateToWeekdayConverter();
         
         // Initialize the analysis model
-        _analysis = new Analysis(_dateToWeekdayConverter);
+        _analysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
         
         // Get directory for test files
         _testsDirectory = Path.Combine(AppConfig.SolutionBasePath, "ActiveSense.Desktop.Tests", "ModelTests", "Files");
@@ -157,8 +158,11 @@ public class AnalysisModeFileTests
     [Test]
     public void GetSleepChartData_ShouldProduceCorrectChartData()
     {
+        // Test the implementation via the IChartDataProvider interface
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetSleepChartData();
+        var chartData = chartProvider.GetSleepChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"));
@@ -175,8 +179,11 @@ public class AnalysisModeFileTests
     [Test]
     public void GetActivityDistributionChartData_ShouldProduceCorrectChartData()
     {
+        // Test the implementation via the IChartDataProvider interface
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetActivityDistributionChartData().ToList();
+        var chartData = chartProvider.GetActivityDistributionChartData().ToList();
         
         // Assert
         Assert.That(chartData.Count, Is.EqualTo(3));
@@ -206,8 +213,11 @@ public class AnalysisModeFileTests
     [Test]
     public void GetTotalSleepTimePerDayChartData_ShouldMatchSleepTimeValues()
     {
+        // Test the implementation via the IChartDataProvider interface
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetTotalSleepTimePerDayChartData();
+        var chartData = chartProvider.GetTotalSleepTimePerDayChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName));
@@ -224,8 +234,11 @@ public class AnalysisModeFileTests
     [Test]
     public void GetStepsChartData_ShouldMatchStepsPerDayValues()
     {
+        // Test the implementation via the IChartDataProvider interface
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetStepsChartData();
+        var chartData = chartProvider.GetStepsChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName));

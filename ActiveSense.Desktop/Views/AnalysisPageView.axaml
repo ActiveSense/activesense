@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:models="clr-namespace:ActiveSense.Desktop.Models"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:interfaces="clr-namespace:ActiveSense.Desktop.Interfaces"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.AnalysisPageView"
              x:DataType="viewModels:AnalysisPageViewModel">
@@ -139,7 +140,7 @@
                                 </ListBox.ItemsPanel>
 
                                 <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="models:Analysis">
+                                    <DataTemplate x:DataType="interfaces:IAnalysis">
                                         <Border
                                             CornerRadius="6"
                                             Padding="8,10"
@@ -190,28 +191,28 @@
                                                             Margin="0,6,0,0"
                                                             Spacing="4">
                                                     <!-- Sleep data availability indicator -->
-                                                    <StackPanel Orientation="Horizontal"
-                                                                Spacing="4"
-                                                                IsVisible="{Binding SleepRecords.Count}">
-                                                        <ui:SymbolIcon Symbol="WeatherMoonFilled"
-                                                                       FontSize="12"
-                                                                       Foreground="#5E5E5E" />
-                                                        <TextBlock Text="Sleep data"
-                                                                   FontSize="12"
-                                                                   Foreground="#5E5E5E" />
-                                                    </StackPanel>
+                                                    <!-- <StackPanel Orientation="Horizontal" -->
+                                                    <!--             Spacing="4" -->
+                                                    <!--             IsVisible="{Binding SleepRecords.Count}"> -->
+                                                    <!--     <ui:SymbolIcon Symbol="WeatherMoonFilled" -->
+                                                    <!--                    FontSize="12" -->
+                                                    <!--                    Foreground="#5E5E5E" /> -->
+                                                    <!--     <TextBlock Text="Sleep data" -->
+                                                    <!--                FontSize="12" -->
+                                                    <!--                Foreground="#5E5E5E" /> -->
+                                                    <!-- </StackPanel> -->
 
                                                     <!-- Activity data availability indicator -->
-                                                    <StackPanel Orientation="Horizontal"
-                                                                Spacing="4"
-                                                                IsVisible="{Binding ActivityRecords.Count}">
-                                                        <ui:SymbolIcon Symbol="WeatherSunnyFilled"
-                                                                       FontSize="12"
-                                                                       Foreground="#5E5E5E" />
-                                                        <TextBlock Text="Activity data"
-                                                                   FontSize="12"
-                                                                   Foreground="#5E5E5E" />
-                                                    </StackPanel>
+                                                    <!-- <StackPanel Orientation="Horizontal" -->
+                                                    <!--             Spacing="4" -->
+                                                    <!--             IsVisible="{Binding ActivityRecords.Count}"> -->
+                                                    <!--     <ui:SymbolIcon Symbol="WeatherSunnyFilled" -->
+                                                    <!--                    FontSize="12" -->
+                                                    <!--                    Foreground="#5E5E5E" /> -->
+                                                    <!--     <TextBlock Text="Activity data" -->
+                                                    <!--                FontSize="12" -->
+                                                    <!--                Foreground="#5E5E5E" /> -->
+                                                    <!-- </StackPanel> -->
                                                 </StackPanel>
 
                                                 <!-- Selection indicator -->

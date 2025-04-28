@@ -5,5 +5,5 @@ namespace ActiveSense.Desktop.Interfaces;
 
 public interface IExporter
 {
-    Task<bool> ExportAsync(Analysis analysis, string outputPath);
+    Task<bool> ExportAsync(IAnalysis analysis, string outputPath);
 }

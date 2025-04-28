@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using NUnit.Framework;
 
@@ -13,6 +14,7 @@ namespace ActiveSense.Desktop.Tests.ProcessorTests;
 public class GeneActiveResultParserTests
 {
     private GeneActiveResultParser _parser;
+    private IResultParser _parserInterface;
     private string _testDataDirectory;
     
 
@@ -20,7 +22,8 @@ public class GeneActiveResultParserTests
     public void Setup()
     {
         var dateToWeekdayConverter = new DateToWeekdayConverter();
-        _parser = new GeneActiveResultParser(dateToWeekdayConverter, new AnalysisSerializer(new DateToWeekdayConverter()));
+        _parser = new GeneActiveResultParser(dateToWeekdayConverter, new AnalysisSerializer(dateToWeekdayConverter));
+        _parserInterface = _parser;
 
         // Create a temporary directory for test data
         _testDataDirectory = Path.Combine(Path.GetTempPath(), "ActiveSenseTest_" + Guid.NewGuid().ToString());
@@ -48,7 +51,7 @@ public class GeneActiveResultParserTests
     public void GetAnalysisPages_ShouldReturnExpectedPages()
     {
         // Act
-        var pages = _parser.GetAnalysisPages();
+        var pages = _parserInterface.GetAnalysisPages();
 
         // Assert
         Assert.That(pages, Is.Not.Empty);
@@ -63,7 +66,7 @@ public class GeneActiveResultParserTests
         // Arrange - Use an empty directory
 
         // Act
-        var results = await _parser.ParseResultsAsync(_testDataDirectory);
+        var results = await _parserInterface.ParseResultsAsync(_testDataDirectory);
 
         // Assert
         Assert.That(results, Is.Empty);
@@ -76,7 +79,7 @@ public class GeneActiveResultParserTests
         var sampleDataDir = CreateSampleDataDirectory();
 
         // Act
-        var results = await _parser.ParseResultsAsync(_testDataDirectory);
+        var results = await _parserInterface.ParseResultsAsync(_testDataDirectory);
         var result = results.FirstOrDefault();
 
         // Assert
@@ -85,17 +88,21 @@ public class GeneActiveResultParserTests
         Assert.That(result.FileName, Is.EqualTo("TestAnalysis"));
         Assert.That(result.FilePath, Is.EqualTo(sampleDataDir));
 
-        // Check sleep records
-        Assert.That(result.SleepRecords, Is.Not.Empty);
-        Assert.That(result.SleepRecords.Count, Is.EqualTo(2));
-        Assert.That(result.SleepRecords.First().NightStarting, Is.EqualTo("2024-11-29"));
-        Assert.That(result.SleepRecords.First().SleepEfficiency, Is.EqualTo("77.9"));
+        // Check sleep records - need to cast to proper interface
+        Assert.That(result is ISleepAnalysis, Is.True, "Result should implement ISleepAnalysis");
+        var sleepAnalysis = (ISleepAnalysis)result;
+        Assert.That(sleepAnalysis.SleepRecords, Is.Not.Empty);
+        Assert.That(sleepAnalysis.SleepRecords.Count, Is.EqualTo(2));
+        Assert.That(sleepAnalysis.SleepRecords.First().NightStarting, Is.EqualTo("2024-11-29"));
+        Assert.That(sleepAnalysis.SleepRecords.First().SleepEfficiency, Is.EqualTo("77.9"));
 
-        // Check activity records
-        Assert.That(result.ActivityRecords, Is.Not.Empty);
-        Assert.That(result.ActivityRecords.Count, Is.EqualTo(2));
-        Assert.That(result.ActivityRecords.First().Day, Is.EqualTo("1"));
-        Assert.That(result.ActivityRecords.First().Steps, Is.EqualTo("3624"));
+        // Check activity records - need to cast to proper interface
+        Assert.That(result is IActivityAnalysis, Is.True, "Result should implement IActivityAnalysis");
+        var activityAnalysis = (IActivityAnalysis)result;
+        Assert.That(activityAnalysis.ActivityRecords, Is.Not.Empty);
+        Assert.That(activityAnalysis.ActivityRecords.Count, Is.EqualTo(2));
+        Assert.That(activityAnalysis.ActivityRecords.First().Day, Is.EqualTo("1"));
+        Assert.That(activityAnalysis.ActivityRecords.First().Steps, Is.EqualTo("3624"));
     }
 
     // [Test]
@@ -109,7 +116,7 @@ public class GeneActiveResultParserTests
     //
     //     try
     //     {
-    //         var results = await _parser.ParseResultsAsync(_testDataDirectory);
+    //         var results = await _parserInterface.ParseResultsAsync(_testDataDirectory);
     //         Assert.That(results, Is.Empty);
     //     }
     //     catch (Exception ex)

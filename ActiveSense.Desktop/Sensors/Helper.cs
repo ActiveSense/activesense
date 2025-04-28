@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using Newtonsoft.Json;
 
@@ -8,7 +9,7 @@ namespace ActiveSense.Desktop.Sensors;
 
 public class AnalysisSerializer(DateToWeekdayConverter converter)
 {
-    public string ExportToBase64(Analysis analysis)
+    public string ExportToBase64(IAnalysis analysis)
     {
         if (analysis == null)
             throw new ArgumentNullException(nameof(analysis));
@@ -19,8 +20,8 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
             {
                 FileName = analysis.FileName,
                 FilePath = analysis.FilePath,
-                ActivityRecords = analysis.ActivityRecords,
-                SleepRecords = analysis.SleepRecords
+                ActivityRecords = analysis is IActivityAnalysis activityAnalysis ? activityAnalysis.ActivityRecords : null,
+                SleepRecords = analysis is ISleepAnalysis sleepAnalysis ? sleepAnalysis.SleepRecords : null
             };
 
             string json = JsonConvert.SerializeObject(serializable, Formatting.None);
@@ -34,7 +35,7 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
         }
     }
 
-    public Analysis ImportFromBase64(string base64)
+    public IAnalysis ImportFromBase64(string base64)
     {
         if (string.IsNullOrEmpty(base64))
             throw new ArgumentNullException(nameof(base64));
@@ -49,14 +50,17 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
             if (serializable == null)
                 throw new Exception("Deserialization resulted in a null object");
             
-            var analysis = new Analysis(converter)
+            var analysis = new GeneActiveAnalysis(converter)
             {
                 FileName = serializable.FileName,
                 FilePath = serializable.FilePath
             };
             
-            analysis.SetActivityRecords(serializable.ActivityRecords);
-            analysis.SetSleepRecords(serializable.SleepRecords);
+            if (serializable.ActivityRecords != null)
+                analysis.SetActivityRecords(serializable.ActivityRecords);
+            
+            if (serializable.SleepRecords != null)
+                analysis.SetSleepRecords(serializable.SleepRecords);
             
             return analysis;
         }

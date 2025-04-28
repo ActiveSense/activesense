@@ -4,12 +4,17 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Charts.DTOs;
+using ActiveSense.Desktop.Interfaces;
 using CsvHelper.Configuration.Attributes;
 
 namespace ActiveSense.Desktop.Models;
 
-public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) : Analysis
+public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) : IActivityAnalysis, ISleepAnalysis, IChartDataProvider
 {
+    public string FilePath { get; set; }
+    public string FileName { get; set; }
+    public bool Exported { get; set; } = false;
+    
     private readonly Dictionary<string, object> _cache = new();
     private List<ActivityRecord> _activityRecords = new();
     private List<SleepRecord> _sleepRecords = new();

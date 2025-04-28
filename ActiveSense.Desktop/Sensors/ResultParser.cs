@@ -33,9 +33,9 @@ public class GeneActiveResultParser(
         return _analysisPages;
     }
 
-    public async Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory)
+    public async Task<IEnumerable<IAnalysis>> ParseResultsAsync(string outputDirectory)
     {
-        var analyses = new List<Analysis>();
+        var analyses = new List<IAnalysis>();
 
         if (!Directory.Exists(outputDirectory))
         {
@@ -54,9 +54,9 @@ public class GeneActiveResultParser(
         return analyses;
     }
 
-    public async Task<List<Analysis>> ParsePdfFilesAsync(string outputDirectory)
+    public async Task<List<IAnalysis>> ParsePdfFilesAsync(string outputDirectory)
     {
-        var analyses = new List<Analysis>();
+        var analyses = new List<IAnalysis>();
         var pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
 
         foreach (var file in pdfFiles)
@@ -76,9 +76,9 @@ public class GeneActiveResultParser(
         return analyses;
     }
 
-    public async Task<List<Analysis>> ParseCsvDirectoriesAsync(string outputDirectory)
+    public async Task<List<IAnalysis>> ParseCsvDirectoriesAsync(string outputDirectory)
     {
-        var analyses = new List<Analysis>();
+        var analyses = new List<IAnalysis>();
         var directories = Directory.GetDirectories(outputDirectory);
 
         foreach (var directory in directories)
@@ -95,9 +95,9 @@ public class GeneActiveResultParser(
         return analyses;
     }
 
-    public async Task<Analysis> ParseCsvDirectoryAsync(string directory)
+    public async Task<IAnalysis> ParseCsvDirectoryAsync(string directory)
     {
-        var analysis = new Analysis(dateToWeekdayConverter)
+        var analysis = new GeneActiveAnalysis(dateToWeekdayConverter)
         {
             FilePath = directory,
             FileName = Path.GetFileName(directory)
@@ -125,8 +125,14 @@ public class GeneActiveResultParser(
         return hasValidData ? analysis : null;
     }
 
-    public bool ParseCsvFile(string filePath, Analysis analysis)
+    public bool ParseCsvFile(string filePath, IAnalysis analysis)
     {
+        if (analysis is not IActivityAnalysis activityAnalysis || 
+            analysis is not ISleepAnalysis sleepAnalysis)
+        {
+            Console.WriteLine("Analysis does not provide required capabilities for GeneActive export");
+            return false;
+        }
         using var reader = new StreamReader(filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
@@ -138,13 +144,13 @@ public class GeneActiveResultParser(
 
         if (analysisType == AnalysisType.Activity)
         {
-            analysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
+            activityAnalysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
             return true;
         }
 
         if (analysisType == AnalysisType.Sleep)
         {
-            analysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
+            sleepAnalysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
             return true;
         }
 
@@ -180,7 +186,7 @@ public class GeneActiveResultParser(
         return headers.Intersect(sleepHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
     }
 
-    public Analysis ExtractAnalysisFromPdfText(string pdfText)
+    public IAnalysis ExtractAnalysisFromPdfText(string pdfText)
     {
         if (string.IsNullOrEmpty(pdfText))
             return null;
