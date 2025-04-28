@@ -59,14 +59,16 @@ public partial class AnalysisPageViewModel : PageViewModel
     [RelayCommand]
     public async Task Initialize()
     {
+        ShowSpinner = true;
         Console.WriteLine("Loading result files...");
         TabItems.Clear();
         var parser = _resultParserFactory.GetParser(SensorType);
         
         await Task.Run(async () =>
         {
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
+            
+            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
 
             foreach (var file in files) ResultFiles.Add(file);
 

@@ -4,6 +4,7 @@
     <option name="projectPerEditor">
       <map>
         <entry key="App.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Assets/DialogStyles.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Assets/Icons.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Assets/Styles.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ActivityPageView.axaml" value="ActiveSense.Desktop.csproj" />
@@ -15,6 +16,7 @@
         <entry key="Views/Charts/ActivityDistributionChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Charts/SleepDurationChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Charts/StepsChartView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/ErrorDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ExportDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/GeneralPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/MainView.axaml" value="ActiveSense.Desktop.csproj" />
