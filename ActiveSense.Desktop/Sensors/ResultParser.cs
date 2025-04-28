@@ -18,7 +18,8 @@ namespace ActiveSense.Desktop.Sensors;
 
 public class GeneActiveResultParser(
     DateToWeekdayConverter dateToWeekdayConverter,
-    AnalysisSerializer analysisSerializer) : IResultParser
+    AnalysisSerializer analysisSerializer)
+    : IResultParser
 {
     private readonly ApplicationPageNames[] _analysisPages =
     [
@@ -42,59 +43,112 @@ public class GeneActiveResultParser(
             return analyses;
         }
 
-        var directories = Directory.GetDirectories(outputDirectory);
+        // Parse PDF files
+        var pdfAnalyses = await ParsePdfFilesAsync(outputDirectory);
+        analyses.AddRange(pdfAnalyses);
+
+        // Parse CSV files in directories
+        var csvAnalyses = await ParseCsvDirectoriesAsync(outputDirectory);
+        analyses.AddRange(csvAnalyses);
+
+        return analyses;
+    }
+
+    public async Task<List<Analysis>> ParsePdfFilesAsync(string outputDirectory)
+    {
+        var analyses = new List<Analysis>();
         var pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
 
         foreach (var file in pdfFiles)
         {
             var pdfText = ExtractTextFromPdf(file);
             var analysis = ExtractAnalysisFromPdfText(pdfText);
-            analyses.Add(analysis);
-            Console.WriteLine("Extracted analysis from PDF: " + file);
+            
+            if (analysis != null)
+            {
+                analysis.Exported = true;
+                analyses.Add(analysis);
+                Console.WriteLine("Extracted analysis from PDF: " + file);
+            }
         }
 
         Console.WriteLine("Found " + pdfFiles.Length + " PDF files. In path: " + outputDirectory);
+        return analyses;
+    }
+
+    public async Task<List<Analysis>> ParseCsvDirectoriesAsync(string outputDirectory)
+    {
+        var analyses = new List<Analysis>();
+        var directories = Directory.GetDirectories(outputDirectory);
+
         foreach (var directory in directories)
         {
             Console.WriteLine("Processing directory: " + directory);
-            var analysis = new Analysis(dateToWeekdayConverter)
+            var analysis = await ParseCsvDirectoryAsync(directory);
+            
+            if (analysis != null)
             {
-                FilePath = directory,
-                FileName = Path.GetFileName(directory)
-            };
-
-            var csvFiles = Directory.GetFiles(directory, "*.csv");
-
-            foreach (var file in csvFiles)
-            {
-                Console.WriteLine("Parsing file: " + file);
-                try
-                {
-                    using var reader = new StreamReader(file);
-                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-                    csv.Read();
-                    csv.ReadHeader();
-                    var headers = csv.HeaderRecord;
-
-                    var analysisType = DetermineAnalysisType(headers);
-
-                    if (analysisType == AnalysisType.Activity)
-                        analysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
-                    else if (analysisType == AnalysisType.Sleep)
-                        analysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Error parsing file {file}: {e.Message}");
-                    throw;
-                }
+                analyses.Add(analysis);
             }
-
-            analyses.Add(analysis);
         }
 
         return analyses;
+    }
+
+    public async Task<Analysis> ParseCsvDirectoryAsync(string directory)
+    {
+        var analysis = new Analysis(dateToWeekdayConverter)
+        {
+            FilePath = directory,
+            FileName = Path.GetFileName(directory)
+        };
+
+        var csvFiles = Directory.GetFiles(directory, "*.csv");
+        bool hasValidData = false;
+
+        foreach (var file in csvFiles)
+        {
+            Console.WriteLine("Parsing file: " + file);
+            try
+            {
+                if (ParseCsvFile(file, analysis))
+                {
+                    hasValidData = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error parsing file {file}: {e.Message}");
+            }
+        }
+
+        return hasValidData ? analysis : null;
+    }
+
+    public bool ParseCsvFile(string filePath, Analysis analysis)
+    {
+        using var reader = new StreamReader(filePath);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        csv.Read();
+        csv.ReadHeader();
+        var headers = csv.HeaderRecord;
+
+        var analysisType = DetermineAnalysisType(headers);
+
+        if (analysisType == AnalysisType.Activity)
+        {
+            analysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
+            return true;
+        }
+
+        if (analysisType == AnalysisType.Sleep)
+        {
+            analysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
+            return true;
+        }
+
+        return false;
     }
 
     private AnalysisType DetermineAnalysisType(string[] headers)

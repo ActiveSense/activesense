@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,6 +63,7 @@ public partial class ExportDialogViewModel : DialogViewModel
         {
             var exporter = _exporterFactory.GetExporter(_selectedSensorType);
             var totalExports = 0;
+            var exportedAnalyses = new List<Analysis>();
             
             foreach (var analysis in _sharedDataService.SelectedAnalyses)
             {
@@ -71,11 +73,14 @@ public partial class ExportDialogViewModel : DialogViewModel
                 if (success)
                 {
                     totalExports++;
+                    analysis.Exported = true;
+                    exportedAnalyses.Add(analysis);
                 }
             }
             
             if (totalExports > 0)
             {
+                _sharedDataService.UpdateAllAnalyses(exportedAnalyses);
                 StatusMessage = $"Successfully exported {totalExports} analyses to {OutputPath}";
                 IsExportSuccessful = true;
             }
@@ -95,5 +100,4 @@ public partial class ExportDialogViewModel : DialogViewModel
             IsExporting = false;
         }
     }
-
 }

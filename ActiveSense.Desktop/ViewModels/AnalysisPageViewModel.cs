@@ -46,6 +46,8 @@ public partial class AnalysisPageViewModel : PageViewModel
         _mainViewModel = mainViewModel;
         _processDialogViewModel = processDialogViewModel;
         _exportDialogViewModel = exportDialogViewModel;
+        ResultFiles = _sharedDataService.AllAnalyses;
+        _sharedDataService.SelectedAnalysesChanged += OnAnalysesChanged;
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
@@ -56,36 +58,39 @@ public partial class AnalysisPageViewModel : PageViewModel
         ShowExportOption = SelectedAnalyses.Any();
     }
 
-    [RelayCommand]
-    public async Task Initialize()
+    private void OnAnalysesChanged(object? sender, EventArgs e)
     {
-        ShowSpinner = true;
-        Console.WriteLine("Loading result files...");
-        TabItems.Clear();
-        var parser = _resultParserFactory.GetParser(SensorType);
-        
-        await Task.Run(async () =>
-        {
-            ResultFiles.Clear();
-            
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
-
-            foreach (var file in files) ResultFiles.Add(file);
-
-            foreach (var pageName in parser.GetAnalysisPages())
-            {
-                TabItems.Add(new TabItemTemplate(
-                    $"{pageName.ToString()}",
-                    pageName,
-                    _pageFactory.GetPageViewModel(pageName)));
-                Console.WriteLine($"Loaded {pageName.ToString()}");
-            }
-            
-            // Select the first tab
-            if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
-        });
-        ShowSpinner = false;
+        ResultFiles = _sharedDataService.AllAnalyses;
     }
+
+   [RelayCommand]
+public async Task Initialize()
+{
+    ShowSpinner = true;
+    Console.WriteLine("Loading result files...");
+    TabItems.Clear();
+    var parser = _resultParserFactory.GetParser(SensorType);
+    
+    await Task.Run(async () =>
+    {
+        var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+        
+        _sharedDataService.UpdateAllAnalyses(files);
+
+        foreach (var pageName in parser.GetAnalysisPages())
+        {
+            TabItems.Add(new TabItemTemplate(
+                $"{pageName.ToString()}",
+                pageName,
+                _pageFactory.GetPageViewModel(pageName)));
+            Console.WriteLine($"Loaded {pageName.ToString()}");
+        }
+        
+        // Select the first tab
+        if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
+    });
+    ShowSpinner = false;
+}
 
 
     [RelayCommand]
