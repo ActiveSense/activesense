@@ -120,8 +120,24 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                             column.Item().PaddingVertical(10)
                                 .Height(200)
                                 .Image(GenerateStepsChartImage(analysis));
+                            
+                            // insert encoded data 
+                            column.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
+                                .PaddingTop(10).PaddingBottom(5)
+                                .Text("ANALYSIS_DATA_BEGIN")
+                                .FontSize(6)
+                                .FontColor(Colors.Grey.Medium);
+                        
+                            column.Item().Text(exportData)
+                                .FontSize(4)
+                                .FontColor(Colors.Grey.Medium);
+                            
+                            column.Item().Text("ANALYSIS_DATA_END")
+                                .FontSize(6)
+                                .FontColor(Colors.Grey.Medium);
                         }
                     });
+                
 
                 // Footer
                 page.Footer()
