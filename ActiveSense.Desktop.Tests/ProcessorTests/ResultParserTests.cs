@@ -14,12 +14,13 @@ public class GeneActiveResultParserTests
 {
     private GeneActiveResultParser _parser;
     private string _testDataDirectory;
+    
 
     [SetUp]
     public void Setup()
     {
         var dateToWeekdayConverter = new DateToWeekdayConverter();
-        _parser = new GeneActiveResultParser(dateToWeekdayConverter);
+        _parser = new GeneActiveResultParser(dateToWeekdayConverter, new AnalysisSerializer(new DateToWeekdayConverter()));
 
         // Create a temporary directory for test data
         _testDataDirectory = Path.Combine(Path.GetTempPath(), "ActiveSenseTest_" + Guid.NewGuid().ToString());

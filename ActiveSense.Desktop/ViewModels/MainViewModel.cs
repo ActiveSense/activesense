@@ -2,6 +2,7 @@
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,12 +16,14 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 
     [ObservableProperty] private DialogViewModel _dialog;
     private readonly PageFactory _pageFactory;
+    private readonly DialogService _dialogService;
 
     /// <inheritdoc/>
-    public MainViewModel(DialogViewModel dialog, PageFactory pageFactory)
+    public MainViewModel(DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService)
     {
         _pageFactory = pageFactory;
         _dialog = dialog;
+        _dialogService = dialogService;
     }
 
 
@@ -36,5 +39,20 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     private void TriggerPane()
     {
         IsPaneOpen = !IsPaneOpen;
+    }
+
+    public async Task<bool> ConfirmOnClose()
+    {
+        var dialog = new WarningDialogViewModel
+        {
+            Title = "Programm beenden?",
+            SubTitle = "Ungespeicherte Analysen gehen verloren.",
+            CloseButtonText = "Abbrechen",
+            OkButtonText = "Schliessen"
+        };
+
+        await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(this, dialog);
+        
+        return dialog.Confirmed;
     }
 }

@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             x:Class="ActiveSense.Desktop.Views.ExportDialogView"
+             x:DataType="viewModels:ExportDialogViewModel">
+
+    <!-- Reference to centralized styles -->
+    <UserControl.Styles>
+        <StyleInclude Source="/Assets/DialogStyles.axaml"/>
+    </UserControl.Styles>
+ 
+    <Border Classes="dialog-container" Width="500">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <!-- Header -->
+            <Grid Grid.Row="0"
+                  Margin="24,24,24,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="Export Analyses"
+                                   Classes="dialog-title"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="Save analyses as PDF files"
+                               Classes="dialog-subtitle" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*">
+                <!-- Path Selection Section -->
+                <Border Grid.Row="0" 
+                        Classes="dialog-content-panel"
+                        Padding="16"
+                        Margin="0,10,0,20">
+                    <Grid RowDefinitions="Auto,Auto">
+                        <TextBlock Grid.Row="0" 
+                                   Text="Output Location" 
+                                   Classes="dialog-section-title"
+                                   Margin="0,0,0,10"/>
+                        
+                        <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
+                            <TextBlock x:Name="OutputPathTextBlock" 
+                                       Grid.Column="0"
+                                       Text="{Binding OutputPath, FallbackValue='No folder selected'}"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                            
+                            <Button x:Name="SaveAnalysesButton"
+                                    Grid.Column="1"
+                                    Classes="Primary"
+                                    Theme="{DynamicResource OutlineButton}"
+                                    Padding="10"
+                                    Background="#F0F0F0"
+                                    BorderThickness="0"
+                                    CornerRadius="4"
+                                    Margin="10,0,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <ui:SymbolIcon Symbol="Folder" FontSize="16"/>
+                                    <TextBlock Text="Browse"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Border>
+                
+                <!-- Status Section -->
+                <Border Grid.Row="1" 
+                        Classes="dialog-content-panel"
+                        Padding="16"
+                        Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="Status" 
+                                   Classes="dialog-section-title"
+                                   Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="{Binding StatusMessage}" 
+                                   Classes="dialog-content-text"
+                                   Margin="0,0,0,10"/>
+                        
+                        <ProgressBar IsIndeterminate="{Binding IsExporting}"
+                                     IsVisible="{Binding IsExporting}"
+                                     Margin="0,10,0,0"
+                                     Height="4"/>
+                        
+                        <!-- Success indicator -->
+                        <StackPanel Orientation="Horizontal" 
+                                    IsVisible="{Binding IsExportSuccessful}"
+                                    Margin="0,10,0,0"
+                                    Spacing="8">
+                            <ui:SymbolIcon Symbol="Checkmark" 
+                                           Classes="dialog-success-icon"
+                                           FontSize="16"/>
+                            <TextBlock Text="Export completed successfully" 
+                                       Foreground="#107C10"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Footer -->
+            <Grid Grid.Row="2"
+                  Margin="24,20"
+                  ColumnDefinitions="Auto, *, Auto">
+
+                <Button Grid.Column="0"
+                        Classes="Secondary"
+                        Command="{Binding CancelCommand}">
+                    <TextBlock>Cancel</TextBlock>
+                </Button>
+                <Button Grid.Column="2" Classes="Primary" Theme="{DynamicResource SolidButton}"
+                        Command="{Binding ExportAnalysesCommand}"
+                        IsEnabled="{Binding !IsExporting}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ui:SymbolIcon Symbol="Save" FontSize="16" />
+                        <TextBlock>Export</TextBlock>
+                    </StackPanel>
+</Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

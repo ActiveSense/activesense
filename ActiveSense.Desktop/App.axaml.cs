@@ -33,14 +33,20 @@ public class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var collection = new ServiceCollection();
+
+        collection.AddTransient<AnalysisSerializer>();
         
         // Register factories
         collection.AddSingleton<ResultParserFactory>();
         collection.AddSingleton<SensorProcessorFactory>();
         collection.AddSingleton<PageFactory>();
+        collection.AddSingleton<ExporterFactory>();
         
         // Register processors
         collection.AddSingleton<GeneActivProcessor>();
+        
+        // Register exporters
+        collection.AddSingleton<GeneActiveExporter>();
         
         // Register parsers
         collection.AddSingleton<GeneActiveResultParser>();
@@ -58,6 +64,7 @@ public class App : Application
         collection.AddTransient<SleepPageViewModel>();
         collection.AddTransient<ActivityPageViewModel>();
         collection.AddTransient<GeneralPageViewModel>();
+        collection.AddTransient<ExportDialogViewModel>();
         
         // Register converters
         collection.AddTransient<DateToWeekdayConverter>();
@@ -87,6 +94,13 @@ public class App : Application
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            _ => throw new InvalidOperationException(),
+        });
+        
+        // Register exporters
+        collection.AddSingleton<Func<SensorTypes, IExporter>>(sp => type => type switch
+        {
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveExporter>(),
             _ => throw new InvalidOperationException(),
         });
         

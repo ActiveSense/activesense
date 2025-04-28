@@ -56,21 +56,21 @@ public partial class ProcessDialogViewModel(
 
         var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
 
-        IsProcessing = true;
-        StatusMessage = "Processing files...";
+        
 
         try
         {
-            var destinationDirectory = scriptService.GetScriptInputPath();
-            var success = await FileService.CopyFilesToDirectoryAsync(SelectedFiles, destinationDirectory);
-
-            if (!success)
-            {
-                StatusMessage = "Failed to copy files";
-                return;
-            }
-
-            var (scriptSuccess, output, error) = await processor.ProcessAsync($"-d {AppConfig.OutputsDirectoryPath}");
+            IsProcessing = true;
+            StatusMessage = "Copying files...";
+        
+            var processingDirectory = scriptService.GetScriptInputPath();
+            var destinationDirectory = AppConfig.OutputsDirectoryPath;
+            
+            processor.CopyFiles(SelectedFiles, processingDirectory, destinationDirectory);
+            
+            StatusMessage = "Analyzing files...";
+            
+            var (scriptSuccess, output, error) = await processor.ProcessAsync($"-d {destinationDirectory}");
 
             ScriptOutput = output;
             ShowScriptOutput = true;

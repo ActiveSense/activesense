@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -19,6 +20,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly ProcessDialogViewModel _processDialogViewModel;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
+    private readonly ExportDialogViewModel _exportDialogViewModel;
     private bool _isInitialized = false;
 
     [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
@@ -26,6 +28,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     [ObservableProperty] private TabItemTemplate _selectedTabItem;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showSpinner = true;
+    [ObservableProperty] private bool _showExportOption = true;
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
@@ -33,7 +36,8 @@ public partial class AnalysisPageViewModel : PageViewModel
         SharedDataService sharedDataService,
         DialogService dialogService,
         MainViewModel mainViewModel,
-        ProcessDialogViewModel processDialogViewModel)
+        ProcessDialogViewModel processDialogViewModel,
+        ExportDialogViewModel exportDialogViewModel)
     {
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
@@ -41,10 +45,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         _dialogService = dialogService;
         _mainViewModel = mainViewModel;
         _processDialogViewModel = processDialogViewModel;
-    }
-
-    public AnalysisPageViewModel()
-    {
+        _exportDialogViewModel = exportDialogViewModel;
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
@@ -52,19 +53,22 @@ public partial class AnalysisPageViewModel : PageViewModel
     partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
+        ShowExportOption = SelectedAnalyses.Any();
     }
 
     [RelayCommand]
     public async Task Initialize()
     {
+        ShowSpinner = true;
         Console.WriteLine("Loading result files...");
         TabItems.Clear();
         var parser = _resultParserFactory.GetParser(SensorType);
         
         await Task.Run(async () =>
         {
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             ResultFiles.Clear();
+            
+            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
 
             foreach (var file in files) ResultFiles.Add(file);
 
@@ -85,12 +89,18 @@ public partial class AnalysisPageViewModel : PageViewModel
 
 
     [RelayCommand]
-    public async Task TriggerDialog()
+    public async Task TriggerProcessDialog()
     {
         await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
 
         // Refresh data after dialog closes
         await Initialize();
+    }
+    
+    [RelayCommand]
+    public async Task TriggerExportDialog()
+    {
+        await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);
     }
 }
 

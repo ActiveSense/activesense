@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
 
 namespace ActiveSense.Desktop.Sensors;
 
-public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverter) : IResultParser
+public class GeneActiveResultParser(
+    DateToWeekdayConverter dateToWeekdayConverter,
+    AnalysisSerializer analysisSerializer) : IResultParser
 {
     private readonly ApplicationPageNames[] _analysisPages =
     [
@@ -20,11 +26,12 @@ public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverte
         ApplicationPageNames.Sleep,
         ApplicationPageNames.General
     ];
-    
-    public ApplicationPageNames[] GetAnalysisPages() {
+
+    public ApplicationPageNames[] GetAnalysisPages()
+    {
         return _analysisPages;
     }
-    
+
     public async Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory)
     {
         var analyses = new List<Analysis>();
@@ -36,14 +43,24 @@ public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverte
         }
 
         var directories = Directory.GetDirectories(outputDirectory);
+        var pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
 
+        foreach (var file in pdfFiles)
+        {
+            var pdfText = ExtractTextFromPdf(file);
+            var analysis = ExtractAnalysisFromPdfText(pdfText);
+            analyses.Add(analysis);
+            Console.WriteLine("Extracted analysis from PDF: " + file);
+        }
+
+        Console.WriteLine("Found " + pdfFiles.Length + " PDF files. In path: " + outputDirectory);
         foreach (var directory in directories)
         {
             Console.WriteLine("Processing directory: " + directory);
             var analysis = new Analysis(dateToWeekdayConverter)
             {
                 FilePath = directory,
-                FileName = Path.GetFileName(directory),
+                FileName = Path.GetFileName(directory)
             };
 
             var csvFiles = Directory.GetFiles(directory, "*.csv");
@@ -63,13 +80,9 @@ public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverte
                     var analysisType = DetermineAnalysisType(headers);
 
                     if (analysisType == AnalysisType.Activity)
-                    {
                         analysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
-                    }
                     else if (analysisType == AnalysisType.Sleep)
-                    {
                         analysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
-                    }
                 }
                 catch (Exception e)
                 {
@@ -111,5 +124,59 @@ public class GeneActiveResultParser(DateToWeekdayConverter dateToWeekdayConverte
         };
 
         return headers.Intersect(sleepHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
+    }
+
+    public Analysis ExtractAnalysisFromPdfText(string pdfText)
+    {
+        if (string.IsNullOrEmpty(pdfText))
+            return null;
+
+        try
+        {
+            const string startMarker = "ANALYSIS_DATA_BEGIN";
+            const string endMarker = "ANALYSIS_DATA_END";
+
+            var startIndex = pdfText.IndexOf(startMarker);
+            if (startIndex == -1)
+                return null;
+
+            startIndex += startMarker.Length;
+
+            var endIndex = pdfText.IndexOf(endMarker, startIndex);
+            if (endIndex == -1)
+                return null;
+
+            var base64Content = pdfText.Substring(startIndex, endIndex - startIndex).Trim();
+
+            base64Content = CleanBase64Content(base64Content);
+
+            return analysisSerializer.ImportFromBase64(base64Content);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error extracting Analysis from PDF text: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static string CleanBase64Content(string base64Content)
+    {
+        return Regex.Replace(base64Content, @"\s+", "");
+    }
+
+    private static string ExtractTextFromPdf(string filePath)
+    {
+        using var reader = new PdfReader(filePath);
+        using var pdfDoc = new PdfDocument(reader);
+
+        var text = new StringBuilder();
+        for (var i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+        {
+            var page = pdfDoc.GetPage(i);
+            var pageText = PdfTextExtractor.GetTextFromPage(page);
+            text.Append(pageText);
+        }
+
+        return text.ToString();
     }
 }

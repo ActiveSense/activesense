@@ -14,81 +14,24 @@
         <viewModels:ProcessDialogViewModel />
     </Design.DataContext>
 
+    <!-- Reference to centralized styles -->
     <UserControl.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderBrush" Value="#E5E5E5" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Margin" Value="0,0,0,12" />
-            <Setter Property="Padding" Value="12" />
-        </Style>
-
-        <Style Selector="TextBlock.heading">
-            <Setter Property="FontSize" Value="24" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0,0,0,8" />
-        </Style>
-
-        <Style Selector="TextBlock.subheading">
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="Medium" />
-            <Setter Property="Margin" Value="0,0,0,6" />
-        </Style>
-
-        <Style Selector="TextBlock.subtitle">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Opacity" Value="0.6" />
-            <Setter Property="Margin" Value="0,4,0,20" />
-        </Style>
-
-        <Style Selector="Button.action">
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="#E5E5E5" />
-            <Setter Property="CornerRadius" Value="20" />
-            <Setter Property="Padding" Value="16,10" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="MinWidth" Value="150" />
-        </Style>
-
-        <Style Selector="Button.action:pointerover">
-            <Setter Property="Background" Value="#F5F5F5" />
-        </Style>
-
-        <Style Selector="Button.primary">
-            <Setter Property="Background" Value="#0078D4" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="20" />
-            <Setter Property="Padding" Value="16,10" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="MinWidth" Value="150" />
-        </Style>
-
-        <Style Selector="Button.primary:pointerover">
-            <Setter Property="Background" Value="#106EBE" />
-        </Style>
+        <StyleInclude Source="/Assets/DialogStyles.axaml"/>
     </UserControl.Styles>
 
-    <Border
-        CornerRadius="16"
-        BorderThickness="0"
-        Background="#F0F6F9"
-        BoxShadow="0 4 24 0 #20000000">
+    <Border Classes="dialog-container" Width="850">
         <Grid RowDefinitions="Auto, *, Auto">
             <!-- Header -->
             <Grid Grid.Row="0"
                   Margin="24,24,24,0">
-
                 <StackPanel>
-                    <TextBlock Text="{Binding Title, FallbackValue='Add more files'}"
-                               Classes="heading" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{Binding Title, FallbackValue='Add more files'}"
+                                   Classes="dialog-title"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
                     <TextBlock Text="Sensordaten analysieren."
-                               Classes="subtitle" />
+                               Classes="dialog-subtitle" />
                 </StackPanel>
 
                 <Button HorizontalAlignment="Right"
@@ -108,12 +51,11 @@
                 <Grid ColumnDefinitions="*, 16, Auto">
                     <!-- Left column - Settings -->
                     <StackPanel Grid.Column="0" Spacing="12">
-                        <Border Classes="card">
+                        <Border Classes="setting-card">
                             <StackPanel Spacing="8">
-                                <TextBlock Classes="subheading">Processing Settings</TextBlock>
+                                <TextBlock Classes="dialog-section-title">Processing Settings</TextBlock>
 
-                                <ui:SettingsExpander Header="Sedentary Threshold"
-                                                     >
+                                <ui:SettingsExpander Header="Sedentary Threshold">
                                     <ui:SettingsExpander.Footer>
                                         <ui:NumberBox Value="6.2"
                                                       SimpleNumberFormat="F2"
@@ -124,8 +66,7 @@
                                     </ui:SettingsExpander.Footer>
                                 </ui:SettingsExpander>
 
-                                <ui:SettingsExpander Header="Light Threshold"
-                                                     >
+                                <ui:SettingsExpander Header="Light Threshold">
                                     <ui:SettingsExpander.Footer>
                                         <ui:NumberBox Value="3.4"
                                                       SimpleNumberFormat="F2"
@@ -136,8 +77,7 @@
                                     </ui:SettingsExpander.Footer>
                                 </ui:SettingsExpander>
                                 
-                                <ui:SettingsExpander Header="Medium Threshold"
-                                                    >
+                                <ui:SettingsExpander Header="Medium Threshold">
                                     <ui:SettingsExpander.Footer>
                                         <ui:NumberBox Value="3.4"
                                                       SimpleNumberFormat="F2"
@@ -148,8 +88,7 @@
                                     </ui:SettingsExpander.Footer>
                                 </ui:SettingsExpander>
                                 
-                                <ui:SettingsExpander Header="Vigorous Threshold"
-                                                   >
+                                <ui:SettingsExpander Header="Vigorous Threshold">
                                     <ui:SettingsExpander.Footer>
                                         <ui:NumberBox Value="3.4"
                                                       SimpleNumberFormat="F2"
@@ -162,18 +101,18 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Classes="card">
+                        <Border Classes="setting-card">
                             <StackPanel Spacing="12">
-                                <TextBlock Classes="subheading">Analysis Status</TextBlock>
+                                <TextBlock Classes="dialog-section-title">Analysis Status</TextBlock>
                                 <TextBlock Text="{Binding StatusMessage, FallbackValue='Ready to process files'}"
-                                           TextWrapping="Wrap" />
+                                           Classes="dialog-content-text" />
                             </StackPanel>
                         </Border>
-                        <Border Classes="card">
+                        
+                        <Border Classes="setting-card">
                             <StackPanel Spacing="12">
-                                <TextBlock Classes="subheading">Analysis Output</TextBlock>
-                                <ScrollViewer>
-
+                                <TextBlock Classes="dialog-section-title">Analysis Output</TextBlock>
+                                <ScrollViewer MaxHeight="220">
                                     <TextBox Text="{Binding ScriptOutput, FallbackValue='Waiting'}" />
                                 </ScrollViewer>
                             </StackPanel>
@@ -185,13 +124,13 @@
 
                     <!-- Right column - File selection -->
                     <Border Grid.Column="2"
-                            Classes="card"
+                            Classes="setting-card"
                             Width="240"
                             VerticalAlignment="Top">
                         <Grid RowDefinitions="Auto, *, Auto">
                             <TextBlock Grid.Row="0"
                                        Text="Selected Files"
-                                       Classes="subheading" />
+                                       Classes="dialog-section-title" />
 
                             <Border Grid.Row="1"
                                     CornerRadius="6"
@@ -225,7 +164,7 @@
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Margin="0,8,0,0"
-                                    Classes="action">
+                                    Classes="dialog-secondary-button">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <ui:SymbolIcon Symbol="Folder" FontSize="14" />
                                     <TextBlock>Select Files</TextBlock>
@@ -241,26 +180,17 @@
                   Margin="24,20"
                   ColumnDefinitions="Auto, *, Auto">
 
-                <TextBlock Grid.Column="1"
-                           Text="or"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Opacity="0.6"
-                           FontSize="16" />
 
                 <Button Grid.Column="0"
-                        Classes="action"
-                        HorizontalAlignment="Left"
+                        Classes="Secondary"
                         Command="{Binding CancelCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock>Abbrechen</TextBlock>
-                    </StackPanel>
+                    <TextBlock>Cancel</TextBlock>
                 </Button>
 
                 <Button Grid.Column="2"
-                        Classes="primary"
-                        Command="{Binding ProcessFilesCommand}"
-                        HorizontalAlignment="Right">
+                        Classes="Primary"
+                        Theme="{DynamicResource SolidButton}"
+                        Command="{Binding ProcessFilesCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ui:SymbolIcon Symbol="Play" FontSize="16" />
                         <TextBlock>Analyse Starten</TextBlock>

@@ -7,4 +7,5 @@ public interface ISensorProcessor
 {
     SensorTypes SupportedType { get; }
     Task<(bool Success, string Output, string Error)> ProcessAsync(string arguments);
+    void CopyFiles(string[] files, string processingDirectory, string outputDirectory);
 }
