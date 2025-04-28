@@ -32,163 +32,96 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
             Settings.License = LicenseType.Community;
             string exportData = serializer.ExportToBase64(analysis);
 
-            Document.Create(container =>
+        Document.Create(container =>
+        {
+            container.Page(page =>
             {
-                container.Page(page =>
-                {
-                    page.Size(PageSizes.A4);
-                    page.Margin(1, Unit.Centimetre);
-                    page.DefaultTextStyle(x => x.FontSize(11));
+                page.Size(PageSizes.A4);
+                page.Margin(1, Unit.Centimetre);
+                page.DefaultTextStyle(x => x.FontSize(11));
 
-                    // Header
-                    page.Header()
-                        .Text("ActiveSense Analysis Report")
-                        .Bold()
-                        .FontSize(16);
+                // Header
+                page.Header()
+                    .Text("ActiveSense Analysis Report")
+                    .Bold()
+                    .FontSize(16);
 
-                    // Content
-                    page.Content()
-                        .Column(column =>
+                // Content
+                page.Content()
+                    .Column(column =>
+                    {
+                        // Title section
+                        column.Item().PaddingVertical(10)
+                            .Text($"Analysis: {analysis.FileName}")
+                            .Bold()
+                            .FontSize(14);
+
+                        // Sleep Data Section
+                        column.Item().PaddingTop(10)
+                            .Text("Schlafdaten")
+                            .Bold()
+                            .FontSize(16);
+
+                        if (analysis.SleepRecords == null || !analysis.SleepRecords.Any())
                         {
-                            // Title section
+                            column.Item().Text("No sleep data available").Italic().FontSize(12);
+                        }
+                        else
+                        {
+                            // Add sleep data table or charts
                             column.Item().PaddingVertical(10)
-                                .Text($"Analysis: {analysis.FileName}")
-                                .Bold()
-                                .FontSize(14);
-
-                            // Overview sections side by side
-                            column.Item().PaddingTop(10).Row(row =>
-                            {
-                                // Sleep overview (left side)
-                                row.RelativeItem().Padding(5).Element(container =>
+                                .Table(table =>
                                 {
-                                    container.Column(innerColumn =>
+                                    table.ColumnsDefinition(columns =>
                                     {
-                                        innerColumn.Item()
-                                            .Text("Übersicht der Schlafdaten")
-                                            .Bold()
-                                            .FontSize(12);
-
-                                        innerColumn.Item()
-                                            .Text("Durchschnittliche Schlafdaten pro Nacht")
-                                            .FontSize(10)
-                                            .Italic();
-
-                                        innerColumn.Item().PaddingVertical(10)
-                                            .Table(table =>
-                                            {
-                                                // Define columns
-                                                table.ColumnsDefinition(columns =>
-                                                {
-                                                    columns.ConstantColumn(120);
-                                                    columns.RelativeColumn();
-                                                });
-
-                                                // Add sleep metrics
-                                                AddTableRow(table, "Average Sleep Time",
-                                                    $"{analysis.AverageSleepTime / 3600:F2} hours");
-                                                AddTableRow(table, "Average Sleep Efficiency",
-                                                    $"{analysis.SleepEfficiency.Average():F1}%");
-                                                AddTableRow(table, "Total Sleep Time",
-                                                    $"{analysis.TotalSleepTime / 3600:F2} hours");
-                                                AddTableRow(table, "Total Wake Time",
-                                                    $"{analysis.TotalWakeTime / 3600:F2} hours");
-                                            });
+                                        columns.ConstantColumn(120);
+                                        columns.RelativeColumn();
                                     });
+
+                                    AddTableRow(table, "Average Sleep Time",
+                                        $"{analysis.AverageSleepTime / 3600:F2} hours");
+                                    AddTableRow(table, "Average Sleep Efficiency",
+                                        $"{analysis.SleepEfficiency.Average():F1}%");
                                 });
 
-                                // Activity overview (right side)
-                                row.RelativeItem().Padding(5).Element(container =>
-                                {
-                                    container.Column(innerColumn =>
-                                    {
-                                        innerColumn.Item()
-                                            .Text("Übersicht der Aktivitätsdaten")
-                                            .Bold()
-                                            .FontSize(12);
-
-                                        innerColumn.Item()
-                                            .Text("Durchschnittliche Aktivität pro Tag")
-                                            .FontSize(10)
-                                            .Italic();
-
-                                        innerColumn.Item().PaddingVertical(10)
-                                            .Table(table =>
-                                            {
-                                                // Define columns
-                                                table.ColumnsDefinition(columns =>
-                                                {
-                                                    columns.ConstantColumn(120);
-                                                    columns.RelativeColumn();
-                                                });
-
-                                                // Add activity metrics
-                                                AddTableRow(table, "Average Steps",
-                                                    $"{analysis.StepsPerDay.Average():F0} steps");
-                                                AddTableRow(table, "Average Light Activity",
-                                                    $"{analysis.AverageLightActivity / 60:F1} minutes");
-                                                AddTableRow(table, "Average Moderate Activity",
-                                                    $"{analysis.AverageModerateActivity / 60:F1} minutes");
-                                                AddTableRow(table, "Average Vigorous Activity",
-                                                    $"{analysis.AverageVigorousActivity / 60:F1} minutes");
-                                            });
-                                    });
-                                });
-                            });
-
-                            // Separator
-                            column.Item().PaddingVertical(10)
-                                .LineHorizontal(1)
-                                .LineColor(Colors.Grey.Medium);
-    
-                            // Sleep Charts
-                            column.Item().PaddingTop(10)
-                                .Text("Schlafdaten")
-                                .Bold()
-                                .FontSize(16);
-                            
-                            // Sleep Pie Chart
-                            column.Item().PaddingTop(10)
-                                .Text("Schlafverteilung")
-                                .Bold()
-                                .FontSize(12);
-
-                            // Generate and add sleep pie chart
                             column.Item().PaddingVertical(10)
                                 .Height(200)
                                 .Image(GeneratePieChartImage(analysis));
+                        }
 
-                            // Steps Bar Chart
-                            column.Item().PaddingTop(20)
-                                .Text("Schritte pro Tag")
-                                .Bold()
-                                .FontSize(12);
+                        // Activity Data Section
+                        column.Item().PaddingTop(20)
+                            .Text("Aktivitätsdaten")
+                            .Bold()
+                            .FontSize(16);
 
-                            // Generate and add steps bar chart
+                        if (analysis.ActivityRecords == null || !analysis.ActivityRecords.Any())
+                        {
+                            column.Item().Text("No activity data available").Italic().FontSize(12);
+                        }
+                        else
+                        {
+                            // Add activity data table or charts
+                            column.Item().PaddingVertical(10)
+                                .Table(table =>
+                                {
+                                    table.ColumnsDefinition(columns =>
+                                    {
+                                        columns.ConstantColumn(120);
+                                        columns.RelativeColumn();
+                                    });
+
+                                    AddTableRow(table, "Average Steps",
+                                        $"{analysis.StepsPerDay.Average():F0} steps");
+                                    AddTableRow(table, "Average Light Activity",
+                                        $"{analysis.AverageLightActivity / 60:F1} minutes");
+                                });
+
                             column.Item().PaddingVertical(10)
                                 .Height(200)
                                 .Image(GenerateStepsChartImage(analysis));
-
-                            // Page break before activity distribution chart
-                            column.Item().PageBreak();
-
-                            // Activity Distribution Chart
-                            column.Item().PaddingTop(20)
-                                .Text("Aktivitätsverteilung")
-                                .Bold()
-                                .FontSize(12);
-
-                            // Generate and add activity distribution chart
-                            column.Item().PaddingVertical(10)
-                                .Height(200)
-                                .Image(GenerateActivityDistributionChartImage(analysis));
                             
-                            // Separator
-                            column.Item().PaddingVertical(10)
-                                .LineHorizontal(1)
-                                .LineColor(Colors.Grey.Medium);
-
-                            // Add the encoded data in the footer
+                            // insert encoded data 
                             column.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
                                 .PaddingTop(10).PaddingBottom(5)
                                 .Text("ANALYSIS_DATA_BEGIN")
@@ -202,31 +135,33 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                             column.Item().Text("ANALYSIS_DATA_END")
                                 .FontSize(6)
                                 .FontColor(Colors.Grey.Medium);
-                        });
+                        }
+                    });
+                
 
-                    // Footer
-                    page.Footer()
-                        .AlignCenter()
-                        .Text(text =>
-                        {
-                            text.Span("Generated: ");
-                            text.Span(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
-                            text.Span(" | Page ");
-                            text.CurrentPageNumber();
-                            text.Span(" of ");
-                            text.TotalPages();
-                        });
-                });
-            }).GeneratePdf(outputPath);
+                // Footer
+                page.Footer()
+                    .AlignCenter()
+                    .Text(text =>
+                    {
+                        text.Span("Generated: ");
+                        text.Span(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+                        text.Span(" | Page ");
+                        text.CurrentPageNumber();
+                        text.Span(" of ");
+                        text.TotalPages();
+                    });
+            });
+        }).GeneratePdf(outputPath);
 
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"PDF export failed: {ex.Message}");
-            return false;
-        }
+        return true;
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"PDF export failed: {ex.Message}");
+        return false;
+    }
+}
 
     private void AddTableRow(TableDescriptor table, string label, string value)
     {

@@ -53,10 +53,7 @@ public partial class ProcessDialogViewModel(
             return;
         }
 
-
         var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
-
-        
 
         try
         {
