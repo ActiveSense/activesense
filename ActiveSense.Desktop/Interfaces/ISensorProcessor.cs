@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Models;
 
 namespace ActiveSense.Desktop.Interfaces;

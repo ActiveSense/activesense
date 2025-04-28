@@ -1,6 +1,4 @@
-using System;
-
-namespace ActiveSense.Desktop.Models
+namespace ActiveSense.Desktop.HelperClasses
 {
     public abstract class ScriptArgument
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -34,6 +35,11 @@ public partial class ProcessDialogViewModel : DialogViewModel
         _scriptService = scriptService;
         
         LoadDefaultArguments();
+    }
+
+    public ProcessDialogViewModel()
+    {
+        
     }
     
     private void LoadDefaultArguments()

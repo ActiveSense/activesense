@@ -9,6 +9,7 @@
              x:DataType="viewModels:ProcessDialogViewModel"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:models="clr-namespace:ActiveSense.Desktop.Models"
+             xmlns:helperClasses="clr-namespace:ActiveSense.Desktop.HelperClasses"
              x:Class="ActiveSense.Desktop.Views.ProcessDialogView">
 
     <Design.DataContext>
@@ -17,40 +18,33 @@
 
     <!-- Reference to centralized styles -->
     <UserControl.Styles>
-        <StyleInclude Source="/Assets/DialogStyles.axaml"/>
-        <StyleInclude Source="/Assets/Styles.axaml"/>
+        <StyleInclude Source="/Assets/DialogStyles.axaml" />
+        <!-- <StyleInclude Source="/Assets/Styles.axaml"/> -->
     </UserControl.Styles>
 
-    <Border Classes="dialog-container" Width="850">
+    <Border Classes="dialog-container"
+            Height="450"
+            Width="600">
         <Grid RowDefinitions="Auto, *, Auto">
             <!-- Header -->
-            <Grid Grid.Row="0"
+            <Grid Grid.Row="0" IsVisible="{Binding !IsProcessing}"
                   Margin="24,24,24,0">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock Text="{Binding Title, FallbackValue='Add more files'}"
                                    Classes="dialog-title"
-                                   VerticalAlignment="Center"/>
+                                   VerticalAlignment="Center" />
                     </StackPanel>
                     <TextBlock Text="Sensordaten analysieren."
                                Classes="dialog-subtitle" />
                 </StackPanel>
-
-                <Button HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Command="{Binding CancelCommand}"
-                        Padding="8">
-                    <ui:SymbolIcon Symbol="Dismiss" FontSize="16" />
-                </Button>
             </Grid>
 
             <!-- Content -->
             <ScrollViewer Grid.Row="1"
                           Padding="24,0,24,0"
                           VerticalScrollBarVisibility="Auto">
-                <Grid ColumnDefinitions="*, 16, Auto">
+                <Grid ColumnDefinitions="*, 16, Auto" IsVisible="{Binding !IsProcessing}">
                     <!-- Left column - Settings -->
                     <StackPanel Grid.Column="0" Spacing="12">
                         <Border Classes="setting-card">
@@ -61,44 +55,44 @@
                                             <ContentControl Content="{Binding}">
                                                 <ContentControl.DataTemplates>
                                                     <!-- Boolean argument template -->
-                                                    <DataTemplate DataType="{x:Type models:BoolArgument}">
+                                                    <DataTemplate DataType="{x:Type helperClasses:BoolArgument}">
                                                         <Border Classes="setting-item">
                                                             <Grid ColumnDefinitions="*, Auto">
                                                                 <StackPanel Grid.Column="0">
-                                                                    <TextBlock Text="{Binding Name}" 
-                                                                               Classes="setting-title"/>
-                                                                    <TextBlock Text="{Binding Description}" 
+                                                                    <TextBlock Text="{Binding Name}"
+                                                                               Classes="setting-title" />
+                                                                    <TextBlock Text="{Binding Description}"
                                                                                Classes="setting-description"
-                                                                               TextWrapping="Wrap"/>
+                                                                               TextWrapping="Wrap" />
                                                                 </StackPanel>
-                                                                <ToggleSwitch Grid.Column="1" 
-                                                                             IsChecked="{Binding Value}"
-                                                                             OnContent="On" 
-                                                                             OffContent="Off"
-                                                                             VerticalAlignment="Center"/>
+                                                                <ToggleSwitch Grid.Column="1"
+                                                                              IsChecked="{Binding Value}"
+                                                                              OnContent="On"
+                                                                              OffContent="Off"
+                                                                              VerticalAlignment="Center" />
                                                             </Grid>
                                                         </Border>
                                                     </DataTemplate>
-                                                    
+
                                                     <!-- Numeric argument template -->
-                                                    <DataTemplate DataType="{x:Type models:NumericArgument}">
+                                                    <DataTemplate DataType="{x:Type helperClasses:NumericArgument}">
                                                         <Border Classes="setting-item">
                                                             <Grid ColumnDefinitions="*, Auto">
                                                                 <StackPanel Grid.Column="0">
-                                                                    <TextBlock Text="{Binding Name}" 
-                                                                               Classes="setting-title"/>
-                                                                    <TextBlock Text="{Binding Description}" 
+                                                                    <TextBlock Text="{Binding Name}"
+                                                                               Classes="setting-title" />
+                                                                    <TextBlock Text="{Binding Description}"
                                                                                Classes="setting-description"
-                                                                               TextWrapping="Wrap"/>
+                                                                               TextWrapping="Wrap" />
                                                                 </StackPanel>
-                                                                <NumericUpDown Grid.Column="1" 
-                                                                             Value="{Binding Value}"
-                                                                             Minimum="{Binding MinValue}"
-                                                                             Maximum="{Binding MaxValue}"
-                                                                             Increment="0.01"
-                                                                             FormatString="F2"
-                                                                             Width="100"
-                                                                             VerticalAlignment="Center"/>
+                                                                <NumericUpDown Grid.Column="1"
+                                                                               Value="{Binding Value}"
+                                                                               Minimum="{Binding MinValue}"
+                                                                               Maximum="{Binding MaxValue}"
+                                                                               Increment="0.01"
+                                                                               FormatString="F2"
+                                                                               Width="100"
+                                                                               VerticalAlignment="Center" />
                                                             </Grid>
                                                         </Border>
                                                     </DataTemplate>
@@ -117,7 +111,7 @@
                                            Classes="dialog-content-text" />
                             </StackPanel>
                         </Border>
-                        
+
                         <Border Classes="setting-card">
                             <StackPanel Spacing="12">
                                 <TextBlock Classes="dialog-section-title">Analysis Output</TextBlock>
@@ -143,9 +137,7 @@
 
                             <Border Grid.Row="1"
                                     CornerRadius="6"
-                                    Padding="6"
-                                    MinHeight="200"
-                                    MaxHeight="280">
+                                    Padding="6">
                                 <ListBox ItemsSource="{Binding SelectedFiles}"
                                          Background="Transparent"
                                          Padding="0">
@@ -184,6 +176,25 @@
                 </Grid>
             </ScrollViewer>
 
+            <Grid IsVisible="{Binding IsProcessing}"
+                  Grid.Row="1"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <Border
+                    Padding="24">
+                    <StackPanel Spacing="12">
+                        <ProgressBar
+                            Width="100"
+                            Height="100"
+                            IsIndeterminate="True"
+                            Theme="{DynamicResource ProgressRing}"
+                            ShowProgressText="False" />
+                        <TextBlock Text="Daten werden geladen..."
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Medium" />
+                    </StackPanel>
+                </Border>
+            </Grid>
             <!-- Footer -->
             <Grid Grid.Row="2"
                   Margin="24,20"
