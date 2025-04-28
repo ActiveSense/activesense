@@ -1,37 +1,76 @@
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class ProcessDialogViewModel(
-    SensorProcessorFactory sensorProcessorFactory,
-    IScriptService scriptService) : DialogViewModel
+public partial class ProcessDialogViewModel : DialogViewModel
 {
-    [ObservableProperty] private string _cancelText = "No";
+    private readonly SensorProcessorFactory _sensorProcessorFactory;
+    private readonly IScriptService _scriptService;
 
-    [ObservableProperty] private bool _confirmed;
-    [ObservableProperty] private string _confirmText = "Yes";
-    [ObservableProperty] private string _iconText = "\xe4e0";
-
+    [ObservableProperty] private string _cancelText = "Cancel";
+    [ObservableProperty] private string _confirmText = "Confirm";
     [ObservableProperty] private bool _isProcessing;
-    [ObservableProperty] private string _message = "Are you sure?";
     [ObservableProperty] private string _scriptOutput = string.Empty;
     [ObservableProperty] private string[]? _selectedFiles;
     [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
-    [ObservableProperty] private string _test = "TestText";
-    [ObservableProperty] private string _title = "Confirm";
+    [ObservableProperty] private string _title = "Analysis Settings";
+    
+    [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
+
+    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService)
+    {
+        _sensorProcessorFactory = sensorProcessorFactory;
+        _scriptService = scriptService;
+        
+        LoadDefaultArguments();
+    }
+    
+    private void LoadDefaultArguments()
+    {
+        var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
+        Arguments.Clear();
+        
+        foreach (var arg in processor.DefaultArguments)
+        {
+            if (arg is BoolArgument boolArg)
+            {
+                Arguments.Add(new BoolArgument
+                {
+                    Flag = boolArg.Flag,
+                    Name = boolArg.Name,
+                    Description = boolArg.Description,
+                    Value = boolArg.Value
+                });
+            }
+            else if (arg is NumericArgument numArg)
+            {
+                Arguments.Add(new NumericArgument
+                {
+                    Flag = numArg.Flag,
+                    Name = numArg.Name,
+                    Description = numArg.Description,
+                    Value = numArg.Value,
+                    MinValue = numArg.MinValue,
+                    MaxValue = numArg.MaxValue
+                });
+            }
+        }
+    }
 
     [RelayCommand]
     public void Cancel()
     {
-        Confirmed = false;
         Close();
     }
 
@@ -41,8 +80,16 @@ public partial class ProcessDialogViewModel(
     {
         SelectedFiles = files;
         FilesSelected?.Invoke(files);
+        
+        if (files == null || files.Length == 0)
+        {
+            StatusMessage = "No files selected";
+        }
+        else
+        {
+            StatusMessage = $"{files.Length} file(s) selected";
+        }
     }
-
 
     [RelayCommand]
     private async Task ProcessFiles()
@@ -53,21 +100,22 @@ public partial class ProcessDialogViewModel(
             return;
         }
 
-        var processor = sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
+        var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
 
         try
         {
             IsProcessing = true;
             StatusMessage = "Copying files...";
         
-            var processingDirectory = scriptService.GetScriptInputPath();
-            var destinationDirectory = AppConfig.OutputsDirectoryPath;
+            var processingDirectory = _scriptService.GetScriptInputPath();
+            var outputDirectory = AppConfig.OutputsDirectoryPath;
             
-            processor.CopyFiles(SelectedFiles, processingDirectory, destinationDirectory);
+            processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
             
             StatusMessage = "Analyzing files...";
             
-            var (scriptSuccess, output, error) = await processor.ProcessAsync($"-d {destinationDirectory}");
+            // Process files with the current arguments
+            var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments);
 
             ScriptOutput = output;
             ShowScriptOutput = true;

@@ -2,7 +2,25 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Common Control Styles -->
-
+        
+    <!-- Add simple styles for our custom setting items -->
+    <Style Selector="Border.setting-item">
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Margin" Value="0,4"/>
+        <Setter Property="Background" Value="#F6F6F6"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+        
+    <Style Selector="TextBlock.setting-title">
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+        
+    <Style Selector="TextBlock.setting-description">
+        <Setter Property="Opacity" Value="0.7"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
 
     <Style Selector="Border.card">
         <Setter Property="CornerRadius" Value="12" />
@@ -29,47 +47,5 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="0" />
     </Style>
-
-
-    <Style Selector="Button.carousel-nav-button">
-        <Setter Property="Background" Value="#FFFFFF" />
-        <Setter Property="Width" Value="40" />
-        <Setter Property="Height" Value="40" />
-        <Setter Property="CornerRadius" Value="20" />
-        <Setter Property="Opacity" Value="0.8" />
-        <Setter Property="Transitions">
-            <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
-            </Transitions>
-        </Setter>
-    </Style>
-
-
-    <!-- Dialogs    -->
-
-    <!-- Common Dialog Container -->
-    <Style Selector="Border.dialog-container">
-        <Setter Property="CornerRadius" Value="16" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Background" Value="#F0F6F9" />
-        <Setter Property="BoxShadow" Value="0 4 24 0 #20000000" />
-        <Setter Property="Width" Value="550" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-
-    <!-- Dialog Header -->
-    <Style Selector="TextBlock.dialog-title">
-        <Setter Property="FontSize" Value="24" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Margin" Value="0,0,0,8" />
-    </Style>
-
-    <Style Selector="TextBlock.dialog-subtitle">
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="Opacity" Value="0.6" />
-        <Setter Property="Margin" Value="0,4,0,16" />
-    </Style>
-
 
 </Styles>

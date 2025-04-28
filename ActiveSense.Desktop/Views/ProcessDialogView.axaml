@@ -8,6 +8,7 @@
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              x:DataType="viewModels:ProcessDialogViewModel"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:models="clr-namespace:ActiveSense.Desktop.Models"
              x:Class="ActiveSense.Desktop.Views.ProcessDialogView">
 
     <Design.DataContext>
@@ -17,6 +18,7 @@
     <!-- Reference to centralized styles -->
     <UserControl.Styles>
         <StyleInclude Source="/Assets/DialogStyles.axaml"/>
+        <StyleInclude Source="/Assets/Styles.axaml"/>
     </UserControl.Styles>
 
     <Border Classes="dialog-container" Width="850">
@@ -53,51 +55,58 @@
                     <StackPanel Grid.Column="0" Spacing="12">
                         <Border Classes="setting-card">
                             <StackPanel Spacing="8">
-                                <TextBlock Classes="dialog-section-title">Processing Settings</TextBlock>
-
-                                <ui:SettingsExpander Header="Sedentary Threshold">
-                                    <ui:SettingsExpander.Footer>
-                                        <ui:NumberBox Value="6.2"
-                                                      SimpleNumberFormat="F2"
-                                                      ValidationMode="InvalidInputOverwritten"
-                                                      SpinButtonPlacementMode="Compact"
-                                                      SmallChange="0.1"
-                                                      Width="120" />
-                                    </ui:SettingsExpander.Footer>
-                                </ui:SettingsExpander>
-
-                                <ui:SettingsExpander Header="Light Threshold">
-                                    <ui:SettingsExpander.Footer>
-                                        <ui:NumberBox Value="3.4"
-                                                      SimpleNumberFormat="F2"
-                                                      ValidationMode="InvalidInputOverwritten"
-                                                      SpinButtonPlacementMode="Compact"
-                                                      SmallChange="0.1"
-                                                      Width="120" />
-                                    </ui:SettingsExpander.Footer>
-                                </ui:SettingsExpander>
-                                
-                                <ui:SettingsExpander Header="Medium Threshold">
-                                    <ui:SettingsExpander.Footer>
-                                        <ui:NumberBox Value="3.4"
-                                                      SimpleNumberFormat="F2"
-                                                      ValidationMode="InvalidInputOverwritten"
-                                                      SpinButtonPlacementMode="Compact"
-                                                      SmallChange="0.1"
-                                                      Width="120" />
-                                    </ui:SettingsExpander.Footer>
-                                </ui:SettingsExpander>
-                                
-                                <ui:SettingsExpander Header="Vigorous Threshold">
-                                    <ui:SettingsExpander.Footer>
-                                        <ui:NumberBox Value="3.4"
-                                                      SimpleNumberFormat="F2"
-                                                      ValidationMode="InvalidInputOverwritten"
-                                                      SpinButtonPlacementMode="Compact"
-                                                      SmallChange="0.1"
-                                                      Width="120" />
-                                    </ui:SettingsExpander.Footer>
-                                </ui:SettingsExpander>
+                                <ItemsControl ItemsSource="{Binding Arguments}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ContentControl Content="{Binding}">
+                                                <ContentControl.DataTemplates>
+                                                    <!-- Boolean argument template -->
+                                                    <DataTemplate DataType="{x:Type models:BoolArgument}">
+                                                        <Border Classes="setting-item">
+                                                            <Grid ColumnDefinitions="*, Auto">
+                                                                <StackPanel Grid.Column="0">
+                                                                    <TextBlock Text="{Binding Name}" 
+                                                                               Classes="setting-title"/>
+                                                                    <TextBlock Text="{Binding Description}" 
+                                                                               Classes="setting-description"
+                                                                               TextWrapping="Wrap"/>
+                                                                </StackPanel>
+                                                                <ToggleSwitch Grid.Column="1" 
+                                                                             IsChecked="{Binding Value}"
+                                                                             OnContent="On" 
+                                                                             OffContent="Off"
+                                                                             VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                    
+                                                    <!-- Numeric argument template -->
+                                                    <DataTemplate DataType="{x:Type models:NumericArgument}">
+                                                        <Border Classes="setting-item">
+                                                            <Grid ColumnDefinitions="*, Auto">
+                                                                <StackPanel Grid.Column="0">
+                                                                    <TextBlock Text="{Binding Name}" 
+                                                                               Classes="setting-title"/>
+                                                                    <TextBlock Text="{Binding Description}" 
+                                                                               Classes="setting-description"
+                                                                               TextWrapping="Wrap"/>
+                                                                </StackPanel>
+                                                                <NumericUpDown Grid.Column="1" 
+                                                                             Value="{Binding Value}"
+                                                                             Minimum="{Binding MinValue}"
+                                                                             Maximum="{Binding MaxValue}"
+                                                                             Increment="0.01"
+                                                                             FormatString="F2"
+                                                                             Width="100"
+                                                                             VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ContentControl.DataTemplates>
+                                            </ContentControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Border>
 

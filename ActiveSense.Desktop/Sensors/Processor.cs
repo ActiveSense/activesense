@@ -1,22 +1,56 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
+using iText.Layout.Element;
 
 namespace ActiveSense.Desktop.Sensors
 {
-    public class GeneActivProcessor(IScriptService rScriptService) : ISensorProcessor
+    public class GeneActivProcessor : ISensorProcessor
     {
-        private readonly IScriptService _rScriptService = rScriptService ?? new RScriptService();
+        private readonly IScriptService _rScriptService;
+        private readonly List<ScriptArgument> _defaultArguments;
+
+        public GeneActivProcessor(IScriptService rScriptService)
+        {
+            _rScriptService = rScriptService ?? new RScriptService();
+            _defaultArguments = CreateDefaultArguments();
+        }
 
         public SensorTypes SupportedType => SensorTypes.GENEActiv;
-
         public static string[] SupportedFileTypes => new[] { ".csv", ".bin" };
+        public IReadOnlyList<ScriptArgument> DefaultArguments => _defaultArguments;
 
-        public async Task<(bool Success, string Output, string Error)> ProcessAsync(string arguments = "")
+        private List<ScriptArgument> CreateDefaultArguments()
+        {
+            return new List<ScriptArgument>
+            {
+                // Boolean arguments
+                new BoolArgument
+                {
+                    Flag = "a",
+                    Name = "Activity Analysis",
+                    Description = "Run activity analysis",
+                    Value = true
+                },
+                new BoolArgument
+                {
+                    Flag = "s",
+                    Name = "Sleep Analysis",
+                    Description = "Run sleep analysis",
+                    Value = true
+                },
+            };
+        }
+
+       public async Task<(bool Success, string Output, string Error)> ProcessAsync(
+            IEnumerable<ScriptArgument> arguments = null)
         {
             try
             {
@@ -24,7 +58,17 @@ namespace ActiveSense.Desktop.Sensors
                 var executablePath = _rScriptService.GetExecutablePath();
                 var workingDirectory = _rScriptService.GetScriptBasePath();
                 
-                var processArguments = $"\"{scriptPath}\" {arguments}";
+                var argsToUse = arguments?.ToList() ?? _defaultArguments;
+                
+                var outputDir = $"-d \"{AppConfig.OutputsDirectoryPath}\"";
+                
+                var scriptArguments = string.Join(" ", 
+                    argsToUse
+                        .Select(arg => arg.ToCommandLineArgument())
+                        .Where(arg => !string.IsNullOrEmpty(arg)));
+                
+                var processArguments = $"\"{scriptPath}\" {outputDir} {scriptArguments}";
+                
                 return await ExecuteProcessAsync(executablePath, processArguments, workingDirectory);
             }
             catch (Exception ex)
@@ -32,8 +76,7 @@ namespace ActiveSense.Desktop.Sensors
                 return (false, string.Empty, $"Failed to execute R script: {ex.Message}");
             }
         }
-        
-        // Protected virtual method that can be overridden in tests
+
         protected virtual async Task<(bool Success, string Output, string Error)> ExecuteProcessAsync(
             string scriptPath, string arguments, string workingDirectory)
         {
@@ -62,7 +105,7 @@ namespace ActiveSense.Desktop.Sensors
 
             return (process.ExitCode == 0, output, error);
         }
-        
+
         public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
         {
             if (files == null || files.Length == 0)
@@ -79,7 +122,7 @@ namespace ActiveSense.Desktop.Sensors
                 {
                     string extension = Path.GetExtension(file).ToLowerInvariant();
                     string fileName = Path.GetFileName(file);
-            
+
                     if (extension == ".bin")
                     {
                         string destinationPath = Path.Combine(processingDirectory, fileName);
