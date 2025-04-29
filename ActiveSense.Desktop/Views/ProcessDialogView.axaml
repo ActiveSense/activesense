@@ -8,7 +8,6 @@
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              x:DataType="viewModels:ProcessDialogViewModel"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:models="clr-namespace:ActiveSense.Desktop.Models"
              xmlns:helperClasses="clr-namespace:ActiveSense.Desktop.HelperClasses"
              x:Class="ActiveSense.Desktop.Views.ProcessDialogView">
 
@@ -35,8 +34,6 @@
                                    Classes="dialog-title"
                                    VerticalAlignment="Center" />
                     </StackPanel>
-                    <TextBlock Text="Sensordaten analysieren."
-                               Classes="dialog-subtitle" />
                 </StackPanel>
             </Grid>
 
@@ -48,78 +45,66 @@
                     <!-- Left column - Settings -->
                     <StackPanel Grid.Column="0" Spacing="12">
                         <Border Classes="setting-card">
-                            <StackPanel Spacing="8">
-                                <ItemsControl ItemsSource="{Binding Arguments}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <ContentControl Content="{Binding}">
-                                                <ContentControl.DataTemplates>
-                                                    <!-- Boolean argument template -->
-                                                    <DataTemplate DataType="{x:Type helperClasses:BoolArgument}">
-                                                        <Border Classes="setting-item">
-                                                            <Grid ColumnDefinitions="*, Auto">
-                                                                <StackPanel Grid.Column="0">
-                                                                    <TextBlock Text="{Binding Name}"
-                                                                               Classes="setting-title" />
-                                                                    <TextBlock Text="{Binding Description}"
-                                                                               Classes="setting-description"
-                                                                               TextWrapping="Wrap" />
-                                                                </StackPanel>
-                                                                <ToggleSwitch Grid.Column="1"
-                                                                              IsChecked="{Binding Value}"
-                                                                              OnContent="On"
-                                                                              OffContent="Off"
-                                                                              VerticalAlignment="Center" />
-                                                            </Grid>
-                                                        </Border>
-                                                    </DataTemplate>
+                            <ScrollViewer Height="275">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Classes="dialog-section-title">Einstellungen</TextBlock>
+                                    <ItemsControl ItemsSource="{Binding Arguments}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <ContentControl Content="{Binding}">
+                                                    <ContentControl.DataTemplates>
+                                                        <!-- Boolean argument template -->
+                                                        <DataTemplate DataType="{x:Type helperClasses:BoolArgument}">
+                                                            <Border Classes="setting-item">
+                                                                <Grid ColumnDefinitions="*, Auto">
+                                                                    <StackPanel Grid.Column="0">
+                                                                        <TextBlock Text="{Binding Name}"
+                                                                            Classes="setting-title" />
+                                                                        <TextBlock Text="{Binding Description}"
+                                                                            Classes="setting-description"
+                                                                            TextWrapping="Wrap" />
+                                                                    </StackPanel>
+                                                                    <ToggleSwitch Grid.Column="1"
+                                                                        IsChecked="{Binding Value}"
+                                                                        OnContent="On"
+                                                                        OffContent="Off"
+                                                                        VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
 
-                                                    <!-- Numeric argument template -->
-                                                    <DataTemplate DataType="{x:Type helperClasses:NumericArgument}">
-                                                        <Border Classes="setting-item">
-                                                            <Grid ColumnDefinitions="*, Auto">
-                                                                <StackPanel Grid.Column="0">
-                                                                    <TextBlock Text="{Binding Name}"
-                                                                               Classes="setting-title" />
-                                                                    <TextBlock Text="{Binding Description}"
-                                                                               Classes="setting-description"
-                                                                               TextWrapping="Wrap" />
-                                                                </StackPanel>
-                                                                <NumericUpDown Grid.Column="1"
-                                                                               Value="{Binding Value}"
-                                                                               Minimum="{Binding MinValue}"
-                                                                               Maximum="{Binding MaxValue}"
-                                                                               Increment="0.01"
-                                                                               FormatString="F2"
-                                                                               Width="100"
-                                                                               VerticalAlignment="Center" />
-                                                            </Grid>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ContentControl.DataTemplates>
-                                            </ContentControl>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
+                                                        <!-- Numeric argument template -->
+                                                        <DataTemplate DataType="{x:Type helperClasses:NumericArgument}">
+                                                            <Border Classes="setting-item">
+                                                                <Grid ColumnDefinitions="*, Auto">
+                                                                    <StackPanel Grid.Column="0">
+                                                                        <TextBlock Text="{Binding Name}"
+                                                                            Classes="setting-title" />
+                                                                        <TextBlock Text="{Binding Description}"
+                                                                            Classes="setting-description"
+                                                                            TextWrapping="Wrap" />
+                                                                    </StackPanel>
+                                                                    <NumericUpDown Grid.Column="1"
+                                                                        Value="{Binding Value}"
+                                                                        Minimum="{Binding MinValue}"
+                                                                        Maximum="{Binding MaxValue}"
+                                                                        Increment="0.01"
+                                                                        FormatString="F2"
+                                                                        Width="100"
+                                                                        VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ContentControl.DataTemplates>
+                                                </ContentControl>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
                         </Border>
 
-                        <Border Classes="setting-card">
-                            <StackPanel Spacing="12">
-                                <TextBlock Classes="dialog-section-title">Analysis Status</TextBlock>
-                                <TextBlock Text="{Binding StatusMessage, FallbackValue='Ready to process files'}"
-                                           Classes="dialog-content-text" />
-                            </StackPanel>
-                        </Border>
 
-                        <Border Classes="setting-card">
-                            <StackPanel Spacing="12">
-                                <TextBlock Classes="dialog-section-title">Analysis Output</TextBlock>
-                                <ScrollViewer MaxHeight="220">
-                                    <TextBox Text="{Binding ScriptOutput, FallbackValue='Waiting'}" />
-                                </ScrollViewer>
-                            </StackPanel>
-                        </Border>
                     </StackPanel>
 
                     <!-- Separator -->
@@ -129,6 +114,7 @@
                     <Border Grid.Column="2"
                             Classes="setting-card"
                             Width="240"
+                            Height="300"
                             VerticalAlignment="Top">
                         <Grid RowDefinitions="Auto, *, Auto">
                             <TextBlock Grid.Row="0"
@@ -189,12 +175,13 @@
                             IsIndeterminate="True"
                             Theme="{DynamicResource ProgressRing}"
                             ShowProgressText="False" />
-                        <TextBlock Text="Daten werden geladen..."
+                        <TextBlock Text="{Binding StatusMessage}"
                                    HorizontalAlignment="Center"
                                    FontWeight="Medium" />
                     </StackPanel>
                 </Border>
             </Grid>
+
             <!-- Footer -->
             <Grid Grid.Row="2"
                   Margin="24,20"

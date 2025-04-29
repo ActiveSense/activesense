@@ -16,7 +16,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
 {
     private readonly SensorProcessorFactory _sensorProcessorFactory;
     private readonly IScriptService _scriptService;
-
+    
     [ObservableProperty] private string _cancelText = "Cancel";
     [ObservableProperty] private string _confirmText = "Confirm";
     [ObservableProperty] private bool _isProcessing;
@@ -25,7 +25,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
-    [ObservableProperty] private string _title = "Analysis Settings";
+    [ObservableProperty] private string _title = "Sensordaten analysieren";
     
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
 
@@ -111,6 +111,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
         try
         {
             IsProcessing = true;
+            
             StatusMessage = "Copying files...";
         
             var processingDirectory = _scriptService.GetScriptInputPath();
@@ -133,6 +134,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             }
 
             StatusMessage = "Processing completed successfully";
+            IsProcessing = false;
         }
         catch (Exception ex)
         {
