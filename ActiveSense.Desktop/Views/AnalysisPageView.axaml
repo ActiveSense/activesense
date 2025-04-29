@@ -22,9 +22,7 @@
 
             <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="5">
                 <Border Grid.Column="0"
-                        Background="#f5f5f5"
-                        CornerRadius="12"
-                        BorderThickness="0"
+                        Classes="card"
                         Padding="4"
                         HorizontalAlignment="Left">
                     <ListBox Name="tabSelector"
@@ -47,6 +45,7 @@
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="Margin" Value="2,0,2,0" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Background" Value="Transparent" />
                                 <Setter Property="CornerRadius" Value="12" />
@@ -60,7 +59,7 @@
                                 <Setter Property="Background" Value="#D8E5E9" />
                             </Style>
                             <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#A9A9A9" />
+                                <Setter Property="Background" Value="#0078D4" />
                                 <Setter Property="TextBlock.Foreground" Value="White" />
                             </Style>
                         </ListBox.Styles>
@@ -226,7 +225,7 @@
                                         <Setter Property="Background" Value="Transparent" />
                                         <Setter Property="CornerRadius" Value="6" />
                                     </Style>
-                                    
+
                                     <Style Selector="ListBoxItem:selected">
                                         <Setter Property="BorderBrush" Value="#0078D4" />
                                         <Setter Property="BorderThickness" Value="2" />

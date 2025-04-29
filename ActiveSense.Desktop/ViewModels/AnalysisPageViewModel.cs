@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -16,20 +14,20 @@ namespace ActiveSense.Desktop.ViewModels;
 public partial class AnalysisPageViewModel : PageViewModel
 {
     private readonly DialogService _dialogService;
+    private readonly ExportDialogViewModel _exportDialogViewModel;
     private readonly MainViewModel _mainViewModel;
     private readonly PageFactory _pageFactory;
     private readonly ProcessDialogViewModel _processDialogViewModel;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
-    private readonly ExportDialogViewModel _exportDialogViewModel;
     private bool _isInitialized = false;
 
     [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
     [ObservableProperty] private TabItemTemplate _selectedTabItem;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
-    [ObservableProperty] private bool _showSpinner = true;
     [ObservableProperty] private bool _showExportOption = true;
+    [ObservableProperty] private bool _showSpinner = true;
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
@@ -78,10 +76,6 @@ public partial class AnalysisPageViewModel : PageViewModel
 
         await Task.Run(async () =>
         {
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
-
-            _sharedDataService.UpdateAllAnalyses(files);
-
             foreach (var pageName in parser.GetAnalysisPages())
             {
                 TabItems.Add(new TabItemTemplate(
@@ -95,6 +89,26 @@ public partial class AnalysisPageViewModel : PageViewModel
             if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
         });
         ShowSpinner = false;
+        
+        try
+        {
+            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+            _sharedDataService.UpdateAllAnalyses(files);
+        }
+        catch (Exception e)
+        {
+            var dialog = new WarningDialogViewModel
+            {
+                Title = "Fehler",
+                SubTitle =
+                    "Die Ergebnisse konnten nicht geladen werden. Die hochgeladene Datei ist möglicherweise fehlerhaft.",
+                CloseButtonText = "Abbrechen",
+                OkButtonText = "OK"
+            };
+            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
+
+            Console.WriteLine(e);
+        }
     }
 
 

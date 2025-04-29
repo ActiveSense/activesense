@@ -232,7 +232,7 @@ public class GeneActiveResultParser(
         catch (Exception ex)
         {
             Console.WriteLine($"Error extracting Analysis from PDF text: {ex.Message}");
-            return null;
+            throw;
         }
     }
 
