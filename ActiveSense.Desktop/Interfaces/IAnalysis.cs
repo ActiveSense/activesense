@@ -10,6 +10,8 @@ public interface IAnalysis
     string FilePath { get; set; }
     string FileName { get; set; }
     bool Exported { get; set; }
+    List<AnalysisTag> Tags { get; set; }
+    void AddTag(string name, string color);
 }
 
 public interface IActivityAnalysis : IAnalysis

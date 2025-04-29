@@ -50,6 +50,23 @@ public class GeneActiveResultParser(
         // Parse CSV files in directories
         var csvAnalyses = await ParseCsvDirectoriesAsync(outputDirectory);
         analyses.AddRange(csvAnalyses);
+        
+        // Assign tags
+        foreach (var analysis in analyses)
+        {
+    
+            if (analysis is ISleepAnalysis sleepAnalysis)
+            {
+                if (sleepAnalysis.SleepRecords.Count != 0) 
+                    analysis.AddTag("Schlafdaten", "#3277a8");
+            }
+    
+            if (analysis is IActivityAnalysis activityAnalysis)
+            {
+                if (activityAnalysis.ActivityRecords.Count != 0) 
+                    analysis.AddTag("Aktivitätsdaten", "#38a832");
+            }
+        }
 
         return analyses;
     }

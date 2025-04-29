@@ -15,6 +15,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     public string FileName { get; set; }
     public bool Exported { get; set; } = false;
     
+    
     private readonly Dictionary<string, object> _cache = new();
     private List<ActivityRecord> _activityRecords = new();
     private List<SleepRecord> _sleepRecords = new();
@@ -24,7 +25,14 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
 
     public IReadOnlyCollection<ActivityRecord> ActivityRecords => _activityRecords.AsReadOnly();
     public IReadOnlyCollection<SleepRecord> SleepRecords => _sleepRecords.AsReadOnly();
+    
+    public List<AnalysisTag> Tags { get; set; } = new List<AnalysisTag>();
 
+    public void AddTag(string name, string color)
+    {
+        Tags.Add(new AnalysisTag(name, color));
+    }
+    
     public void AddActivityRecords(IEnumerable<ActivityRecord> records)
     {
         _activityRecords.AddRange(records);

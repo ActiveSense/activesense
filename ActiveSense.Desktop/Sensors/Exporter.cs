@@ -1,18 +1,13 @@
 using System;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.SKCharts;
-using Newtonsoft.Json;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -27,148 +22,147 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
 
     public async Task<bool> ExportAsync(IAnalysis analysis, string outputPath)
     {
-        if (analysis is not IActivityAnalysis activityAnalysis || 
-            analysis is not ISleepAnalysis sleepAnalysis ||
-            analysis is not IChartDataProvider chartProvider)
+        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis and IChartDataProvider chartProvider))
         {
             Console.WriteLine("Analysis does not provide required capabilities for GeneActive export");
             return false;
         }
+
         try
         {
             Settings.License = LicenseType.Community;
-            string exportData = serializer.ExportToBase64(analysis);
+            var exportData = serializer.ExportToBase64(analysis);
 
-        Document.Create(container =>
-        {
-            container.Page(page =>
+            Document.Create(container =>
             {
-                page.Size(PageSizes.A4);
-                page.Margin(1, Unit.Centimetre);
-                page.DefaultTextStyle(x => x.FontSize(11));
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+                    page.DefaultTextStyle(x => x.FontSize(11));
 
-                // Header
-                page.Header()
-                    .Text("ActiveSense Analysis Report")
-                    .Bold()
-                    .FontSize(16);
+                    // Header
+                    page.Header()
+                        .Text("ActiveSense Analysis Report")
+                        .Bold()
+                        .FontSize(16);
 
-                // Content
-                page.Content()
-                    .Column(column =>
-                    {
-                        // Title section
-                        column.Item().PaddingVertical(10)
-                            .Text($"Analysis: {analysis.FileName}")
-                            .Bold()
-                            .FontSize(14);
-
-                        // Sleep Data Section
-                        column.Item().PaddingTop(10)
-                            .Text("Schlafdaten")
-                            .Bold()
-                            .FontSize(16);
-
-                        if (sleepAnalysis.SleepRecords == null || sleepAnalysis.SleepRecords.Count == 0)
+                    // Content
+                    page.Content()
+                        .Column(column =>
                         {
-                            column.Item().Text("No sleep data available").Italic().FontSize(12);
-                        }
-                        else
-                        {
-                            // Add sleep data table or charts
+                            // Title section
                             column.Item().PaddingVertical(10)
-                                .Table(table =>
-                                {
-                                    table.ColumnsDefinition(columns =>
+                                .Text($"Analysis: {analysis.FileName}")
+                                .Bold()
+                                .FontSize(14);
+
+                            // Sleep Data Section
+                            column.Item().PaddingTop(10)
+                                .Text("Schlafdaten")
+                                .Bold()
+                                .FontSize(16);
+
+                            if (sleepAnalysis.SleepRecords == null || sleepAnalysis.SleepRecords.Count == 0)
+                            {
+                                column.Item().Text("No sleep data available").Italic().FontSize(12);
+                            }
+                            else
+                            {
+                                // Add sleep data table or charts
+                                column.Item().PaddingVertical(10)
+                                    .Table(table =>
                                     {
-                                        columns.ConstantColumn(120);
-                                        columns.RelativeColumn();
+                                        table.ColumnsDefinition(columns =>
+                                        {
+                                            columns.ConstantColumn(120);
+                                            columns.RelativeColumn();
+                                        });
+
+                                        AddTableRow(table, "Average Sleep Time",
+                                            $"{sleepAnalysis.AverageSleepTime / 3600:F2} hours");
+                                        AddTableRow(table, "Average Sleep Efficiency",
+                                            $"{sleepAnalysis.SleepEfficiency.Average():F1}%");
                                     });
 
-                                    AddTableRow(table, "Average Sleep Time",
-                                        $"{sleepAnalysis.AverageSleepTime / 3600:F2} hours");
-                                    AddTableRow(table, "Average Sleep Efficiency",
-                                        $"{sleepAnalysis.SleepEfficiency.Average():F1}%");
-                                });
+                                column.Item().PaddingVertical(10)
+                                    .Height(200)
+                                    .Image(GeneratePieChartImage(chartProvider));
+                            }
 
-                            column.Item().PaddingVertical(10)
-                                .Height(200)
-                                .Image(GeneratePieChartImage(chartProvider));
-                        }
+                            // Activity Data Section
+                            column.Item().PaddingTop(20)
+                                .Text("Aktivitätsdaten")
+                                .Bold()
+                                .FontSize(16);
 
-                        // Activity Data Section
-                        column.Item().PaddingTop(20)
-                            .Text("Aktivitätsdaten")
-                            .Bold()
-                            .FontSize(16);
-
-                        if (activityAnalysis.ActivityRecords == null || !activityAnalysis.ActivityRecords.Any())
-                        {
-                            column.Item().Text("No activity data available").Italic().FontSize(12);
-                        }
-                        else
-                        {
-                            // Add activity data table or charts
-                            column.Item().PaddingVertical(10)
-                                .Table(table =>
-                                {
-                                    table.ColumnsDefinition(columns =>
+                            if (activityAnalysis.ActivityRecords == null || !activityAnalysis.ActivityRecords.Any())
+                            {
+                                column.Item().Text("No activity data available").Italic().FontSize(12);
+                            }
+                            else
+                            {
+                                // Add activity data table or charts
+                                column.Item().PaddingVertical(10)
+                                    .Table(table =>
                                     {
-                                        columns.ConstantColumn(120);
-                                        columns.RelativeColumn();
+                                        table.ColumnsDefinition(columns =>
+                                        {
+                                            columns.ConstantColumn(120);
+                                            columns.RelativeColumn();
+                                        });
+
+                                        AddTableRow(table, "Average Steps",
+                                            $"{activityAnalysis.StepsPerDay.Average():F0} steps");
+                                        AddTableRow(table, "Average Light Activity",
+                                            $"{activityAnalysis.AverageLightActivity / 60:F1} minutes");
                                     });
 
-                                    AddTableRow(table, "Average Steps",
-                                        $"{activityAnalysis.StepsPerDay.Average():F0} steps");
-                                    AddTableRow(table, "Average Light Activity",
-                                        $"{activityAnalysis.AverageLightActivity / 60:F1} minutes");
-                                });
+                                column.Item().PaddingVertical(10)
+                                    .Height(200)
+                                    .Image(GenerateStepsChartImage(chartProvider));
 
-                            column.Item().PaddingVertical(10)
-                                .Height(200)
-                                .Image(GenerateStepsChartImage(chartProvider));
-                            
-                            // insert encoded data 
-                            column.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
-                                .PaddingTop(10).PaddingBottom(5)
-                                .Text("ANALYSIS_DATA_BEGIN")
-                                .FontSize(6)
-                                .FontColor(Colors.Grey.Medium);
-                        
-                            column.Item().Text(exportData)
-                                .FontSize(4)
-                                .FontColor(Colors.Grey.Medium);
-                            
-                            column.Item().Text("ANALYSIS_DATA_END")
-                                .FontSize(6)
-                                .FontColor(Colors.Grey.Medium);
-                        }
-                    });
-                
+                                // insert encoded data 
+                                column.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
+                                    .PaddingTop(10).PaddingBottom(5)
+                                    .Text("ANALYSIS_DATA_BEGIN")
+                                    .FontSize(6)
+                                    .FontColor(Colors.Grey.Medium);
 
-                // Footer
-                page.Footer()
-                    .AlignCenter()
-                    .Text(text =>
-                    {
-                        text.Span("Generated: ");
-                        text.Span(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
-                        text.Span(" | Page ");
-                        text.CurrentPageNumber();
-                        text.Span(" of ");
-                        text.TotalPages();
-                    });
-            });
-        }).GeneratePdf(outputPath);
+                                column.Item().Text(exportData)
+                                    .FontSize(4)
+                                    .FontColor(Colors.Grey.Medium);
 
-        return true;
+                                column.Item().Text("ANALYSIS_DATA_END")
+                                    .FontSize(6)
+                                    .FontColor(Colors.Grey.Medium);
+                            }
+                        });
+
+
+                    // Footer
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(text =>
+                        {
+                            text.Span("Generated: ");
+                            text.Span(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+                            text.Span(" | Page ");
+                            text.CurrentPageNumber();
+                            text.Span(" of ");
+                            text.TotalPages();
+                        });
+                });
+            }).GeneratePdf(outputPath);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"PDF export failed: {ex.Message}");
+            return false;
+        }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"PDF export failed: {ex.Message}");
-        return false;
-    }
-}
 
     private void AddTableRow(TableDescriptor table, string label, string value)
     {
@@ -314,5 +308,4 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         return data.ToArray();
     }
-
 }

@@ -35,12 +35,6 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     
     }
 
-    [RelayCommand]
-    private void TriggerPane()
-    {
-        IsPaneOpen = !IsPaneOpen;
-    }
-
     public async Task<bool> ConfirmOnClose()
     {
         var dialog = new WarningDialogViewModel

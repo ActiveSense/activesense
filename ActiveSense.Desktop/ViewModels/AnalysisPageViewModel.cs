@@ -53,7 +53,6 @@ public partial class AnalysisPageViewModel : PageViewModel
 
     public AnalysisPageViewModel()
     {
-        
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
@@ -69,34 +68,34 @@ public partial class AnalysisPageViewModel : PageViewModel
         ResultFiles = _sharedDataService.AllAnalyses;
     }
 
-   [RelayCommand]
-public async Task Initialize()
-{
-    ShowSpinner = true;
-    Console.WriteLine("Loading result files...");
-    TabItems.Clear();
-    var parser = _resultParserFactory.GetParser(SensorType);
-    
-    await Task.Run(async () =>
+    [RelayCommand]
+    public async Task Initialize()
     {
-        var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
-        
-        _sharedDataService.UpdateAllAnalyses(files);
+        ShowSpinner = true;
+        Console.WriteLine("Loading result files...");
+        TabItems.Clear();
+        var parser = _resultParserFactory.GetParser(SensorType);
 
-        foreach (var pageName in parser.GetAnalysisPages())
+        await Task.Run(async () =>
         {
-            TabItems.Add(new TabItemTemplate(
-                $"{pageName.ToString()}",
-                pageName,
-                _pageFactory.GetPageViewModel(pageName)));
-            Console.WriteLine($"Loaded {pageName.ToString()}");
-        }
-        
-        // Select the first tab
-        if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
-    });
-    ShowSpinner = false;
-}
+            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+
+            _sharedDataService.UpdateAllAnalyses(files);
+
+            foreach (var pageName in parser.GetAnalysisPages())
+            {
+                TabItems.Add(new TabItemTemplate(
+                    $"{pageName.ToString()}",
+                    pageName,
+                    _pageFactory.GetPageViewModel(pageName)));
+                Console.WriteLine($"Loaded {pageName.ToString()}");
+            }
+
+            // Select the first tab
+            if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
+        });
+        ShowSpinner = false;
+    }
 
 
     [RelayCommand]
@@ -107,7 +106,7 @@ public async Task Initialize()
         // Refresh data after dialog closes
         await Initialize();
     }
-    
+
     [RelayCommand]
     public async Task TriggerExportDialog()
     {
