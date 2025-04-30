@@ -40,8 +40,6 @@ public class SharedDataService
     }
     public void UpdateAllAnalyses(IEnumerable<IAnalysis> newAnalyses)
     {
-        var existingFilenames = new HashSet<string>(AllAnalyses.Select(a => a.FileName));
-    
         foreach (var newAnalysis in newAnalyses)
         {
             var existingItem = AllAnalyses.FirstOrDefault(a => a.FileName == newAnalysis.FileName);
@@ -49,7 +47,6 @@ public class SharedDataService
             if (existingItem != null)
             {
                 newAnalysis.Exported = existingItem.Exported;
-            
                 int index = AllAnalyses.IndexOf(existingItem);
                 AllAnalyses[index] = newAnalysis;
             }

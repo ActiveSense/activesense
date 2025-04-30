@@ -107,13 +107,28 @@ namespace ActiveSense.Desktop.Sensors
             return (process.ExitCode == 0, output, error);
         }
 
+        public void ClearProcessingDirectory(string processingDirectory)
+        {
+            if (Directory.Exists(processingDirectory))
+            {
+                try
+                {
+                    Directory.Delete(processingDirectory, true);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error clearing processing directory: {ex.Message}");
+                }
+            }
+        }
         public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
         {
             if (files == null || files.Length == 0)
             {
                 return;
             }
-
+            
+            ClearProcessingDirectory(processingDirectory);
             Directory.CreateDirectory(processingDirectory);
             Directory.CreateDirectory(outputDirectory);
 
