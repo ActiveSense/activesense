@@ -6,6 +6,7 @@ using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Services;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -21,6 +22,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
     private bool _isInitialized = false;
+    [ObservableProperty] private bool _isProcessingInBackground;
 
     [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
@@ -47,6 +49,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         _exportDialogViewModel = exportDialogViewModel;
         ResultFiles = _sharedDataService.AllAnalyses;
         _sharedDataService.SelectedAnalysesChanged += OnAnalysesChanged;
+        _sharedDataService.BackgroundProcessingChanged += OnBackgroundProcessingChanged;
     }
 
     public AnalysisPageViewModel()
@@ -59,6 +62,12 @@ public partial class AnalysisPageViewModel : PageViewModel
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
         ShowExportOption = SelectedAnalyses.Any();
+    }
+
+    private void OnBackgroundProcessingChanged(object? sender, EventArgs e)
+    {
+        Dispatcher.UIThread.Post(() => { IsProcessingInBackground = _sharedDataService.IsProcessingInBackground; });
+        ParseResults();
     }
 
     private void OnAnalysesChanged(object? sender, EventArgs e)
@@ -88,8 +97,14 @@ public partial class AnalysisPageViewModel : PageViewModel
             // Select the first tab
             if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
         });
-        ShowSpinner = false;
         
+        ParseResults();
+        ShowSpinner = false;
+    }
+
+    private async void ParseResults()
+    {
+        var parser = _resultParserFactory.GetParser(SensorType);
         try
         {
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);

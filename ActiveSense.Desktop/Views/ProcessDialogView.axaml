@@ -37,6 +37,18 @@
                 </StackPanel>
             </Grid>
 
+            <Button
+                Command="{Binding CancelCommand}"
+                Width="32" Height="32"
+                Margin="10"
+                Padding="8"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Background="Transparent"
+                BorderThickness="0">
+                <ui:SymbolIcon Symbol="Dismiss" FontSize="16" />
+            </Button>
+
             <!-- Content -->
             <ScrollViewer Grid.Row="1"
                           Padding="24,0,24,0"
@@ -191,7 +203,7 @@
                 <Button Grid.Column="0"
                         Classes="Secondary"
                         Command="{Binding CancelCommand}">
-                    <TextBlock>Cancel</TextBlock>
+                    <TextBlock>Abbrechen</TextBlock>
                 </Button>
 
                 <Button Grid.Column="2"

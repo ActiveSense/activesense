@@ -104,13 +104,24 @@
                             Command="{Binding TriggerProcessDialogCommand}"
                             ToolTip.Placement="Bottom"
                             ToolTip.ShowDelay="400">
+                        <StackPanel>
+                            <ProgressBar
+                                IsVisible="{Binding IsProcessingInBackground}"
+                                Width="20"
+                                Height="20"
+                                IsIndeterminate="True"
+                                Theme="{DynamicResource ProgressRing}"
+                                Foreground="White"
+                                ShowProgressText="False" />
+                            <ui:SymbolIcon Symbol="Add" IsVisible="{Binding !IsProcessingInBackground}" FontSize="16" Foreground="White" />
+                        </StackPanel>
                         <ToolTip.Tip>
                             <StackPanel Width="200">
                                 <TextBlock Classes="h1" FontWeight="SemiBold">Add Files</TextBlock>
                                 <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">Upload and analyze new sensor data files</TextBlock>
                             </StackPanel>
                         </ToolTip.Tip>
-                        <ui:SymbolIcon Symbol="Add" FontSize="16" Foreground="White" />
+
                     </Button>
                 </StackPanel>
             </Grid>

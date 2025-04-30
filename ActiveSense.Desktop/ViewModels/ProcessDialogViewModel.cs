@@ -16,6 +16,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
 {
     private readonly SensorProcessorFactory _sensorProcessorFactory;
     private readonly IScriptService _scriptService;
+    private readonly SharedDataService _sharedDataService;
     
     [ObservableProperty] private string _cancelText = "Cancel";
     [ObservableProperty] private string _confirmText = "Confirm";
@@ -29,10 +30,11 @@ public partial class ProcessDialogViewModel : DialogViewModel
     
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
 
-    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService)
+    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, SharedDataService sharedDataService)
     {
         _sensorProcessorFactory = sensorProcessorFactory;
         _scriptService = scriptService;
+        _sharedDataService = sharedDataService;
         
         LoadDefaultArguments();
     }
@@ -111,6 +113,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
         try
         {
             IsProcessing = true;
+            _sharedDataService.IsProcessingInBackground = true;
             
             StatusMessage = "Copying files...";
         
@@ -145,6 +148,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
         finally
         {
             IsProcessing = false;
+            _sharedDataService.IsProcessingInBackground = false;
         }
     }
 }

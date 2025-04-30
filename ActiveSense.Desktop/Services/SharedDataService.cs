@@ -11,7 +11,20 @@ public class SharedDataService
 {
     public ObservableCollection<IAnalysis> SelectedAnalyses { get; } = new ObservableCollection<IAnalysis>();
     public ObservableCollection<IAnalysis> AllAnalyses { get; } = new();
-    
+    private bool _isProcessingInBackground;
+    public bool IsProcessingInBackground 
+    { 
+        get => _isProcessingInBackground;
+        set
+        {
+            if (_isProcessingInBackground != value)
+            {
+                _isProcessingInBackground = value;
+                BackgroundProcessingChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+    public event EventHandler? BackgroundProcessingChanged;
     public event EventHandler? SelectedAnalysesChanged;
     public event EventHandler? AllAnalysesChanged;
     
