@@ -38,44 +38,50 @@
             </Border>
             
             <!-- Chart content when available -->
-            <StackPanel IsVisible="{Binding ChartsVisible}">
+            <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
                 <!-- Sleep Duration Charts Section -->
-                <StackPanel>
-                    <!-- Headers shown only once -->
-                    <TextBlock Classes="header" Text="{Binding TotalSleepTitle}" />
-                    <TextBlock Classes="description"
-                               Text="{Binding TotalSleepDescription}" />
-                    
-                    <!-- Charts -->
-                    <ItemsControl ItemsSource="{Binding TotalSleepCharts}" Margin="10,10,10,20">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel>
-                                    <TextBlock Margin="10,15,10,5" FontWeight="Medium" Text="{Binding Title}" />
-                                    <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
-                                        <lvc:CartesianChart
-                                            Series="{Binding Series}"
-                                            XAxes="{Binding XAxes}"
-                                            YAxes="{Binding YAxes}"
-                                            LegendPosition="{Binding LegendPosition}"
-                                            Margin="0,5,0,0"
-                                            MinHeight="400" />
-                                    </Border>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                <Expander Header="{Binding TotalSleepTitle}" 
+                          IsExpanded="True"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding TotalSleepDescription}"
+                                   Margin="0,0,0,10"/>
+                                   
+                        <ItemsControl ItemsSource="{Binding TotalSleepCharts}" Margin="0,0,0,12">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Margin="4,10,4,4" FontWeight="Medium" Text="{Binding Title}" />
+                                        <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
 
                 <!-- Pie Charts Section -->
-                <StackPanel>
-                    <!-- Headers shown only once -->
-                    <TextBlock Classes="header" Text="{Binding SleepDistributionTitle}" />
-                    <TextBlock Classes="description"
-                               Text="{Binding SleepDistributionDescription}" />
-                    
-                    <!-- Pie Charts -->
-                    <Border Margin="10,10,10,20">
+                <Expander Header="{Binding SleepDistributionTitle}" 
+                          IsExpanded="True"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding SleepDistributionDescription}"
+                                   Margin="0,0,0,10"/>
+                                   
                         <ItemsControl ItemsSource="{Binding PieCharts}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -85,7 +91,7 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         
-                                        <TextBlock Grid.Row="0" Margin="10,10,10,0" FontWeight="Medium"
+                                        <TextBlock Grid.Row="0" Margin="4,10,4,4" FontWeight="Medium"
                                                    Text="{Binding Title}" />
                                         <Border Grid.Row="1" Classes="Shadow" Theme="{DynamicResource CardBorder}">
                                             <lvc:PieChart
@@ -104,8 +110,8 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
-                    </Border>
-                </StackPanel>
+                    </StackPanel>
+                </Expander>
             </StackPanel>
         </Grid>
     </ScrollViewer>
