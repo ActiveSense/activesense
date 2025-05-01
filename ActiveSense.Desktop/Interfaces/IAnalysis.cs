@@ -56,5 +56,9 @@ public interface IChartDataProvider
     ChartDataDTO GetMovementPatternChartData();
     IEnumerable<ChartDataDTO> GetActivityDistributionChartData();
     ChartDataDTO GetTotalSleepTimePerDayChartData();
+    ChartDataDTO GetSedentaryChartData();
+    ChartDataDTO GetLightActivityChartData();
+    ChartDataDTO GetModerateActivityChartData();
+    ChartDataDTO GetVigorousActivityChartData();
 
 }

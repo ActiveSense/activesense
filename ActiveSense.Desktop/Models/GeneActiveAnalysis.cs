@@ -236,6 +236,44 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
             Title = FileName
         };
     }
+    
+    public ChartDataDTO GetSedentaryChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = SedentaryActivity,
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+    
+    public ChartDataDTO GetLightActivityChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = LightActivity,
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+    public ChartDataDTO GetModerateActivityChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = ModerateActivity,
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+    public ChartDataDTO GetVigorousActivityChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = VigorousActivity,
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
 
     #endregion
 

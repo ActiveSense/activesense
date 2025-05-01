@@ -26,6 +26,22 @@ public partial class ActivityPageViewModel : PageViewModel
     [ObservableProperty] private string _stepsTitle = "Schritte pro Tag";
     [ObservableProperty] private string _stepsDescription = "Durchschnittliche Schritte pro Tag";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _stepsCharts = new();
+    
+    [ObservableProperty] private string _sedentaryTitle = "Inaktive Zeit";
+    [ObservableProperty] private string _sedentaryDescription = "Inaktive Zeit pro Tag";
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sedentaryCharts = new();
+    
+    [ObservableProperty] private string _lightTitle = "Leichte Aktivität";
+    [ObservableProperty] private string _lightDescription = "Leichte Aktivität pro Tag";
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _lightCharts = new();
+    
+    [ObservableProperty] private string _moderateTitle = "Mittlere Aktivität";
+    [ObservableProperty] private string _moderateDescription = "Mittlere Aktivität pro Tag";
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _moderateCharts = new();
+    
+    [ObservableProperty] private string _vigorousTitle = "Intensive Aktivität";
+    [ObservableProperty] private string _vigorousDescription = "Intensive Aktivität pro Tag";
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _vigorousCharts = new();
 
     public ActivityPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
     {
@@ -45,6 +61,10 @@ public partial class ActivityPageViewModel : PageViewModel
     {
         UpdateSelectedAnalyses();
         CreateStepsChart();
+        CreateSedentaryChart();
+        CreateLightChart();
+        CreateModerateChart();
+        CreateVigorousChart();
         CreateActivityDistributionChart();
     }
 
@@ -93,6 +113,94 @@ public partial class ActivityPageViewModel : PageViewModel
             StepsCharts.Add(chartGenerator.GenerateChart(
                 "Schritte pro Tag", 
                 "Durchschnittliche Schritte pro Tag"));
+        }
+    }
+    
+    private void CreateSedentaryChart()
+    {
+        SedentaryCharts.Clear();
+
+        var dtos = new List<ChartDataDTO>();
+        foreach (var analysis in SelectedAnalyses)
+        {
+            if (analysis is IChartDataProvider chartProvider)
+            {
+                dtos.Add(chartProvider.GetSedentaryChartData());
+            }
+        }
+
+        if (dtos.Any())
+        {
+            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+            SedentaryCharts.Add(chartGenerator.GenerateChart(
+                "Inaktive Zeit pro Tag", 
+                "Inaktive Zeit pro Tag"));
+        }
+    }
+    
+    private void CreateLightChart()
+    {
+        LightCharts.Clear();
+
+        var dtos = new List<ChartDataDTO>();
+        foreach (var analysis in SelectedAnalyses)
+        {
+            if (analysis is IChartDataProvider chartProvider)
+            {
+                dtos.Add(chartProvider.GetLightActivityChartData());
+            }
+        }
+
+        if (dtos.Any())
+        {
+            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+            LightCharts.Add(chartGenerator.GenerateChart(
+                "Leichte Aktivität pro Tag", 
+                "Leichte Aktivität pro Tag"));
+        }
+    }
+    
+    private void CreateModerateChart()
+    {
+        ModerateCharts.Clear();
+
+        var dtos = new List<ChartDataDTO>();
+        foreach (var analysis in SelectedAnalyses)
+        {
+            if (analysis is IChartDataProvider chartProvider)
+            {
+                dtos.Add(chartProvider.GetModerateActivityChartData());
+            }
+        }
+
+        if (dtos.Any())
+        {
+            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+            ModerateCharts.Add(chartGenerator.GenerateChart(
+                "Mittlere Aktivität pro Tag", 
+                "Mittlere Aktivität pro Tag"));
+        }
+    }
+    
+    private void CreateVigorousChart()
+    {
+        VigorousCharts.Clear();
+
+        var dtos = new List<ChartDataDTO>();
+        foreach (var analysis in SelectedAnalyses)
+        {
+            if (analysis is IChartDataProvider chartProvider)
+            {
+                dtos.Add(chartProvider.GetVigorousActivityChartData());
+            }
+        }
+
+        if (dtos.Any())
+        {
+            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+            VigorousCharts.Add(chartGenerator.GenerateChart(
+                "Intensive Aktivität pro Tag", 
+                "Intensive Aktivität pro Tag"));
         }
     }
     #endregion
