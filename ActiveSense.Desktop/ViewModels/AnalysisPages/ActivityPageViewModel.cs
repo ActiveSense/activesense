@@ -20,28 +20,34 @@ public partial class ActivityPageViewModel : PageViewModel
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
     
     [ObservableProperty] private string _activityDistributionTitle = "Aktivitätsverteilung";
-    [ObservableProperty] private string _activityDistributionDescription = "Aktivitätsverteilung pro Tag";
+    [ObservableProperty] private string _activityDistributionDescription = "Aktivitätsverteilung pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _activityDistributionChart = new();
+    [ObservableProperty] private bool _isActivityDistributionExpanded = false;
     
     [ObservableProperty] private string _stepsTitle = "Schritte pro Tag";
     [ObservableProperty] private string _stepsDescription = "Durchschnittliche Schritte pro Tag";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _stepsCharts = new();
+    [ObservableProperty] private bool _isStepsExpanded = false;
     
     [ObservableProperty] private string _sedentaryTitle = "Inaktive Zeit";
-    [ObservableProperty] private string _sedentaryDescription = "Inaktive Zeit pro Tag";
+    [ObservableProperty] private string _sedentaryDescription = "Inaktive Zeit pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sedentaryCharts = new();
+    [ObservableProperty] private bool _isSedentaryExpanded = false;
     
     [ObservableProperty] private string _lightTitle = "Leichte Aktivität";
-    [ObservableProperty] private string _lightDescription = "Leichte Aktivität pro Tag";
+    [ObservableProperty] private string _lightDescription = "Leichte Aktivität pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _lightCharts = new();
+    [ObservableProperty] private bool _isLightExpanded = false;
     
     [ObservableProperty] private string _moderateTitle = "Mittlere Aktivität";
-    [ObservableProperty] private string _moderateDescription = "Mittlere Aktivität pro Tag";
+    [ObservableProperty] private string _moderateDescription = "Mittlere Aktivität pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _moderateCharts = new();
+    [ObservableProperty] private bool _isModerateExpanded = false;
     
     [ObservableProperty] private string _vigorousTitle = "Intensive Aktivität";
-    [ObservableProperty] private string _vigorousDescription = "Intensive Aktivität pro Tag";
+    [ObservableProperty] private string _vigorousDescription = "Intensive Aktivität pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _vigorousCharts = new();
+    [ObservableProperty] private bool _isVigorousExpanded = false;
 
     public ActivityPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
     {

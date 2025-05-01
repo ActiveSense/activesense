@@ -162,7 +162,7 @@ public class AnalysisModeFileTests
         IChartDataProvider chartProvider = _analysis;
         
         // Act
-        var chartData = chartProvider.GetSleepChartData();
+        var chartData = chartProvider.GetSleepDistributionChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"));

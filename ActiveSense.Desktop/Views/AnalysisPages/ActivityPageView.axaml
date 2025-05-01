@@ -39,7 +39,7 @@
             <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
                 <!-- Steps Chart Section -->
                 <Expander Header="{Binding StepsTitle}"
-                          IsExpanded="True"
+                          IsExpanded="{Binding IsStepsExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
@@ -72,7 +72,7 @@
 
                 <!-- Activity Distribution Charts Section -->
                 <Expander Header="{Binding ActivityDistributionTitle}"
-                          IsExpanded="True"
+                          IsExpanded="{Binding IsActivityDistributionExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
@@ -113,7 +113,7 @@
 
                 <!-- Sedentary Chart Section -->
                 <Expander Header="{Binding SedentaryTitle}"
-                          IsExpanded="True"
+                          IsExpanded="{Binding IsSedentaryExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
@@ -147,7 +147,7 @@
 
                 <!-- Light Chart Section -->
                 <Expander Header="{Binding LightTitle}"
-                          IsExpanded="True"
+                          IsExpanded="{Binding IsLightExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
@@ -180,7 +180,7 @@
                 
                 <!-- Moderate Chart Section -->
                 <Expander Header="{Binding ModerateTitle}"
-                          IsExpanded="True"
+                          IsExpanded="{Binding IsModerateExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
@@ -213,7 +213,7 @@
                 
                 <!-- Vigorous Chart Section -->
                 <Expander Header="{Binding VigorousTitle}"
-                          IsExpanded="True"
+                          IsExpanded="{Binding IsVigorousExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
