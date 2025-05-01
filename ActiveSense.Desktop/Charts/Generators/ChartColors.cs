@@ -10,14 +10,14 @@ public class ChartColors
     {
         var predefinedColors = new[]
         {
-            SKColors.CornflowerBlue,
-            SKColors.Orange,
-            SKColors.ForestGreen,
-            SKColors.Crimson,
-            SKColors.Purple,
-            SKColors.Gold,
-            SKColors.Teal,
-            SKColors.DarkSlateBlue
+            SKColor.Parse("#0072B2"),  // Blue - distinguishable in all forms of colorblindness
+            SKColor.Parse("#E69F00"),  // Orange - visible to most colorblind types
+            SKColor.Parse("#009E73"),  // Bluish green - distinguishable from blue/orange
+            SKColor.Parse("#CC79A7"),  // Pink/purple - distinct luminance 
+            SKColor.Parse("#D55E00"),  // Vermillion - high luminance contrast
+            SKColor.Parse("#56B4E9"),  // Sky blue - different luminance than regular blue
+            SKColor.Parse("#F0E442"),  // Yellow - high contrast with all others
+            SKColor.Parse("#999999"),  // Gray - neutral with distinctive luminance
         };
 
         if (count <= predefinedColors.Length)
