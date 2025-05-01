@@ -61,7 +61,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
-        ShowExportOption = SelectedAnalyses.Any();
+        ShowExportOption = SelectedAnalyses.Count == 1;
     }
 
     private void OnBackgroundProcessingChanged(object? sender, EventArgs e)
@@ -139,6 +139,19 @@ public partial class AnalysisPageViewModel : PageViewModel
     [RelayCommand]
     public async Task TriggerExportDialog()
     {
+        if (SelectedAnalyses.Count != 1)
+        {
+            var warningDialog = new WarningDialogViewModel
+            {
+                Title = "Export nicht möglich",
+                SubTitle = "Bitte wählen Sie genau eine Analyse zum Exportieren aus.",
+                CloseButtonText = "Schließen",
+                OkButtonText = "OK"
+            };
+            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, warningDialog);
+            return;
+        }
+    
         await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);
     }
 }

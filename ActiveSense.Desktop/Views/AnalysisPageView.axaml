@@ -82,7 +82,7 @@
                             BorderThickness="0"
                             Cursor="Hand"
                             Command="{Binding TriggerExportDialogCommand}"
-                            IsVisible="{Binding SelectedAnalyses.Count}"
+                            IsVisible="{Binding ShowExportOption}"
                             ToolTip.Placement="Bottom"
                             ToolTip.ShowDelay="400">
                         <ToolTip.Tip>
@@ -134,7 +134,7 @@
                     <Border Grid.Column="1">
                         <Grid RowDefinitions="Auto, *">
                             <ListBox ItemsSource="{Binding ResultFiles}"
-                                     SelectionMode="Multiple,Toggle"
+                                     SelectionMode="Multiple"
                                      SelectionChanged="OnSelectionChanged"
                                      MinHeight="300"
                                      Background="Transparent"
