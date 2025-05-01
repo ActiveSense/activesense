@@ -48,6 +48,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         ResultFiles = _sharedDataService.AllAnalyses;
         _sharedDataService.SelectedAnalysesChanged += OnAnalysesChanged;
         _sharedDataService.BackgroundProcessingChanged += OnBackgroundProcessingChanged;
+        _sharedDataService.AllAnalysesChanged += OnAnalysesChanged;
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
@@ -61,7 +62,6 @@ public partial class AnalysisPageViewModel : PageViewModel
     private void OnBackgroundProcessingChanged(object? sender, EventArgs e)
     {
         Dispatcher.UIThread.Post(() => { IsProcessingInBackground = _sharedDataService.IsProcessingInBackground; });
-        ParseResults();
     }
 
     private void OnAnalysesChanged(object? sender, EventArgs e)
@@ -92,40 +92,15 @@ public partial class AnalysisPageViewModel : PageViewModel
             return Task.CompletedTask;
         });
 
-        ParseResults();
         ShowSpinner = false;
     }
 
-    private async void ParseResults()
-    {
-        try
-        {
-            var parser = _resultParserFactory.GetParser(SensorType);
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
-            _sharedDataService.UpdateAllAnalyses(files);
-        }
-        catch (Exception e)
-        {
-            var dialog = new WarningDialogViewModel
-            {
-                Title = "Fehler",
-                SubTitle =
-                    "Die Ergebnisse konnten nicht geladen werden. Die hochgeladene Datei ist möglicherweise fehlerhaft.",
-                CloseButtonText = "Abbrechen",
-                OkButtonText = "OK"
-            };
-            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
-
-            Console.WriteLine(e);
-        }
-    }
 
 
     [RelayCommand]
     private async Task TriggerProcessDialog()
     {
         await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
-        await Initialize();
     }
 
     [RelayCommand]

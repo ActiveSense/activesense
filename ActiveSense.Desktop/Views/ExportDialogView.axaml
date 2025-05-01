@@ -29,15 +29,11 @@
                         Padding="16"
                         Margin="0,10,0,10">
                     <StackPanel>
-                        <TextBlock Text="Einstellungen"
-                                   Classes="dialog-section-title"
-                                   Margin="0,0,0,10" />
-
                         <CheckBox Content="Rohdaten exportieren"
                                   IsChecked="{Binding IncludeRawData}"
                                   Margin="0,0,0,5" />
 
-                        <TextBlock Text="Die Daten werden in einem ZIP-Ordner gespeichert."
+                        <TextBlock Text="Zusätzlich zum Report werden die Rohdaten der Analyse exportiert."
                                    TextWrapping="Wrap"
                                    Foreground="#666666"
                                    FontSize="12"

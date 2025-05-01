@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
@@ -17,7 +18,11 @@ public partial class ProcessDialogViewModel : DialogViewModel
     private readonly SensorProcessorFactory _sensorProcessorFactory;
     private readonly IScriptService _scriptService;
     private readonly SharedDataService _sharedDataService;
+    private readonly ResultParserFactory _resultParserFactory;
+    private readonly DialogService _dialogService;
+    private readonly MainViewModel _mainViewModel;
     
+    [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private string _cancelText = "Cancel";
     [ObservableProperty] private string _confirmText = "Confirm";
     [ObservableProperty] private bool _isProcessing;
@@ -30,8 +35,11 @@ public partial class ProcessDialogViewModel : DialogViewModel
     
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
 
-    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, SharedDataService sharedDataService)
+    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, SharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService, MainViewModel mainViewModel)
     {
+        _mainViewModel = mainViewModel;
+        _dialogService = dialogService;
+        _resultParserFactory = resultParserFactory;
         _sensorProcessorFactory = sensorProcessorFactory;
         _scriptService = scriptService;
         _sharedDataService = sharedDataService;
@@ -72,7 +80,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     }
 
     [RelayCommand]
-    public void Cancel()
+    private void Cancel()
     {
         Close();
     }
@@ -117,7 +125,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
             
-            StatusMessage = "Analyzing files...";
+            StatusMessage = "Procesing files...";
             
             var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments);
 
@@ -130,7 +138,8 @@ public partial class ProcessDialogViewModel : DialogViewModel
                 return;
             }
 
-            StatusMessage = "Processing completed successfully";
+            StatusMessage = "Parsing results...";
+            ParseResults();
             IsProcessing = false;
         }
         catch (Exception ex)
@@ -145,4 +154,30 @@ public partial class ProcessDialogViewModel : DialogViewModel
             _sharedDataService.IsProcessingInBackground = false;
         }
     }
+
+    
+    private async void ParseResults()
+    {
+        try
+        {
+            var parser = _resultParserFactory.GetParser(SensorType);
+            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+            _sharedDataService.UpdateAllAnalyses(files);
+        }
+        catch (Exception e)
+        {
+            var dialog = new WarningDialogViewModel
+            {
+                Title = "Fehler",
+                SubTitle =
+                    "Die Ergebnisse konnten nicht geladen werden. Die hochgeladene Datei ist möglicherweise fehlerhaft.",
+                CloseButtonText = "Abbrechen",
+                OkButtonText = "OK"
+            };
+            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
+
+            Console.WriteLine(e);
+        }
+    }
+
 }
