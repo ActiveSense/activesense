@@ -5,6 +5,7 @@ using System.Linq;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Tests.Helpers;
@@ -15,7 +16,7 @@ using NUnit.Framework;
 namespace ActiveSense.Desktop.Tests.ResultParserTests;
 
 [TestFixture]
-public class GeneActiveResultParserTests
+public class GeneActiveParserTests
 {
     private Comparer _comparer;
     private ResultParserFactory _resultParserFactory;
@@ -28,13 +29,13 @@ public class GeneActiveResultParserTests
     {
         var services = new ServiceCollection();
 
-        services.AddTransient<GeneActiveResultParser>();
+        services.AddTransient<GeneActiveParser>();
         services.AddTransient<DateToWeekdayConverter>();
         services.AddTransient<AnalysisSerializer>();
 
         services.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
-            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveParser>(),
             _ => throw new ArgumentException($"No parser found for sensor type {type}")
         });
 

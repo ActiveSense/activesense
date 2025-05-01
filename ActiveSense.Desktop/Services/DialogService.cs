@@ -16,6 +16,6 @@ public class DialogService
         dialogViewModel.Show();
 
         // Wait for the dialog to be closed
-        await dialogViewModel.WaitAsnyc();
+        await dialogViewModel.WaitAsync();
     }
 }

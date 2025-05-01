@@ -13,7 +13,7 @@ public partial class MainView : AppWindow
         InitializeComponent();
         this.Loaded += (s, e) =>
         {
-            if (DataContext is MainViewModel viewModel)
+            if (DataContext is ViewModels.MainViewModel viewModel)
             {
                 viewModel.Initialize();
             }
@@ -29,7 +29,7 @@ public partial class MainView : AppWindow
             
         e.Cancel = true;
         
-        if (DataContext is MainViewModel viewModel)
+        if (DataContext is ViewModels.MainViewModel viewModel)
         {
             var result = await viewModel.ConfirmOnClose();
             

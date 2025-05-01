@@ -124,7 +124,6 @@ public partial class ProcessDialogViewModel : DialogViewModel
             
             StatusMessage = "Analyzing files...";
             
-            // Process files with the current arguments
             var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments);
 
             ScriptOutput = output;

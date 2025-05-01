@@ -6,7 +6,7 @@
         xmlns:global="clr-namespace:"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ActiveSense.Desktop.Views.MainView"
-        x:DataType="global:MainViewModel"
+        x:DataType="vm:MainViewModel"
         Height="600"
         Width="1000"
         Icon="/Assets/avalonia-logo.ico"

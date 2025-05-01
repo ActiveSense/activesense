@@ -4,6 +4,7 @@ using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using ActiveSense.Desktop.Services;
@@ -43,20 +44,20 @@ public class App : Application
         collection.AddSingleton<ExporterFactory>();
         
         // Register processors
-        collection.AddSingleton<GeneActivProcessor>();
+        collection.AddSingleton<GeneActiveProcessor>();
         
         // Register exporters
         collection.AddSingleton<GeneActiveExporter>();
         
         // Register parsers
-        collection.AddSingleton<GeneActiveResultParser>();
+        collection.AddSingleton<GeneActiveParser>();
 
         // Register services
         collection.AddSingleton<IScriptService, RScriptService>();
         collection.AddSingleton<SharedDataService>();
         
         // Register view models
-        collection.AddSingleton<MainViewModel>();
+        collection.AddSingleton<ViewModels.MainViewModel>();
         collection.AddTransient<DialogService>();
         collection.AddTransient<DialogViewModel>();
         collection.AddTransient<ProcessDialogViewModel>();
@@ -86,14 +87,14 @@ public class App : Application
         // Register processors 
         collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
         {
-            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActivProcessor>(),
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveProcessor>(),
             _ => throw new InvalidOperationException(),
         });
 
         // Register parsers
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
-            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
+            SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveParser>(),
             _ => throw new InvalidOperationException(),
         });
         
@@ -114,7 +115,7 @@ public class App : Application
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView
             {
-                DataContext = services.GetRequiredService<MainViewModel>()
+                DataContext = services.GetRequiredService<ViewModels.MainViewModel>()
             };
         }
 

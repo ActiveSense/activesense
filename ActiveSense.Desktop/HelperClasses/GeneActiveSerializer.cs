@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using Newtonsoft.Json;
 
-namespace ActiveSense.Desktop.Sensors;
+namespace ActiveSense.Desktop.HelperClasses;
 
 public class AnalysisSerializer(DateToWeekdayConverter converter)
 {
@@ -65,8 +64,6 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
 
             if (serializable.SleepRecords != null)
                 analysis.SetSleepRecords(serializable.SleepRecords);
-
-
 
             return analysis;
         }

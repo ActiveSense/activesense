@@ -15,10 +15,10 @@ namespace ActiveSense.Desktop.Tests.SensorTests;
 /// Tests for the GeneActivProcessor class using mocks to avoid executing the actual R script
 /// </summary>
 [TestFixture]
-public class GeneActivProcessorTests
+public class GeneActiveProcessorTests
 {
     // Creating a testable subclass of GeneActivProcessor to override the process execution
-    private class TestableGeneActivProcessor : GeneActivProcessor
+    private class TestableGeneActiveProcessor : GeneActiveProcessor
     {
         private readonly bool _shouldSucceed;
         private readonly string _mockOutput;
@@ -29,7 +29,7 @@ public class GeneActivProcessorTests
         public string CapturedArguments { get; private set; }
         public string CapturedWorkingDirectory { get; private set; }
 
-        public TestableGeneActivProcessor(
+        public TestableGeneActiveProcessor(
             IScriptService scriptService,
             bool shouldSucceed = true, 
             string mockOutput = "", 
@@ -63,7 +63,7 @@ public class GeneActivProcessorTests
     }
 
     private Mock<IScriptService> _mockScriptService;
-    private TestableGeneActivProcessor _processor;
+    private TestableGeneActiveProcessor _processor;
     private ISensorProcessor _processorInterface;
 
     [SetUp]
@@ -84,7 +84,7 @@ public class GeneActivProcessorTests
     public void SupportedType_ShouldReturnGeneActiv()
     {
         // Arrange
-        _processor = new TestableGeneActivProcessor(_mockScriptService.Object);
+        _processor = new TestableGeneActiveProcessor(_mockScriptService.Object);
         _processorInterface = _processor;
         
         // Act & Assert
@@ -95,7 +95,7 @@ public class GeneActivProcessorTests
     public void SupportedFileTypes_ShouldIncludeCsvAndBin()
     {
         // Act & Assert
-        var supportedTypes = GeneActivProcessor.SupportedFileTypes;
+        var supportedTypes = GeneActiveProcessor.SupportedFileTypes;
         Assert.That(supportedTypes, Contains.Item(".csv"));
         Assert.That(supportedTypes, Contains.Item(".bin"));
     }
@@ -104,7 +104,7 @@ public class GeneActivProcessorTests
     public async Task ProcessAsync_WhenProcessSucceeds_ReturnsSuccessResult()
     {
         // Arrange
-        _processor = new TestableGeneActivProcessor(
+        _processor = new TestableGeneActiveProcessor(
             _mockScriptService.Object,
             shouldSucceed: true,
             mockOutput: "Mock success output",
@@ -129,7 +129,7 @@ public class GeneActivProcessorTests
     public async Task ProcessAsync_WhenProcessFails_ReturnsFailureResult()
     {
         // Arrange
-        _processor = new TestableGeneActivProcessor(
+        _processor = new TestableGeneActiveProcessor(
             _mockScriptService.Object,
             shouldSucceed: false,
             mockOutput: "Mock output",
@@ -149,7 +149,7 @@ public class GeneActivProcessorTests
     public async Task ProcessAsync_WhenExceptionOccurs_ReturnsFailureResult()
     {
         // Arrange
-        _processor = new TestableGeneActivProcessor(
+        _processor = new TestableGeneActiveProcessor(
             _mockScriptService.Object,
             exceptionToThrow: new Exception("Mock process exception"));
         _processorInterface = _processor;
@@ -168,7 +168,7 @@ public class GeneActivProcessorTests
     public async Task ProcessAsync_UsesCorrectArguments()
     {
         // Arrange
-        _processor = new TestableGeneActivProcessor(_mockScriptService.Object);
+        _processor = new TestableGeneActiveProcessor(_mockScriptService.Object);
         _processorInterface = _processor;
         
         // Use the actual arguments type for the interface
@@ -193,7 +193,7 @@ public class GeneActivProcessorTests
     public async Task ProcessAsync_WithEmptyArguments_ExecutesScriptWithDefaultArguments()
     {
         // Arrange
-        _processor = new TestableGeneActivProcessor(_mockScriptService.Object);
+        _processor = new TestableGeneActiveProcessor(_mockScriptService.Object);
         _processorInterface = _processor;
         
         // Act

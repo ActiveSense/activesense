@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Sensors;
 using NUnit.Framework;
@@ -11,9 +12,9 @@ using NUnit.Framework;
 namespace ActiveSense.Desktop.Tests.ProcessorTests;
 
 [TestFixture]
-public class GeneActiveResultParserTests
+public class GeneActiveParserTests
 {
-    private GeneActiveResultParser _parser;
+    private GeneActiveParser _parser;
     private IResultParser _parserInterface;
     private string _testDataDirectory;
     
@@ -22,7 +23,7 @@ public class GeneActiveResultParserTests
     public void Setup()
     {
         var dateToWeekdayConverter = new DateToWeekdayConverter();
-        _parser = new GeneActiveResultParser(dateToWeekdayConverter, new AnalysisSerializer(dateToWeekdayConverter));
+        _parser = new GeneActiveParser(dateToWeekdayConverter, new AnalysisSerializer(dateToWeekdayConverter));
         _parserInterface = _parser;
 
         // Create a temporary directory for test data
@@ -194,7 +195,7 @@ public class GeneActiveResultParserTests
     private AnalysisType CallPrivateDetermineAnalysisType(string[] headers)
     {
         // Use reflection to call the private method
-        var methodInfo = typeof(GeneActiveResultParser).GetMethod("DetermineAnalysisType",
+        var methodInfo = typeof(GeneActiveParser).GetMethod("DetermineAnalysisType",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         return (AnalysisType)methodInfo.Invoke(_parser, new object[] { headers });

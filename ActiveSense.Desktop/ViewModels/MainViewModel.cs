@@ -3,10 +3,9 @@ using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Services;
-using ActiveSense.Desktop.ViewModels;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+
+namespace ActiveSense.Desktop.ViewModels;
 
 public partial class MainViewModel : ViewModelBase, IDialogProvider
 {

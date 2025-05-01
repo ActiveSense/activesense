@@ -13,26 +13,25 @@ using iText.Layout.Element;
 
 namespace ActiveSense.Desktop.Sensors
 {
-    public class GeneActivProcessor : ISensorProcessor
+    public class GeneActiveProcessor : ISensorProcessor
     {
         private readonly IScriptService _rScriptService;
         private readonly List<ScriptArgument> _defaultArguments;
 
-        public GeneActivProcessor(IScriptService rScriptService)
+        public GeneActiveProcessor(IScriptService rScriptService)
         {
             _rScriptService = rScriptService ?? new RScriptService();
             _defaultArguments = CreateDefaultArguments();
         }
 
         public SensorTypes SupportedType => SensorTypes.GENEActiv;
-        public static string[] SupportedFileTypes => new[] { ".csv", ".bin" };
+        public static string[] SupportedFileTypes => [".csv", ".bin"];
         public IReadOnlyList<ScriptArgument> DefaultArguments => _defaultArguments;
 
         private List<ScriptArgument> CreateDefaultArguments()
         {
-            return new List<ScriptArgument>
-            {
-                // Boolean arguments
+            return
+            [
                 new BoolArgument
                 {
                     Flag = "a",
@@ -40,14 +39,16 @@ namespace ActiveSense.Desktop.Sensors
                     Description = "Run activity analysis",
                     Value = true
                 },
+
                 new BoolArgument
                 {
                     Flag = "s",
                     Name = "Sleep Analysis",
                     Description = "Run sleep analysis",
                     Value = true
-                },
-            };
+                }
+
+            ];
         }
 
        public async Task<(bool Success, string Output, string Error)> ProcessAsync(

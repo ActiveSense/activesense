@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Charts.Generators;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
@@ -30,10 +31,10 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
             return await ExportPdfAndCsvZipAsync(analysis, outputPath);
         }
 
-        return await ExportReportAsync(analysis, outputPath);
+        return await ExportPDFReportAsync(analysis, outputPath);
     }
 
-    public async Task<bool> ExportReportAsync(IAnalysis analysis, string outputPath)
+    private async Task<bool> ExportPDFReportAsync(IAnalysis analysis, string outputPath)
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis
             and IChartDataProvider chartProvider))
@@ -193,7 +194,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         {
             var tempPdfPath = Path.GetTempFileName();
 
-            var pdfSuccess = await ExportReportAsync(analysis, tempPdfPath);
+            var pdfSuccess = await ExportPDFReportAsync(analysis, tempPdfPath);
             if (!pdfSuccess)
             {
                 if (File.Exists(tempPdfPath))

@@ -17,16 +17,16 @@ public partial class GeneralPageViewModel : PageViewModel
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible;
-    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
     
     [ObservableProperty] private string _sleepStepsTitle = "Schlaf- und Aktivitätsverteilung";
     [ObservableProperty] private string _sleepStepsDescription = "Tägliche Schritte in Relation zur Schlafeffizienz";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepStepsCharts = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepStepsCharts = [];
     [ObservableProperty] private bool _isSleepStepsExpanded = false;
 
     [ObservableProperty] private string _movementTitle = "Aktivitätsverteilung";
     [ObservableProperty] private string _movementDescription = "Die durchschnittliche Verteilung der Aktivität über 24h";
-    [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = new();
+    [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = [];
     [ObservableProperty] private bool _isMovementExpanded = false;
 
     public GeneralPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
@@ -58,15 +58,12 @@ public partial class GeneralPageViewModel : PageViewModel
         MovementPieCharts.Clear();
         foreach (var analysis in SelectedAnalyses)
         {
-            if (analysis is IActivityAnalysis activityAnalysis &&
-                analysis is IChartDataProvider chartProvider)
-            {
-                var dto = chartProvider.GetMovementPatternChartData();
-                var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
-                if (SelectedAnalyses.Any())
-                    MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
-                        "Die durchschnittliche Verteilung der Aktivität über 24h"));
-            }
+            if (analysis is not (IActivityAnalysis activityAnalysis and IChartDataProvider chartProvider)) continue;
+            var dto = chartProvider.GetMovementPatternChartData();
+            var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
+            if (SelectedAnalyses.Any())
+                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                    "Die durchschnittliche Verteilung der Aktivität über 24h"));
         }
     }
 
@@ -75,30 +72,26 @@ public partial class GeneralPageViewModel : PageViewModel
         SleepStepsCharts.Clear();
         foreach (var analysis in SelectedAnalyses)
         {
-            if (analysis is  IActivityAnalysis activityAnalysis &&
-                analysis is ISleepAnalysis sleepAnalysis &&
-                analysis is  IChartDataProvider chartProvider)
+            if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis)) continue;
+            var line = new List<ChartDataDTO>();
+            var bar = new List<ChartDataDTO>();
+
+            var labels = activityAnalysis.ActivityWeekdays();
+
+            bar.Add(new ChartDataDTO
             {
-                var line = new List<ChartDataDTO>();
-                var bar = new List<ChartDataDTO>();
-
-                var labels = activityAnalysis.ActivityWeekdays();
-
-                bar.Add(new ChartDataDTO
-                {
-                    Data = activityAnalysis.StepsPercentage,
-                    Labels = labels,
-                    Title = "Schritte pro Tag"
-                });
-                line.Add(new ChartDataDTO
-                {
-                    Data = sleepAnalysis.SleepEfficiency,
-                    Labels = labels,
-                    Title = "Schlaf-Effizienz"
-                });
-                var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
-                SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
-            }
+                Data = activityAnalysis.StepsPercentage,
+                Labels = labels,
+                Title = "Schritte pro Tag"
+            });
+            line.Add(new ChartDataDTO
+            {
+                Data = sleepAnalysis.SleepEfficiency,
+                Labels = labels,
+                Title = "Schlaf-Effizienz"
+            });
+            var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
+            SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
         }
     }
 

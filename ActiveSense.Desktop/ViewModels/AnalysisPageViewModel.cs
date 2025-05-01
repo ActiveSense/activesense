@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -83,7 +82,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         TabItems.Clear();
         var parser = _resultParserFactory.GetParser(SensorType);
 
-        await Task.Run(async () =>
+        await Task.Run(() =>
         {
             foreach (var pageName in parser.GetAnalysisPages())
             {
@@ -94,19 +93,19 @@ public partial class AnalysisPageViewModel : PageViewModel
                 Console.WriteLine($"Loaded {pageName.ToString()}");
             }
 
-            // Select the first tab
-            if (TabItems.Count > 0 && SelectedTabItem == null) SelectedTabItem = TabItems[0];
+            if (TabItems.Count > 0) SelectedTabItem = TabItems[0];
+            return Task.CompletedTask;
         });
-        
+
         ParseResults();
         ShowSpinner = false;
     }
 
     private async void ParseResults()
     {
-        var parser = _resultParserFactory.GetParser(SensorType);
         try
         {
+            var parser = _resultParserFactory.GetParser(SensorType);
             var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
             _sharedDataService.UpdateAllAnalyses(files);
         }
@@ -128,16 +127,14 @@ public partial class AnalysisPageViewModel : PageViewModel
 
 
     [RelayCommand]
-    public async Task TriggerProcessDialog()
+    private async Task TriggerProcessDialog()
     {
         await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
-
-        // Refresh data after dialog closes
         await Initialize();
     }
 
     [RelayCommand]
-    public async Task TriggerExportDialog()
+    private async Task TriggerExportDialog()
     {
         if (SelectedAnalyses.Count != 1)
         {
@@ -151,7 +148,6 @@ public partial class AnalysisPageViewModel : PageViewModel
             await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, warningDialog);
             return;
         }
-    
         await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);
     }
 }

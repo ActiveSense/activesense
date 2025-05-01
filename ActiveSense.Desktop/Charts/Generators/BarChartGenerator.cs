@@ -10,12 +10,8 @@ using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewMode
 
 namespace ActiveSense.Desktop.Charts.Generators;
 
-public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, ChartDataDTO[] lineData = null)
+public class BarChartGenerator(ChartDataDTO[] barData, ChartColors chartColors, ChartDataDTO[]? lineData = null)
 {
-    /// <summary>
-    /// Normalizes chart data to make sure that all series have values for each label
-    /// </summary>
-    /// <returns>An array of values corresponding to each label in allLabels</returns>
     public double[] NormalizeChartData(ChartDataDTO dto, string[] allLabels)
     {
         var valueMap = new Dictionary<string, double>();

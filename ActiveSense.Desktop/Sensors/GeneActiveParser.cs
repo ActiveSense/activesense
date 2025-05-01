@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using CsvHelper;
@@ -16,7 +17,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 
 namespace ActiveSense.Desktop.Sensors;
 
-public class GeneActiveResultParser(
+public class GeneActiveParser(
     DateToWeekdayConverter dateToWeekdayConverter,
     AnalysisSerializer analysisSerializer)
     : IResultParser
