@@ -51,6 +51,7 @@ source("utils/cleanup.R")
 librarys <- c(
   "GENEAread",
   "GENEAclassify",
+  "profvis",
   "scales",
   "reshape2",
   "future",
@@ -64,6 +65,7 @@ library_installer(librarys)
 
 library(GENEAread)
 library(GENEAclassify)
+library(profvis)
 library(scales)
 library(reshape2)
 library(future)
@@ -118,7 +120,6 @@ sleep_datacols = c(
   "Light.mean", "Light.max",
   "Temp.mean", "Temp.sumdiff", "Temp.meandiff", "Temp.abssumdiff",
   "Temp.sddiff", "Temp.var", "Temp.GENEAskew", "Temp.mad",
-  "Step.GENEAcount", "Step.sd", "Step.mean", 
   "Principal.Frequency.mean", "Principal.Frequency.median"
 )
 
