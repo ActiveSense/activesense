@@ -17,16 +17,17 @@ public partial class GeneralPageViewModel : PageViewModel
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible;
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _generalCharts = new();
-    [ObservableProperty] private ObservableCollection<PieChartViewModel> _generalCharts2 = new();
-
-    [ObservableProperty]
-    private string _movementDescription = "Die durchschnittliche Verteilung der Aktivität über 24h";
-
-    [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
+    
+    [ObservableProperty] private string _sleepStepsTitle = "Schlaf- und Aktivitätsverteilung";
+    [ObservableProperty] private string _sleepStepsDescription = "Tägliche Schritte in Relation zur Schlafeffizienz";
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepStepsCharts = new();
+    [ObservableProperty] private bool _isSleepStepsExpanded = false;
 
     [ObservableProperty] private string _movementTitle = "Aktivitätsverteilung";
-    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
+    [ObservableProperty] private string _movementDescription = "Die durchschnittliche Verteilung der Aktivität über 24h";
+    [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = new();
+    [ObservableProperty] private bool _isMovementExpanded = false;
 
     public GeneralPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
     {
@@ -71,7 +72,7 @@ public partial class GeneralPageViewModel : PageViewModel
 
     private void CreateStepsChart()
     {
-        GeneralCharts.Clear();
+        SleepStepsCharts.Clear();
         foreach (var analysis in SelectedAnalyses)
         {
             if (analysis is  IActivityAnalysis activityAnalysis &&
@@ -96,7 +97,7 @@ public partial class GeneralPageViewModel : PageViewModel
                     Title = "Schlaf-Effizienz"
                 });
                 var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
-                GeneralCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
+                SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
             }
         }
     }

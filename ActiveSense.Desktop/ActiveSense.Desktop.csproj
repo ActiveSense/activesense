@@ -49,11 +49,16 @@
         <DependentUpon>SleepPageView.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Remove="ViewModels\Charts\DataListViewModel.cs" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="publish\linux\libSkiaSharp.so" />
       <None Remove="publish\linux\NUnit3.TestAdapter.pdb" />
       <None Remove="publish\linux\ActiveSense.Desktop.pdb" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="AnalysisFiles\" />
     </ItemGroup>
 </Project>

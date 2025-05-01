@@ -52,9 +52,15 @@ public interface ISleepAnalysis : IAnalysis
 public interface IChartDataProvider
 {
     ChartDataDTO GetStepsChartData();
-    ChartDataDTO GetSleepChartData();
+    ChartDataDTO GetSleepDistributionChartData();
     ChartDataDTO GetMovementPatternChartData();
     IEnumerable<ChartDataDTO> GetActivityDistributionChartData();
     ChartDataDTO GetTotalSleepTimePerDayChartData();
+    ChartDataDTO GetSedentaryChartData();
+    ChartDataDTO GetLightActivityChartData();
+    ChartDataDTO GetModerateActivityChartData();
+    ChartDataDTO GetVigorousActivityChartData();
+    ChartDataDTO GetSleepEfficiencyChartData();
+    ChartDataDTO GetActivePeriodsChartData();
 
 }

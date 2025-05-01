@@ -83,6 +83,11 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
             .Select(record => TryParseDouble(record.SleepEfficiency))
             .ToArray());
     
+    public double[] ActivePeriods => GetCachedValue(() => 
+        _sleepRecords
+            .Select(record => TryParseDouble(record.NumActivePeriods))
+            .ToArray());
+    
     public double[] TotalSleepTimePerDay => GetCachedValue(() => 
         _sleepRecords
             .Select(record => TryParseDouble(record.TotalSleepTime))
@@ -178,32 +183,52 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             new ChartDataDTO
             {
-                Data = LightActivity,
+                Data = LightActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
                 Labels = weekdays,
                 Title = "Leichte Aktivität"
             },
             new ChartDataDTO
             {
-                Data = ModerateActivity,
+                Data = ModerateActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
                 Labels = weekdays,
                 Title = "Mittlere Aktivität"
             },
             new ChartDataDTO
             {
-                Data = VigorousActivity,
+                Data = VigorousActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
                 Labels = weekdays,
                 Title = "Intensive Aktivität"
             }
         };
     }
 
-    public ChartDataDTO GetSleepChartData()
+    public ChartDataDTO GetSleepDistributionChartData()
     {
         return new ChartDataDTO
         {
-            Labels = new[] { "Total Sleep Time", "Total Wake Time" },
-            Data = new[] { TotalSleepTime, TotalWakeTime },
+            Labels = new[] { "Zeit Schlafend", "Zeit Wach" },
+            Data = new[] { Math.Round(AverageSleepTime / 3600, 1), Math.Round(AverageWakeTime / 3600, 1) },
             Title = $"Schlafverteilung {FileName}"
+        };
+    }
+    
+    public ChartDataDTO GetSleepEfficiencyChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = SleepEfficiency,
+            Labels = SleepWeekdays(),
+            Title = $"Schlaf-Effizienz {FileName}"
+        };
+    }
+    
+    public ChartDataDTO GetActivePeriodsChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = ActivePeriods,
+            Labels = SleepWeekdays(),
+            Title = $"Aktive Perioden {FileName}"
         };
     }
 
@@ -221,7 +246,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     {
         return new ChartDataDTO
         {
-            Data = TotalSleepTimePerDay,
+            Data = TotalSleepTimePerDay.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = SleepWeekdays(),
             Title = FileName
         };
@@ -232,6 +257,44 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         return new ChartDataDTO
         {
             Data = StepsPerDay,
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+    
+    public ChartDataDTO GetSedentaryChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = SedentaryActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+
+    public ChartDataDTO GetLightActivityChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = LightActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+    public ChartDataDTO GetModerateActivityChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = ModerateActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
+            Labels = ActivityWeekdays(),
+            Title = FileName
+        };
+    }
+    public ChartDataDTO GetVigorousActivityChartData()
+    {
+        return new ChartDataDTO
+        {
+            Data = VigorousActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
             Title = FileName
         };

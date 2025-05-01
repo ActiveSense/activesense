@@ -50,22 +50,17 @@ public class GeneActiveResultParser(
         // Parse CSV files in directories
         var csvAnalyses = await ParseCsvDirectoriesAsync(outputDirectory);
         analyses.AddRange(csvAnalyses);
-        
+
         // Assign tags
         foreach (var analysis in analyses)
         {
-    
             if (analysis is ISleepAnalysis sleepAnalysis)
-            {
-                if (sleepAnalysis.SleepRecords.Count != 0) 
+                if (sleepAnalysis.SleepRecords.Count != 0)
                     analysis.AddTag("Schlafdaten", "#3277a8");
-            }
-    
+
             if (analysis is IActivityAnalysis activityAnalysis)
-            {
-                if (activityAnalysis.ActivityRecords.Count != 0) 
+                if (activityAnalysis.ActivityRecords.Count != 0)
                     analysis.AddTag("Aktivitätsdaten", "#38a832");
-            }
         }
 
         return analyses;
@@ -80,10 +75,11 @@ public class GeneActiveResultParser(
         {
             var pdfText = ExtractTextFromPdf(file);
             var analysis = ExtractAnalysisFromPdfText(pdfText);
-            
+
             if (analysis != null)
             {
                 analysis.Exported = true;
+                analysis.FileName = Path.GetFileNameWithoutExtension(file);
                 analyses.Add(analysis);
                 Console.WriteLine("Extracted analysis from PDF: " + file);
             }
@@ -102,11 +98,8 @@ public class GeneActiveResultParser(
         {
             Console.WriteLine("Processing directory: " + directory);
             var analysis = await ParseCsvDirectoryAsync(directory);
-            
-            if (analysis != null)
-            {
-                analyses.Add(analysis);
-            }
+
+            if (analysis != null) analyses.Add(analysis);
         }
 
         return analyses;
@@ -121,17 +114,14 @@ public class GeneActiveResultParser(
         };
 
         var csvFiles = Directory.GetFiles(directory, "*.csv");
-        bool hasValidData = false;
+        var hasValidData = false;
 
         foreach (var file in csvFiles)
         {
             Console.WriteLine("Parsing file: " + file);
             try
             {
-                if (ParseCsvFile(file, analysis))
-                {
-                    hasValidData = true;
-                }
+                if (ParseCsvFile(file, analysis)) hasValidData = true;
             }
             catch (Exception e)
             {
@@ -144,12 +134,13 @@ public class GeneActiveResultParser(
 
     public bool ParseCsvFile(string filePath, IAnalysis analysis)
     {
-        if (analysis is not IActivityAnalysis activityAnalysis || 
+        if (analysis is not IActivityAnalysis activityAnalysis ||
             analysis is not ISleepAnalysis sleepAnalysis)
         {
             Console.WriteLine("Analysis does not provide required capabilities for GeneActive export");
             return false;
         }
+
         using var reader = new StreamReader(filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 

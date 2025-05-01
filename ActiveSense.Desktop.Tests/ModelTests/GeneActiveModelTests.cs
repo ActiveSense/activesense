@@ -363,7 +363,7 @@ public class AnalysisModelTests
         IChartDataProvider chartProvider = _analysis;
         
         // Act
-        var chartData = chartProvider.GetSleepChartData();
+        var chartData = chartProvider.GetSleepDistributionChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"), "Sleep chart title is incorrect");

@@ -37,25 +37,24 @@
                         Foreground="#666666" />
                 </StackPanel>
             </Border>
-            
+
             <!-- Charts content -->
             <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
                 <!-- Daily Steps Chart Section -->
-                <Expander Header="Tägliche Schritte" 
-                          IsExpanded="True"
+                <Expander Header="{Binding SleepStepsTitle}"
+                          IsExpanded="{Binding IsSleepStepsExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock Classes="description"
-                                   Text="Übersicht der durchschnittlichen Schritte pro Tag. Diese Daten zeigen die körperliche Aktivität im Verlauf der Zeit und helfen, Bewegungsmuster zu erkennen."
-                                   Margin="0,0,0,10"/>
-                                   
-                        <ItemsControl ItemsSource="{Binding GeneralCharts}">
+                                   Text="{Binding SleepStepsDescription}"
+                                   Margin="0,0,0,10" />
+                        <ItemsControl ItemsSource="{Binding SleepStepsCharts}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <Border Classes="Shadow" 
+                                        <Border Classes="Shadow"
                                                 Theme="{DynamicResource CardBorder}"
                                                 Margin="0,0,0,12">
                                             <avalonia:CartesianChart
@@ -74,16 +73,16 @@
                 </Expander>
 
                 <!-- Activity Distribution Charts Section -->
-                <Expander Header="{Binding MovementTitle}" 
-                          IsExpanded="True"
+                <Expander Header="{Binding MovementTitle}"
+                          IsExpanded="{Binding IsMovementExpanded}"
                           FontSize="16"
                           Margin="4,4,4,0"
                           HorizontalAlignment="Stretch">
                     <StackPanel>
                         <TextBlock Classes="description"
                                    Text="{Binding MovementDescription}"
-                                   Margin="0,0,0,10"/>
-                                   
+                                   Margin="0,0,0,10" />
+
                         <ItemsControl ItemsSource="{Binding MovementPieCharts}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -93,10 +92,10 @@
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
 
-                                        <TextBlock Grid.Row="0" Margin="4,10,4,4" 
+                                        <TextBlock Grid.Row="0" Margin="4,10,4,4"
                                                    FontWeight="Medium"
                                                    Text="{Binding Title}" />
-                                        <Border Grid.Row="1" Classes="Shadow" 
+                                        <Border Grid.Row="1" Classes="Shadow"
                                                 Theme="{DynamicResource CardBorder}"
                                                 Margin="0,0,0,12">
                                             <avalonia:PieChart
