@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using NUnit.Framework;
 
@@ -11,7 +12,7 @@ namespace ActiveSense.Desktop.Tests.ModelTests;
 [TestFixture]
 public class AnalysisModelTests
 {
-    private Analysis _analysis;
+    private GeneActiveAnalysis _analysis;
     private DateToWeekdayConverter _dateToWeekdayConverter;
     
     // Sample data
@@ -23,7 +24,7 @@ public class AnalysisModelTests
     {
         _dateToWeekdayConverter = new DateToWeekdayConverter();
         
-        _analysis = new Analysis(_dateToWeekdayConverter);
+        _analysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
         
         _sampleSleepRecords = LoadSampleSleepRecords();
         _sampleActivityRecords = LoadSampleActivityRecords();
@@ -125,9 +126,12 @@ public class AnalysisModelTests
     [Test]
     public void TotalSleepTime_ShouldCalculateCorrectSum()
     {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
         double expected = 26676 + 26998 + 18473; // Sum of all sleep times
         
-        double actual = _analysis.TotalSleepTime;
+        double actual = sleepAnalysis.TotalSleepTime;
         
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "TotalSleepTime calculation is incorrect");
     }
@@ -135,9 +139,12 @@ public class AnalysisModelTests
     [Test]
     public void TotalWakeTime_ShouldCalculateCorrectSum()
     {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
         double expected = 7549 + 9395 + 6790; // Sum of all wake times
         
-        double actual = _analysis.TotalWakeTime;
+        double actual = sleepAnalysis.TotalWakeTime;
         
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "TotalWakeTime calculation is incorrect");
     }
@@ -145,9 +152,12 @@ public class AnalysisModelTests
     [Test]
     public void AverageSleepTime_ShouldCalculateCorrectAverage()
     {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
         double expected = (26676 + 26998 + 18473) / 3.0; // Average of all sleep times
         
-        double actual = _analysis.AverageSleepTime;
+        double actual = sleepAnalysis.AverageSleepTime;
         
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "AverageSleepTime calculation is incorrect");
     }
@@ -155,9 +165,12 @@ public class AnalysisModelTests
     [Test]
     public void AverageWakeTime_ShouldCalculateCorrectAverage()
     {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
         double expected = (7549 + 9395 + 6790) / 3.0; // Average of all wake times
         
-        double actual = _analysis.AverageWakeTime;
+        double actual = sleepAnalysis.AverageWakeTime;
         
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "AverageWakeTime calculation is incorrect");
     }
@@ -165,9 +178,12 @@ public class AnalysisModelTests
     [Test]
     public void SleepEfficiency_ShouldReturnCorrectValues()
     {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
         double[] expected = { 77.9, 74.2, 73.1 };
         
-        var actual = _analysis.SleepEfficiency;
+        var actual = sleepAnalysis.SleepEfficiency;
         
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "SleepEfficiency array length is incorrect");
         for (int i = 0; i < expected.Length; i++)
@@ -179,9 +195,12 @@ public class AnalysisModelTests
     [Test]
     public void TotalSleepTimePerDay_ShouldReturnCorrectValues()
     {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
         double[] expected = { 26676, 26998, 18473 };
         
-        var actual = _analysis.TotalSleepTimePerDay;
+        var actual = sleepAnalysis.TotalSleepTimePerDay;
         
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "TotalSleepTimePerDay array length is incorrect");
         for (int i = 0; i < expected.Length; i++)
@@ -197,9 +216,12 @@ public class AnalysisModelTests
     [Test]
     public void StepsPerDay_ShouldReturnCorrectValues()
     {
+        // Cast to IActivityAnalysis to test the interface method
+        IActivityAnalysis activityAnalysis = _analysis;
+        
         double[] expected = { 3624, 10217, 11553 };
         
-        var actual = _analysis.StepsPerDay;
+        var actual = activityAnalysis.StepsPerDay;
         
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "StepsPerDay array length is incorrect");
         for (int i = 0; i < expected.Length; i++)
@@ -211,9 +233,12 @@ public class AnalysisModelTests
     [Test]
     public void ModerateActivity_ShouldReturnCorrectValues()
     {
+        // Cast to IActivityAnalysis to test the interface method
+        IActivityAnalysis activityAnalysis = _analysis;
+        
         double[] expected = { 3286, 4440, 9008 };
         
-        var actual = _analysis.ModerateActivity;
+        var actual = activityAnalysis.ModerateActivity;
         
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "ModerateActivity array length is incorrect");
         for (int i = 0; i < expected.Length; i++)
@@ -225,9 +250,12 @@ public class AnalysisModelTests
     [Test]
     public void VigorousActivity_ShouldReturnCorrectValues()
     {
+        // Cast to IActivityAnalysis to test the interface method
+        IActivityAnalysis activityAnalysis = _analysis;
+        
         double[] expected = { 0, 2076, 0 };
         
-        var actual = _analysis.VigorousActivity;
+        var actual = activityAnalysis.VigorousActivity;
         
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "VigorousActivity array length is incorrect");
         for (int i = 0; i < expected.Length; i++)
@@ -239,13 +267,16 @@ public class AnalysisModelTests
     [Test]
     public void StepsPercentage_ShouldCalculateCorrectPercentages()
     {
+        // Cast to IActivityAnalysis to test the interface method
+        IActivityAnalysis activityAnalysis = _analysis;
+        
         double[] expected = { 
             3624 / 10000.0 * 100, 
             10217 / 10000.0 * 100, 
             11553 / 10000.0 * 100 
         };
         
-        var actual = _analysis.StepsPercentage;
+        var actual = activityAnalysis.StepsPercentage;
         
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "StepsPercentage array length is incorrect");
         for (int i = 0; i < expected.Length; i++)
@@ -261,7 +292,10 @@ public class AnalysisModelTests
     [Test]
     public void SleepWeekdays_ShouldReturnCorrectWeekdays()
     {
-        var weekdays = _analysis.SleepWeekdays();
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+        
+        var weekdays = sleepAnalysis.SleepWeekdays();
         
         Assert.That(weekdays.Length, Is.EqualTo(3), "SleepWeekdays should return 3 weekdays");
         
@@ -277,7 +311,10 @@ public class AnalysisModelTests
     [Test]
     public void ActivityWeekdays_ShouldReturnCorrectWeekdays()
     {
-        var weekdays = _analysis.ActivityWeekdays();
+        // Cast to IActivityAnalysis to test the interface method
+        IActivityAnalysis activityAnalysis = _analysis;
+        
+        var weekdays = activityAnalysis.ActivityWeekdays();
         
         Assert.That(weekdays.Length, Is.EqualTo(3), "ActivityWeekdays should return 3 weekdays");
         
@@ -297,8 +334,11 @@ public class AnalysisModelTests
     [Test]
     public void GetActivityDistributionChartData_ShouldReturnCorrectData()
     {
+        // Cast to IChartDataProvider to test the interface method
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetActivityDistributionChartData().ToList();
+        var chartData = chartProvider.GetActivityDistributionChartData().ToList();
         
         // Assert
         Assert.That(chartData.Count, Is.EqualTo(3), "GetActivityDistributionChartData should return 3 series");
@@ -319,8 +359,11 @@ public class AnalysisModelTests
     [Test]
     public void GetSleepChartData_ShouldReturnCorrectData()
     {
+        // Cast to IChartDataProvider to test the interface method
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetSleepChartData();
+        var chartData = chartProvider.GetSleepChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"), "Sleep chart title is incorrect");
@@ -336,8 +379,11 @@ public class AnalysisModelTests
     [Test]
     public void GetTotalSleepTimePerDayChartData_ShouldReturnCorrectData()
     {
+        // Cast to IChartDataProvider to test the interface method
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetTotalSleepTimePerDayChartData();
+        var chartData = chartProvider.GetTotalSleepTimePerDayChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName), "Total sleep time chart title is incorrect");
@@ -353,8 +399,11 @@ public class AnalysisModelTests
     [Test]
     public void GetStepsChartData_ShouldReturnCorrectData()
     {
+        // Cast to IChartDataProvider to test the interface method
+        IChartDataProvider chartProvider = _analysis;
+        
         // Act
-        var chartData = _analysis.GetStepsChartData();
+        var chartData = chartProvider.GetStepsChartData();
         
         // Assert
         Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName), "Steps chart title is incorrect");
@@ -401,6 +450,5 @@ public class AnalysisModelTests
         Assert.That(updatedSteps.Length, Is.EqualTo(4), "Updated StepsPerDay should have 4 items");
         Assert.That(updatedSteps[3], Is.EqualTo(5000).Within(0.01), "The new step value was not added correctly");
     }
-    
     #endregion
 }

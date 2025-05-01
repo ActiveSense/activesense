@@ -8,5 +8,5 @@ namespace ActiveSense.Desktop.Interfaces;
 public interface IResultParser
 {
     ApplicationPageNames[] GetAnalysisPages();
-    Task<IEnumerable<Analysis>> ParseResultsAsync(string outputDirectory);
+    Task<IEnumerable<IAnalysis>> ParseResultsAsync(string outputDirectory);
 }

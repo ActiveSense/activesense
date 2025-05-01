@@ -4,32 +4,35 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Charts.DTOs;
+using ActiveSense.Desktop.Interfaces;
 using CsvHelper.Configuration.Attributes;
 
 namespace ActiveSense.Desktop.Models;
 
-public class Analysis
+public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) : IActivityAnalysis, ISleepAnalysis, IChartDataProvider
 {
-    private readonly DateToWeekdayConverter _dateToWeekdayConverter;
-    private readonly Dictionary<string, object> _cache = new();
-
-    private List<ActivityRecord> _activityRecords = new();
-    private List<SleepRecord> _sleepRecords = new();
-    
     public string FilePath { get; set; }
     public string FileName { get; set; }
     public bool Exported { get; set; } = false;
+    
+    
+    private readonly Dictionary<string, object> _cache = new();
+    private List<ActivityRecord> _activityRecords = new();
+    private List<SleepRecord> _sleepRecords = new();
 
-    public Analysis(DateToWeekdayConverter dateToWeekdayConverter)
-    {
-        _dateToWeekdayConverter = dateToWeekdayConverter;
-    }
 
     #region Collections
 
     public IReadOnlyCollection<ActivityRecord> ActivityRecords => _activityRecords.AsReadOnly();
     public IReadOnlyCollection<SleepRecord> SleepRecords => _sleepRecords.AsReadOnly();
+    
+    public List<AnalysisTag> Tags { get; set; } = new List<AnalysisTag>();
 
+    public void AddTag(string name, string color)
+    {
+        Tags.Add(new AnalysisTag(name, color));
+    }
+    
     public void AddActivityRecords(IEnumerable<ActivityRecord> records)
     {
         _activityRecords.AddRange(records);
@@ -150,7 +153,7 @@ public class Analysis
     public string[] SleepWeekdays() => GetCachedValue(() =>
     {
         var weekdays = _sleepRecords
-            .Select(r => _dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
+            .Select(r => dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
             .ToArray();
         return GetUniqueWeekdayLabels(weekdays);
     }, "SleepWeekdays");
@@ -158,7 +161,7 @@ public class Analysis
     public string[] ActivityWeekdays() => GetCachedValue(() =>
     {
         var weekdays = _activityRecords
-            .Select(r => _dateToWeekdayConverter.ConvertDateToWeekday(r.Day))
+            .Select(r => dateToWeekdayConverter.ConvertDateToWeekday(r.Day))
             .ToArray();
         return GetUniqueWeekdayLabels(weekdays);
     }, "ActivityWeekdays");
@@ -263,23 +266,22 @@ public class Analysis
     private string[] GetUniqueWeekdayLabels(string[] weekdays)
     {
         if (weekdays == null || weekdays.Length == 0)
-            return Array.Empty<string>();
+            return [];
             
         var uniqueLabels = new string[weekdays.Length];
         var weekdayCounts = new Dictionary<string, int>();
         
         for (int i = 0; i < weekdays.Length; i++)
         {
-            string weekday = weekdays[i];
+            var weekday = weekdays[i];
             
-            if (!weekdayCounts.ContainsKey(weekday))
+            if (weekdayCounts.TryAdd(weekday, 1))
             {
-                weekdayCounts[weekday] = 1;
                 uniqueLabels[i] = weekday;
             }
             else
             {
-                int count = ++weekdayCounts[weekday];
+                var count = ++weekdayCounts[weekday];
                 uniqueLabels[i] = $"{weekday} {count}";
             }
         }

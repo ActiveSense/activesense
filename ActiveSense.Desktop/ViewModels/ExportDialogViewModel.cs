@@ -1,103 +1,88 @@
 using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Newtonsoft.Json;
-using System.IO;
 
 namespace ActiveSense.Desktop.ViewModels;
 
-public partial class ExportDialogViewModel : DialogViewModel
+public partial class ExportDialogViewModel(
+    ExporterFactory exporterFactory,
+    SharedDataService sharedDataService,
+    MainViewModel mainViewModel,
+    DialogService dialogService)
+    : DialogViewModel
 {
-    private readonly ExporterFactory _exporterFactory;
-    private readonly SharedDataService _sharedDataService;
-    
     [ObservableProperty] private bool _confirmed;
-    [ObservableProperty] private string _outputPath = string.Empty;
-    [ObservableProperty] private string _statusMessage = "Select a folder to export analyses";
-    [ObservableProperty] private bool _isExporting = false;
-    [ObservableProperty] private bool _isExportSuccessful = false;
+    [ObservableProperty] private string _statusMessage = "Choose export options";
     [ObservableProperty] private SensorTypes _selectedSensorType = SensorTypes.GENEActiv;
+    [ObservableProperty] private bool _includeRawData = false;
     
-    public ExportDialogViewModel(
-        ExporterFactory exporterFactory,
-        SharedDataService sharedDataService)
+    public event Func<bool, Task<string?>>? FilePickerRequested;
+
+    public int SelectedAnalysesCount => sharedDataService.SelectedAnalyses.Count;
+    
+    public IAnalysis GetFirstSelectedAnalysis()
     {
-        _exporterFactory = exporterFactory;
-        _sharedDataService = sharedDataService;
+        return sharedDataService.SelectedAnalyses.FirstOrDefault();
     }
     
     [RelayCommand]
-    public void Cancel()
+    private void Cancel()
     {
         Confirmed = false;
         Close();
     }
     
     [RelayCommand]
-    public async Task ExportAnalyses()
+    private async Task ExportAnalysis()
     {
-        if (string.IsNullOrEmpty(OutputPath))
+        if (sharedDataService.SelectedAnalyses.Count != 1)
         {
-            StatusMessage = "Please select a folder first";
+            StatusMessage = "Please select exactly one analysis to export";
             return;
         }
         
-        if (_sharedDataService.SelectedAnalyses.Count == 0)
+        var filePath = await FilePickerRequested?.Invoke(IncludeRawData)!;
+        
+        if (string.IsNullOrEmpty(filePath))
         {
-            StatusMessage = "No analyses selected for export";
             return;
         }
-        
-        IsExporting = true;
-        StatusMessage = "Exporting analyses...";
         
         try
         {
-            var exporter = _exporterFactory.GetExporter(_selectedSensorType);
-            var totalExports = 0;
-            var exportedAnalyses = new List<Analysis>();
+            var exporter = exporterFactory.GetExporter(SelectedSensorType);
+            var analysis = sharedDataService.SelectedAnalyses.First();
             
-            foreach (var analysis in _sharedDataService.SelectedAnalyses)
-            {
-                var pdfPath = System.IO.Path.Combine(OutputPath, $"{analysis.FileName}.pdf");
-                var success = await exporter.ExportAsync(analysis, pdfPath);
-                
-                if (success)
-                {
-                    totalExports++;
-                    analysis.Exported = true;
-                    exportedAnalyses.Add(analysis);
-                }
-            }
+            var success = await exporter.ExportAsync(analysis, filePath, IncludeRawData);
             
-            if (totalExports > 0)
+            if (success)
             {
-                _sharedDataService.UpdateAllAnalyses(exportedAnalyses);
-                StatusMessage = $"Successfully exported {totalExports} analyses to {OutputPath}";
-                IsExportSuccessful = true;
+                analysis.Exported = true;
+                sharedDataService.UpdateAllAnalyses([analysis]);
             }
             else
             {
-                StatusMessage = "Failed to export any analyses";
-                IsExportSuccessful = false;
+                var dialog = new WarningDialogViewModel()
+                {
+                    Title = "Export fehlgeschlagen",
+                    Message = "Export failed. Please check the file path and try again.",
+                    OkButtonText = "OK",
+                    CloseButtonText = "Abbrechen"
+                };
+                await dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(mainViewModel, dialog);
             }
+
+            Close();
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error during export: {ex.Message}";
-            IsExportSuccessful = false;
-        }
-        finally
-        {
-            IsExporting = false;
         }
     }
 }

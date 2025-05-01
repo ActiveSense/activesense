@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,7 +17,7 @@ public partial class ActivityPageViewModel : PageViewModel
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible = false;
-    [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
     
     [ObservableProperty] private string _activityDistributionTitle = "Aktivitätsverteilung";
     [ObservableProperty] private string _activityDistributionDescription = "Aktivitätsverteilung pro Tag";
@@ -61,11 +62,15 @@ public partial class ActivityPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            var dto = analysis.GetActivityDistributionChartData().ToArray();
-            var chartGenerator = new StackedBarGenerator(dto, _chartColors);
-            if (SelectedAnalyses.Any())
-                ActivityDistributionChart.Add(chartGenerator.GenerateChart($"{analysis.FileName}",
+            if (analysis is IActivityAnalysis activityAnalysis && 
+                analysis is IChartDataProvider chartProvider)
+            {
+                var dto = chartProvider.GetActivityDistributionChartData().ToArray();
+                var chartGenerator = new StackedBarGenerator(dto, _chartColors);
+                ActivityDistributionChart.Add(chartGenerator.GenerateChart(
+                    $"{analysis.FileName}",
                     "Aktivitätsverteilung pro Tag"));
+            }
         }
     }
 
@@ -74,11 +79,21 @@ public partial class ActivityPageViewModel : PageViewModel
         StepsCharts.Clear();
 
         var dtos = new List<ChartDataDTO>();
-        foreach (var analysis in SelectedAnalyses) dtos.Add(analysis.GetStepsChartData());
+        foreach (var analysis in SelectedAnalyses)
+        {
+            if (analysis is IChartDataProvider chartProvider)
+            {
+                dtos.Add(chartProvider.GetStepsChartData());
+            }
+        }
 
-        var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
-        if (SelectedAnalyses.Any())
-            StepsCharts.Add(chartGenerator.GenerateChart("Schritte pro Tag", "Durchschnittliche Schritte pro Tag"));
+        if (dtos.Any())
+        {
+            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+            StepsCharts.Add(chartGenerator.GenerateChart(
+                "Schritte pro Tag", 
+                "Durchschnittliche Schritte pro Tag"));
+        }
     }
     #endregion
 }

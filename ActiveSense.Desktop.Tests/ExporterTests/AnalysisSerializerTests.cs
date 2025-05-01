@@ -2,27 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Sensors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
-namespace ActiveSense.Desktop.Tests.ModelTests;
+namespace ActiveSense.Desktop.Tests.ExporterTests;
 
 [TestFixture]
 public class AnalysisSerializerTests
 {
-    private Analysis _analysis;
+    private GeneActiveAnalysis _analysis;
     private DateToWeekdayConverter _dateToWeekdayConverter;
-    private AnalysisSerializer serializer;
+    private AnalysisSerializer _serializer;
     
     [SetUp]
     public void Setup()
     {
         _dateToWeekdayConverter = new DateToWeekdayConverter();
-        _analysis = new Analysis(_dateToWeekdayConverter);
-        serializer = new AnalysisSerializer(_dateToWeekdayConverter);
+        _analysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        _serializer = new AnalysisSerializer(_dateToWeekdayConverter);
+        
         // Setup test data
         _analysis.FileName = "TestAnalysis";
         _analysis.FilePath = "/test/path/to/analysis";
@@ -88,7 +90,7 @@ public class AnalysisSerializerTests
     public void ExportToBase64_WithValidAnalysis_ReturnsBase64String()
     {
         // Act
-        string base64 = serializer.ExportToBase64(_analysis);
+        string base64 = _serializer.ExportToBase64(_analysis);
         
         // Assert
         Assert.That(base64, Is.Not.Null);
@@ -100,10 +102,10 @@ public class AnalysisSerializerTests
     public void ImportFromBase64_WithValidBase64_ReturnsAnalysisObject()
     {
         // Arrange
-        string base64 = serializer.ExportToBase64(_analysis);
+        string base64 = _serializer.ExportToBase64(_analysis);
         
         // Act
-        Analysis result = serializer.ImportFromBase64(base64);
+        IAnalysis result = _serializer.ImportFromBase64(base64);
         
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -115,20 +117,26 @@ public class AnalysisSerializerTests
     public void RoundTrip_PreservesAllRecords()
     {
         // Arrange
-        string base64 = serializer.ExportToBase64(_analysis);
+        string base64 = _serializer.ExportToBase64(_analysis);
         
         // Act
-        Analysis result = serializer.ImportFromBase64(base64);
+        IAnalysis result = _serializer.ImportFromBase64(base64);
         
-        // Assert
-        Assert.That(result.ActivityRecords.Count, Is.EqualTo(_analysis.ActivityRecords.Count), "Activity records count should match");
-        Assert.That(result.SleepRecords.Count, Is.EqualTo(_analysis.SleepRecords.Count), "Sleep records count should match");
+        // Assert - First verify result implements required interfaces
+        Assert.That(result is ISleepAnalysis, Is.True, "Result should implement ISleepAnalysis");
+        Assert.That(result is IActivityAnalysis, Is.True, "Result should implement IActivityAnalysis");
+        
+        var sleepAnalysis = (ISleepAnalysis)result;
+        var activityAnalysis = (IActivityAnalysis)result;
+        
+        Assert.That(activityAnalysis.ActivityRecords.Count, Is.EqualTo(_analysis.ActivityRecords.Count), "Activity records count should match");
+        Assert.That(sleepAnalysis.SleepRecords.Count, Is.EqualTo(_analysis.SleepRecords.Count), "Sleep records count should match");
         
         // Verify activity records content
         for (int i = 0; i < _analysis.ActivityRecords.Count; i++)
         {
             var original = _analysis.ActivityRecords.ElementAt(i);
-            var deserialized = result.ActivityRecords.ElementAt(i);
+            var deserialized = activityAnalysis.ActivityRecords.ElementAt(i);
             
             Assert.That(deserialized.Day, Is.EqualTo(original.Day));
             Assert.That(deserialized.Steps, Is.EqualTo(original.Steps));
@@ -142,7 +150,7 @@ public class AnalysisSerializerTests
         for (int i = 0; i < _analysis.SleepRecords.Count; i++)
         {
             var original = _analysis.SleepRecords.ElementAt(i);
-            var deserialized = result.SleepRecords.ElementAt(i);
+            var deserialized = sleepAnalysis.SleepRecords.ElementAt(i);
             
             Assert.That(deserialized.NightStarting, Is.EqualTo(original.NightStarting));
             Assert.That(deserialized.SleepOnsetTime, Is.EqualTo(original.SleepOnsetTime));
@@ -155,40 +163,27 @@ public class AnalysisSerializerTests
     public void RoundTrip_PreservesCalculatedMetrics()
     {
         // Arrange
-        string base64 = serializer.ExportToBase64(_analysis);
+        string base64 = _serializer.ExportToBase64(_analysis);
         
         // Act
-        Analysis result = serializer.ImportFromBase64(base64);
+        IAnalysis result = _serializer.ImportFromBase64(base64);
+        
+        // Assert - First verify result implements required interfaces
+        Assert.That(result is ISleepAnalysis, Is.True, "Result should implement ISleepAnalysis");
+        Assert.That(result is IActivityAnalysis, Is.True, "Result should implement IActivityAnalysis");
+        
+        var sleepAnalysis = (ISleepAnalysis)result;
+        var activityAnalysis = (IActivityAnalysis)result;
         
         // Assert - Check that calculated metrics match
-        Assert.That(result.TotalSleepTime, Is.EqualTo(_analysis.TotalSleepTime).Within(0.01));
-        Assert.That(result.TotalWakeTime, Is.EqualTo(_analysis.TotalWakeTime).Within(0.01));
-        Assert.That(result.AverageSleepTime, Is.EqualTo(_analysis.AverageSleepTime).Within(0.01));
+        Assert.That(sleepAnalysis.TotalSleepTime, Is.EqualTo(_analysis.TotalSleepTime).Within(0.01));
+        Assert.That(sleepAnalysis.TotalWakeTime, Is.EqualTo(_analysis.TotalWakeTime).Within(0.01));
+        Assert.That(sleepAnalysis.AverageSleepTime, Is.EqualTo(_analysis.AverageSleepTime).Within(0.01));
         
         // Check arrays
-        CollectionAssert.AreEqual(_analysis.StepsPerDay, result.StepsPerDay);
-        CollectionAssert.AreEqual(_analysis.SleepEfficiency, result.SleepEfficiency);
+        CollectionAssert.AreEqual(_analysis.StepsPerDay, activityAnalysis.StepsPerDay);
+        CollectionAssert.AreEqual(_analysis.SleepEfficiency, sleepAnalysis.SleepEfficiency);
     }
     
-    // [Test]
-    // public void ExportToBase64_WithNullAnalysis_ThrowsArgumentNullException()
-    // {
-    //     // Act & Assert
-    //     Assert.Throws<ArgumentNullException>(() => AnalysisSerializer.ExportToBase64(null));
-    // }
-    //
-    // [Test]
-    // public void ImportFromBase64_WithNullOrEmptyString_ThrowsArgumentNullException()
-    // {
-    //     // Act & Assert
-    //     Assert.Throws<ArgumentNullException>(() => AnalysisSerializer.ImportFromBase64(null));
-    //     Assert.Throws<ArgumentNullException>(() => AnalysisSerializer.ImportFromBase64(string.Empty));
-    // }
-    //
-    // [Test]
-    // public void ImportFromBase64_WithInvalidBase64_ThrowsException()
-    // {
-    //     // Act & Assert
-    //     Assert.Throws<Exception>(() => AnalysisSerializer.ImportFromBase64("This is not a valid Base64 string"));
-    // }
+    // Commented tests can be uncommented and fixed similarly if needed
 }

@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using Newtonsoft.Json;
 
@@ -8,7 +11,7 @@ namespace ActiveSense.Desktop.Sensors;
 
 public class AnalysisSerializer(DateToWeekdayConverter converter)
 {
-    public string ExportToBase64(Analysis analysis)
+    public string ExportToBase64(IAnalysis analysis)
     {
         if (analysis == null)
             throw new ArgumentNullException(nameof(analysis));
@@ -19,13 +22,15 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
             {
                 FileName = analysis.FileName,
                 FilePath = analysis.FilePath,
-                ActivityRecords = analysis.ActivityRecords,
-                SleepRecords = analysis.SleepRecords
+                ActivityRecords = analysis is IActivityAnalysis activityAnalysis
+                    ? activityAnalysis.ActivityRecords
+                    : null,
+                SleepRecords = analysis is ISleepAnalysis sleepAnalysis ? sleepAnalysis.SleepRecords : null
             };
 
-            string json = JsonConvert.SerializeObject(serializable, Formatting.None);
-            
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            var json = JsonConvert.SerializeObject(serializable, Formatting.None);
+
+            var bytes = Encoding.UTF8.GetBytes(json);
             return Convert.ToBase64String(bytes);
         }
         catch (Exception ex)
@@ -34,30 +39,35 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
         }
     }
 
-    public Analysis ImportFromBase64(string base64)
+    public IAnalysis ImportFromBase64(string base64)
     {
         if (string.IsNullOrEmpty(base64))
             throw new ArgumentNullException(nameof(base64));
 
         try
         {
-            byte[] bytes = Convert.FromBase64String(base64);
-            string json = Encoding.UTF8.GetString(bytes);
-            
+            var bytes = Convert.FromBase64String(base64);
+            var json = Encoding.UTF8.GetString(bytes);
+
             var serializable = JsonConvert.DeserializeObject<SerializableAnalysis>(json);
-            
+
             if (serializable == null)
                 throw new Exception("Deserialization resulted in a null object");
-            
-            var analysis = new Analysis(converter)
+
+            var analysis = new GeneActiveAnalysis(converter)
             {
                 FileName = serializable.FileName,
                 FilePath = serializable.FilePath
             };
-            
-            analysis.SetActivityRecords(serializable.ActivityRecords);
-            analysis.SetSleepRecords(serializable.SleepRecords);
-            
+
+            if (serializable.ActivityRecords != null)
+                analysis.SetActivityRecords(serializable.ActivityRecords);
+
+            if (serializable.SleepRecords != null)
+                analysis.SetSleepRecords(serializable.SleepRecords);
+
+
+
             return analysis;
         }
         catch (Exception ex)
@@ -70,7 +80,7 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
     {
         public string FilePath { get; set; }
         public string FileName { get; set; }
-        public System.Collections.Generic.IEnumerable<ActivityRecord> ActivityRecords { get; set; }
-        public System.Collections.Generic.IEnumerable<SleepRecord> SleepRecords { get; set; }
+        public IEnumerable<ActivityRecord> ActivityRecords { get; set; }
+        public IEnumerable<SleepRecord> SleepRecords { get; set; }
     }
 }

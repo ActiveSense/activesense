@@ -26,6 +26,7 @@
         <entry key="Views/ProcessView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/RepresentationView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/SleepPageView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/WarningDialogView.axaml" value="ActiveSense.Desktop.csproj" />
       </map>
     </option>
   </component>

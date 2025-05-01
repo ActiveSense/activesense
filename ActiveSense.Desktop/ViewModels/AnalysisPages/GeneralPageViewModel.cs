@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
 using ActiveSense.Desktop.ViewModels.Charts;
@@ -25,14 +26,13 @@ public partial class GeneralPageViewModel : PageViewModel
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = new();
 
     [ObservableProperty] private string _movementTitle = "Aktivitätsverteilung";
-    [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
 
     public GeneralPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
     {
         _sharedDataService = sharedDataService;
         _chartColors = chartColors;
 
-        // Subscribe to changes in the shared data
         _sharedDataService.SelectedAnalysesChanged += OnSelectedAnalysesChanged;
     }
 
@@ -57,11 +57,15 @@ public partial class GeneralPageViewModel : PageViewModel
         MovementPieCharts.Clear();
         foreach (var analysis in SelectedAnalyses)
         {
-            var dto = analysis.GetMovementPatternChartData();
-            var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
-            if (SelectedAnalyses.Any())
-                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
-                    "Die durchschnittliche Verteilung der Aktivität über 24h"));
+            if (analysis is IActivityAnalysis activityAnalysis &&
+                analysis is IChartDataProvider chartProvider)
+            {
+                var dto = chartProvider.GetMovementPatternChartData();
+                var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
+                if (SelectedAnalyses.Any())
+                    MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                        "Die durchschnittliche Verteilung der Aktivität über 24h"));
+            }
         }
     }
 
@@ -70,25 +74,30 @@ public partial class GeneralPageViewModel : PageViewModel
         GeneralCharts.Clear();
         foreach (var analysis in SelectedAnalyses)
         {
-            var line = new List<ChartDataDTO>();
-            var bar = new List<ChartDataDTO>();
-
-            var labels = analysis.ActivityWeekdays();
-
-            bar.Add(new ChartDataDTO
+            if (analysis is  IActivityAnalysis activityAnalysis &&
+                analysis is ISleepAnalysis sleepAnalysis &&
+                analysis is  IChartDataProvider chartProvider)
             {
-                Data = analysis.StepsPercentage,
-                Labels = labels,
-                Title = "Schritte pro Tag"
-            });
-            line.Add(new ChartDataDTO
-            {
-                Data = analysis.SleepEfficiency,
-                Labels = labels,
-                Title = "Schlaf-Effizienz"
-            });
-            var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
-            GeneralCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
+                var line = new List<ChartDataDTO>();
+                var bar = new List<ChartDataDTO>();
+
+                var labels = activityAnalysis.ActivityWeekdays();
+
+                bar.Add(new ChartDataDTO
+                {
+                    Data = activityAnalysis.StepsPercentage,
+                    Labels = labels,
+                    Title = "Schritte pro Tag"
+                });
+                line.Add(new ChartDataDTO
+                {
+                    Data = sleepAnalysis.SleepEfficiency,
+                    Labels = labels,
+                    Title = "Schlaf-Effizienz"
+                });
+                var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
+                GeneralCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
+            }
         }
     }
 
