@@ -72,19 +72,19 @@ public class GeneActiveParser(
         var analyses = new List<IAnalysis>();
         var pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
 
-        foreach (var file in pdfFiles)
+        await Task.Run(() =>
         {
-            var pdfText = ExtractTextFromPdf(file);
-            var analysis = ExtractAnalysisFromPdfText(pdfText);
-
-            if (analysis != null)
+            foreach (var file in pdfFiles)
             {
+                var pdfText = ExtractTextFromPdf(file);
+                var analysis = ExtractAnalysisFromPdfText(pdfText);
+
                 analysis.Exported = true;
                 analysis.FileName = Path.GetFileNameWithoutExtension(file);
                 analyses.Add(analysis);
                 Console.WriteLine("Extracted analysis from PDF: " + file);
             }
-        }
+        });
 
         return analyses;
     }
@@ -99,7 +99,7 @@ public class GeneActiveParser(
             Console.WriteLine("Processing directory: " + directory);
             var analysis = await ParseCsvDirectoryAsync(directory);
 
-            if (analysis != null) analyses.Add(analysis);
+            analyses.Add(analysis);
         }
 
         return analyses;
@@ -116,18 +116,21 @@ public class GeneActiveParser(
         var csvFiles = Directory.GetFiles(directory, "*.csv");
         var hasValidData = false;
 
-        foreach (var file in csvFiles)
+        await Task.Run(() =>
         {
-            Console.WriteLine("Parsing file: " + file);
-            try
+            foreach (var file in csvFiles)
             {
-                if (ParseCsvFile(file, analysis)) hasValidData = true;
+                Console.WriteLine("Parsing file: " + file);
+                try
+                {
+                    if (ParseCsvFile(file, analysis)) hasValidData = true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error parsing file {file}: {e.Message}");
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error parsing file {file}: {e.Message}");
-            }
-        }
+        });
 
         return hasValidData ? analysis : null;
     }

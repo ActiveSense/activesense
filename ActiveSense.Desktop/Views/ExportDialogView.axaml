@@ -6,13 +6,14 @@
              x:DataType="viewModels:ExportDialogViewModel">
 
     <UserControl.Styles>
-        <StyleInclude Source="/Assets/DialogStyles.axaml"/>
+        <StyleInclude Source="/Assets/DialogStyles.axaml" />
     </UserControl.Styles>
- 
+
     <Border Classes="dialog-container" Width="450">
         <Grid RowDefinitions="Auto, *, Auto">
             <Grid Grid.Row="0"
-                  Margin="24,24,24,0">
+                  Margin="24,24,24,0"
+                 >
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock Text="Analyse Exportieren"
@@ -22,20 +23,20 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*">
-                <Border Grid.Row="0" 
+            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*" IsVisible="{Binding !ExportStarted}">
+                <Border Grid.Row="0"
                         Classes="dialog-content-panel"
                         Padding="16"
                         Margin="0,10,0,10">
                     <StackPanel>
-                        <TextBlock Text="Einstellungen" 
+                        <TextBlock Text="Einstellungen"
                                    Classes="dialog-section-title"
-                                   Margin="0,0,0,10"/>
-                        
+                                   Margin="0,0,0,10" />
+
                         <CheckBox Content="Rohdaten exportieren"
                                   IsChecked="{Binding IncludeRawData}"
                                   Margin="0,0,0,5" />
-                        
+
                         <TextBlock Text="Die Daten werden in einem ZIP-Ordner gespeichert."
                                    TextWrapping="Wrap"
                                    Foreground="#666666"
@@ -45,9 +46,23 @@
                 </Border>
             </Grid>
 
+            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*" IsVisible="{Binding ExportStarted}">
+                <StackPanel>
+                    <Border Margin="40">
+                        <ProgressBar
+                            Width="100"
+                            Height="100"
+                            IsIndeterminate="True"
+                            Theme="{DynamicResource ProgressRing}"
+                            ShowProgressText="False" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+
             <Grid Grid.Row="2"
                   Margin="24,20"
-                  ColumnDefinitions="Auto, *, Auto">
+                  ColumnDefinitions="Auto, *, Auto"
+                  IsVisible="{Binding }">
 
                 <Button Grid.Column="0"
                         Classes="Secondary"
