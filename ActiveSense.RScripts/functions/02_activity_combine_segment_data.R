@@ -50,7 +50,7 @@ activity_combine_segment_data = function(binfile,
 
   # Initialize the segmented data
   segment_data = c()
-  
+    
   for (i in 0:DayNo) {
     if (i == 0){
       segment_data1 = getGENEAsegments(binfile,
@@ -74,7 +74,8 @@ activity_combine_segment_data = function(binfile,
                                         Rp = 3,
                                         hysteresis = 0.1)
       )
-    } else if (i == DayNo){
+      
+    } else if (i == DayNo) {
       segment_data1 = getGENEAsegments(binfile,
                                         start = First_Start_time + 86400 * (i - 1) ,
                                         end = Last_Time,
@@ -90,8 +91,8 @@ activity_combine_segment_data = function(binfile,
                                         intervalseconds = 30,
                                         mininterval = 1,
                                         downsample = as.numeric(unlist(header$Value[2])),
-                                        samplefreq = as.numeric(unlist(header$Value[2])), 
-                                        filterorder = 2, 
+                                        samplefreq = as.numeric(unlist(header$Value[2])),
+                                        filterorder = 2,
                                         boundaries = c(0.5, 5),
                                         Rp = 3,
                                         hysteresis = 0.1)
@@ -111,12 +112,12 @@ activity_combine_segment_data = function(binfile,
                                         intervalseconds = 30,
                                         mininterval = 1,
                                         downsample = as.numeric(unlist(header$Value[2])),
-                                        samplefreq = as.numeric(unlist(header$Value[2])), 
-                                        filterorder = 2, 
+                                        samplefreq = as.numeric(unlist(header$Value[2])),
+                                        filterorder = 2,
                                         boundaries = c(0.5, 5),
                                         Rp = 3,
                                         hysteresis = 0.1)
-      
+
     }
     
   segment_data = rbind(segment_data, segment_data1)
