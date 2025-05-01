@@ -31,10 +31,10 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
             return await ExportPdfAndCsvZipAsync(analysis, outputPath);
         }
 
-        return await ExportPDFReportAsync(analysis, outputPath);
+        return await ExportPdfReportAsync(analysis, outputPath);
     }
 
-    private async Task<bool> ExportPDFReportAsync(IAnalysis analysis, string outputPath)
+    private async Task<bool> ExportPdfReportAsync(IAnalysis analysis, string outputPath)
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis
             and IChartDataProvider chartProvider))
@@ -194,7 +194,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         {
             var tempPdfPath = Path.GetTempFileName();
 
-            var pdfSuccess = await ExportPDFReportAsync(analysis, tempPdfPath);
+            var pdfSuccess = await ExportPdfReportAsync(analysis, tempPdfPath);
             if (!pdfSuccess)
             {
                 if (File.Exists(tempPdfPath))

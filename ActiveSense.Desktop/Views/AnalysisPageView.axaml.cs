@@ -21,7 +21,8 @@ public partial class AnalysisPageView : UserControl
     private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (DataContext is AnalysisPageViewModel viewModel && sender is ListBox listBox)
-            viewModel.SelectedAnalyses = new ObservableCollection<IAnalysis>(
-                listBox.SelectedItems.Cast<IAnalysis>());
+            if (listBox.SelectedItems != null)
+                viewModel.SelectedAnalyses = new ObservableCollection<IAnalysis>(
+                    listBox.SelectedItems.Cast<IAnalysis>());
     }
 }

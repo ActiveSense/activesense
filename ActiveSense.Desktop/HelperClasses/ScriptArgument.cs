@@ -1,10 +1,12 @@
+using System;
+
 namespace ActiveSense.Desktop.HelperClasses
 {
     public abstract class ScriptArgument
     {
-        public string Flag { get; set; }        // Command-line flag (e.g., "a" for "-a")
-        public string Name { get; set; }         // Display name
-        public string Description { get; set; }  // Description for UI
+        public required string Flag { get; set; }        // Command-line flag (e.g., "a" for "-a")
+        public string Name { get; set; } = String.Empty;        // Display name
+        public string Description { get; set; } = String.Empty;  // Description for UI
         
         public abstract string ToCommandLineArgument();
     }

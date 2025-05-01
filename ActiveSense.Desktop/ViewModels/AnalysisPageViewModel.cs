@@ -20,12 +20,11 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly ProcessDialogViewModel _processDialogViewModel;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SharedDataService _sharedDataService;
-    private bool _isInitialized = false;
     [ObservableProperty] private bool _isProcessingInBackground;
 
     [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
-    [ObservableProperty] private TabItemTemplate _selectedTabItem;
+    [ObservableProperty] private TabItemTemplate? _selectedTabItem = null;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showExportOption = true;
     [ObservableProperty] private bool _showSpinner = true;
@@ -49,10 +48,6 @@ public partial class AnalysisPageViewModel : PageViewModel
         ResultFiles = _sharedDataService.AllAnalyses;
         _sharedDataService.SelectedAnalysesChanged += OnAnalysesChanged;
         _sharedDataService.BackgroundProcessingChanged += OnBackgroundProcessingChanged;
-    }
-
-    public AnalysisPageViewModel()
-    {
     }
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];

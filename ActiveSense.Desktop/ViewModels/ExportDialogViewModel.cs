@@ -28,7 +28,7 @@ public partial class ExportDialogViewModel(
     
     public IAnalysis GetFirstSelectedAnalysis()
     {
-        return sharedDataService.SelectedAnalyses.FirstOrDefault();
+        return sharedDataService.SelectedAnalyses.First();
     }
     
     [RelayCommand]

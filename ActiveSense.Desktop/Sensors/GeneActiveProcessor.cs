@@ -52,7 +52,7 @@ namespace ActiveSense.Desktop.Sensors
         }
 
        public async Task<(bool Success, string Output, string Error)> ProcessAsync(
-            IEnumerable<ScriptArgument> arguments = null)
+            IEnumerable<ScriptArgument> arguments)
         {
             try
             {

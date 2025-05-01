@@ -25,7 +25,7 @@ public class RScriptService : IScriptService
         // Navigate up one directory from the base directory to get to the solution directory
         // and then to the ActiveSense.RScripts directory
         string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        string solutionDirectory = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName;
+        string? solutionDirectory = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName;
         
         if (solutionDirectory == null)
         {

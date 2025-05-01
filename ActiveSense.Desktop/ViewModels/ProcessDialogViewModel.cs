@@ -39,11 +39,6 @@ public partial class ProcessDialogViewModel : DialogViewModel
         LoadDefaultArguments();
     }
 
-    public ProcessDialogViewModel()
-    {
-        
-    }
-    
     private void LoadDefaultArguments()
     {
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);

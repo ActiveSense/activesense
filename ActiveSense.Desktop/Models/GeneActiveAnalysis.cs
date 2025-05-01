@@ -11,14 +11,14 @@ namespace ActiveSense.Desktop.Models;
 
 public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) : IActivityAnalysis, ISleepAnalysis, IChartDataProvider
 {
-    public string FilePath { get; set; }
-    public string FileName { get; set; }
+    public string FilePath { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
     public bool Exported { get; set; } = false;
     
     
     private readonly Dictionary<string, object> _cache = new();
-    private List<ActivityRecord> _activityRecords = new();
-    private List<SleepRecord> _sleepRecords = new();
+    private List<ActivityRecord> _activityRecords = [];
+    private List<SleepRecord> _sleepRecords = [];
 
 
     #region Collections
@@ -26,7 +26,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     public IReadOnlyCollection<ActivityRecord> ActivityRecords => _activityRecords.AsReadOnly();
     public IReadOnlyCollection<SleepRecord> SleepRecords => _sleepRecords.AsReadOnly();
     
-    public List<AnalysisTag> Tags { get; set; } = new List<AnalysisTag>();
+    public List<AnalysisTag> Tags { get; set; } = [];
 
     public void AddTag(string name, string color)
     {
@@ -358,56 +358,56 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
 public class SleepRecord
 {
     [Name("Night.Starting")] 
-    public string NightStarting { get; set; }
+    public required string NightStarting { get; set; }
 
     [Name("Sleep.Onset.Time")] 
-    public string SleepOnsetTime { get; set; }
+    public required string SleepOnsetTime { get; set; }
 
     [Name("Rise.Time")] 
-    public string RiseTime { get; set; }
+    public required string RiseTime { get; set; }
 
     [Name("Total.Elapsed.Bed.Time")] 
-    public string TotalElapsedBedTime { get; set; }
+    public required string TotalElapsedBedTime { get; set; }
 
     [Name("Total.Sleep.Time")] 
-    public string TotalSleepTime { get; set; }
+    public required string TotalSleepTime { get; set; }
 
     [Name("Total.Wake.Time")] 
-    public string TotalWakeTime { get; set; }
+    public required string TotalWakeTime { get; set; }
 
     [Name("Sleep.Efficiency")] 
-    public string SleepEfficiency { get; set; }
+    public required string SleepEfficiency { get; set; }
 
     [Name("Num.Active.Periods")] 
-    public string NumActivePeriods { get; set; }
+    public required string NumActivePeriods { get; set; }
 
     [Name("Median.Activity.Length")] 
-    public string MedianActivityLength { get; set; }
+    public required string MedianActivityLength { get; set; }
 }
 
 public class ActivityRecord
 {
     [Name("Day.Number")] 
-    public string Day { get; set; }
+    public required string Day { get; set; }
 
     [Name("Steps")] 
-    public string Steps { get; set; }
+    public required string Steps { get; set; }
 
     [Name("Non_Wear")] 
-    public string NonWear { get; set; }
+    public required string NonWear { get; set; }
 
     [Name("Sleep")] 
-    public string Sleep { get; set; }
+    public required string Sleep { get; set; }
 
     [Name("Sedentary")] 
-    public string Sedentary { get; set; }
+    public required string Sedentary { get; set; }
 
     [Name("Light")] 
-    public string Light { get; set; }
+    public required string Light { get; set; }
 
     [Name("Moderate")] 
-    public string Moderate { get; set; }
+    public required string Moderate { get; set; }
 
     [Name("Vigorous")] 
-    public string Vigorous { get; set; }
+    public required string Vigorous { get; set; }
 }

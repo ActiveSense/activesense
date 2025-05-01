@@ -5,7 +5,7 @@ namespace ActiveSense.Desktop;
 
 public static class AppConfig
 {
-    private static string _solutionBasePath;
+    private static string _solutionBasePath = string.Empty;
     
     /// <summary>
     /// Gets the base directory of the solution
@@ -30,20 +30,16 @@ public static class AppConfig
     
     private static string CalculateSolutionBasePath()
     {
-        // Start with the executable directory
         string directory = AppDomain.CurrentDomain.BaseDirectory;
         
-        // For development environment
         if (directory.Contains("bin"))
         {
-            // Go up until we find the solution directory
             while (!Directory.Exists(Path.Combine(directory, "ActiveSense.Desktop")) && 
                    !File.Exists(Path.Combine(directory, "ActiveSense.Desktop.sln")))
             {
-                DirectoryInfo parentDir = Directory.GetParent(directory);
+                DirectoryInfo? parentDir = Directory.GetParent(directory);
                 if (parentDir == null)
                 {
-                    // If we can't find it, fall back to the executable directory
                     return AppDomain.CurrentDomain.BaseDirectory;
                 }
                 
@@ -51,7 +47,6 @@ public static class AppConfig
             }
         }
         
-        // Ensure the outputs directory exists
         string outputsPath = Path.Combine(directory, "outputs");
         if (!Directory.Exists(outputsPath))
         {

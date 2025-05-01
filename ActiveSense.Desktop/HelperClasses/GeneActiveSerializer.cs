@@ -12,8 +12,11 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
 {
     public string ExportToBase64(IAnalysis analysis)
     {
-        if (analysis == null)
-            throw new ArgumentNullException(nameof(analysis));
+        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis
+           ))
+        {
+            throw new ArgumentException("Analysis must be an IActivityAnalysis or ISleepAnalysis.");
+        }
 
         try
         {
@@ -21,10 +24,8 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
             {
                 FileName = analysis.FileName,
                 FilePath = analysis.FilePath,
-                ActivityRecords = analysis is IActivityAnalysis activityAnalysis
-                    ? activityAnalysis.ActivityRecords
-                    : null,
-                SleepRecords = analysis is ISleepAnalysis sleepAnalysis ? sleepAnalysis.SleepRecords : null
+                ActivityRecords = activityAnalysis.ActivityRecords,
+                SleepRecords = sleepAnalysis.SleepRecords,
             };
 
             var json = JsonConvert.SerializeObject(serializable, Formatting.None);
@@ -75,9 +76,9 @@ public class AnalysisSerializer(DateToWeekdayConverter converter)
 
     private class SerializableAnalysis
     {
-        public string FilePath { get; set; }
-        public string FileName { get; set; }
-        public IEnumerable<ActivityRecord> ActivityRecords { get; set; }
-        public IEnumerable<SleepRecord> SleepRecords { get; set; }
+        public string FilePath { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public IEnumerable<ActivityRecord> ActivityRecords { get; set; } = new List<ActivityRecord>();
+        public IEnumerable<SleepRecord> SleepRecords { get; set; } = new List<SleepRecord>();
     }
 }

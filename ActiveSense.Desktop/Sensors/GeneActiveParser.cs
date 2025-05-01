@@ -86,7 +86,6 @@ public class GeneActiveParser(
             }
         }
 
-        Console.WriteLine("Found " + pdfFiles.Length + " PDF files. In path: " + outputDirectory);
         return analyses;
     }
 
@@ -149,18 +148,21 @@ public class GeneActiveParser(
         csv.ReadHeader();
         var headers = csv.HeaderRecord;
 
-        var analysisType = DetermineAnalysisType(headers);
-
-        if (analysisType == AnalysisType.Activity)
+        if (headers != null)
         {
-            activityAnalysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
-            return true;
-        }
+            var analysisType = DetermineAnalysisType(headers);
 
-        if (analysisType == AnalysisType.Sleep)
-        {
-            sleepAnalysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
-            return true;
+            if (analysisType == AnalysisType.Activity)
+            {
+                activityAnalysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
+                return true;
+            }
+
+            if (analysisType == AnalysisType.Sleep)
+            {
+                sleepAnalysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
+                return true;
+            }
         }
 
         return false;
@@ -197,23 +199,16 @@ public class GeneActiveParser(
 
     public IAnalysis ExtractAnalysisFromPdfText(string pdfText)
     {
-        if (string.IsNullOrEmpty(pdfText))
-            return null;
-
         try
         {
             const string startMarker = "ANALYSIS_DATA_BEGIN";
             const string endMarker = "ANALYSIS_DATA_END";
 
-            var startIndex = pdfText.IndexOf(startMarker);
-            if (startIndex == -1)
-                return null;
+            var startIndex = pdfText.IndexOf(startMarker, StringComparison.Ordinal);
 
             startIndex += startMarker.Length;
 
-            var endIndex = pdfText.IndexOf(endMarker, startIndex);
-            if (endIndex == -1)
-                return null;
+            var endIndex = pdfText.IndexOf(endMarker, startIndex, StringComparison.Ordinal);
 
             var base64Content = pdfText.Substring(startIndex, endIndex - startIndex).Trim();
 
