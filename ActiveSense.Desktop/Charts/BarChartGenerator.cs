@@ -4,6 +4,8 @@ using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using LiveChartsCore;
+using LiveChartsCore.Kernel.Sketches;
+using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
@@ -53,7 +55,42 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             .ToArray();
 
         var series = new List<ISeries>();
+        var yAxes = new List<ICartesianAxis>();
         
+        // Create primary Y axis for bar data (left side)
+        var primaryAxis = new Axis
+        {
+            Name = barData != null && barData.Length > 0 ? barData[0].Title : "Werte",
+            NameTextSize = 12,
+            TextSize = 10,
+            Position = AxisPosition.Start
+        };
+        yAxes.Add(primaryAxis);
+        
+        // Create secondary Y axis for line data (right side) if needed
+        if (lineData != null && lineData.Length > 0 && barData != null && barData.Length > 0)
+        {
+            var secondaryColor = SKColors.Red;
+            if (lineData.Length > 0 && !string.IsNullOrEmpty(lineData[0].Title))
+            {
+                var secondaryAxis = new Axis
+                {
+                    Name = lineData[0].Title,
+                    NameTextSize = 12,
+                    NamePaint = new SolidColorPaint(secondaryColor),
+                    TextSize = 10,
+                    LabelsPaint = new SolidColorPaint(secondaryColor),
+                    TicksPaint = new SolidColorPaint(secondaryColor),
+                    SubticksPaint = new SolidColorPaint(secondaryColor),
+                    DrawTicksPath = true,
+                    ShowSeparatorLines = false,
+                    Position = AxisPosition.End
+                };
+                yAxes.Add(secondaryAxis);
+            }
+        }
+        
+        // Add bar series if provided
         if (barData != null && barData.Length > 0)
         {
             var colors = chartColors.GetColorPalette(barData.Length);
@@ -69,46 +106,54 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                     Stroke = null,
                     Fill = new SolidColorPaint(colors[colorIndex++]),
                     MaxBarWidth = 15,
-                    Name = dto.Title ?? $"Series {colorIndex}"
+                    Name = dto.Title ?? $"Series {colorIndex}",
+                    ScalesYAt = 0 // Scale using the first Y axis
                 });
             }
+            
+            // Add mean line for bar data
+            // var allValues = barData.SelectMany(dto => dto.Data);
+            // double meanValue = allValues.Any() ? allValues.Average() : 0;
+            // var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
+            // series.Add(new LineSeries<double>
+            // {
+            //     Values = meanValues,
+            //     Stroke = new SolidColorPaint(SKColors.Gray, 2),
+            //     Fill = null,
+            //     GeometrySize = 0,
+            //     Name = "Durchschnitt",
+            //     LineSmoothness = 0,
+            //     ScalesYAt = 0 // Scale using the first Y axis
+            // });
         }
 
+        // Add line series if provided
         if (lineData != null && lineData.Length > 0)
         {
             var lineColors = chartColors.GetColorPalette(lineData.Length);
             int lineColorIndex = 0;
+            
+            // If we have only line data with no bars, scale it to first axis
+            // Otherwise, scale to second axis
+            int scaleYAt = (barData == null || barData.Length == 0) ? 0 : 1;
 
             foreach (var dto in lineData)
             {
                 var normalizedValues = NormalizeChartData(dto, allLabels);
+                var lineColor = lineData.Length > 1 ? lineColors[lineColorIndex++] : SKColors.Red;
 
                 series.Add(new LineSeries<double>
                 {
                     Values = normalizedValues,
-                    Stroke = new SolidColorPaint(lineData.Length > 1 ? lineColors[lineColorIndex++] : SKColors.Red, 2),
+                    Stroke = new SolidColorPaint(lineColor, 2),
                     Fill = null,
-                    GeometrySize = 0,
+                    GeometrySize = 5,
+                    GeometryStroke = new SolidColorPaint(lineColor, 2),
                     Name = dto.Title ?? "Line Series",
-                    LineSmoothness = 0
+                    LineSmoothness = 0.5,
+                    ScalesYAt = scaleYAt
                 });
             }
-        }
-
-        if (barData != null && barData.Length > 0)
-        {
-            var allValues = barData.SelectMany(dto => dto.Data);
-            double meanValue = allValues.Any() ? allValues.Average() : 0;
-            var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
-            series.Add(new LineSeries<double>
-            {
-                Values = meanValues,
-                Stroke = new SolidColorPaint(SKColors.Gray, 2),
-                Fill = null,
-                GeometrySize = 0,
-                Name = "Durchschnitt",
-                LineSmoothness = 0
-            });
         }
 
         var xAxis = new Axis
@@ -125,7 +170,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             Description = description,
             Series = series.ToArray(),
             XAxes = new[] { xAxis },
-            YAxes = new[] { new Axis() }
+            YAxes = yAxes.ToArray()
         };
     }
 }

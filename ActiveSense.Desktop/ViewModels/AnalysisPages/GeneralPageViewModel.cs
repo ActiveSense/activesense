@@ -81,7 +81,7 @@ public partial class GeneralPageViewModel : PageViewModel
 
             bar.Add(new ChartDataDTO
             {
-                Data = activityAnalysis.StepsPercentage,
+                Data = activityAnalysis.StepsPerDay,
                 Labels = labels,
                 Title = "Schritte pro Tag"
             });
