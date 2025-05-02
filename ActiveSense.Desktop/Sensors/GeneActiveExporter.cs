@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
@@ -44,7 +45,7 @@ public partial class SleepPageViewModel : PageViewModel
     [ObservableProperty] private bool _isSleepEfficiencyExpanded = false;
     
     [ObservableProperty] private string _activePeriodsTitle = "Aktive Perioden";
-    [ObservableProperty] private string _activePeriodsDescription = "Aktive Perioden pro Nacht in Stunden";
+    [ObservableProperty] private string _activePeriodsDescription = "Aktive Perioden pro Nacht";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _activePeriodsCharts = [];
     [ObservableProperty] private bool _isActivePeriodsExpanded = false;
     
@@ -109,7 +110,7 @@ public partial class SleepPageViewModel : PageViewModel
             }
         }
 
-        var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors);
+        var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors, null);
         if (SelectedAnalyses.Any())
             TotalSleepCharts.Add(barChartGenerator.GenerateChart("Total Sleep Time",
                 "Durchschnittliche Schlafzeit pro Nacht"));
@@ -129,7 +130,7 @@ public partial class SleepPageViewModel : PageViewModel
             }
         }
 
-        var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors);
+        var barChartGenerator = new BarChartGenerator(null, _chartColors, chartDataDtos.ToArray());
         if (SelectedAnalyses.Any())
             SleepEfficiencyCharts.Add(barChartGenerator.GenerateChart("Sleep Efficiency",
                 "Durchschnittliche Schlaf-Effizienz pro Nacht"));
@@ -152,7 +153,7 @@ public partial class SleepPageViewModel : PageViewModel
         var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors);
         if (SelectedAnalyses.Any())
             ActivePeriodsCharts.Add(barChartGenerator.GenerateChart("Active Periods",
-                "Durchschnittliche aktive Perioden pro Nacht"));
+                "Aktive Perioden pro Nacht"));
     }
     
     #endregion

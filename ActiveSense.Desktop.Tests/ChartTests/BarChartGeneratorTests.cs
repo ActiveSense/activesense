@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using LiveChartsCore;
