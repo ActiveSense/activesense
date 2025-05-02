@@ -1,13 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Models;
 using ActiveSense.Desktop.Services;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -15,27 +14,36 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class ProcessDialogViewModel : DialogViewModel
 {
-    private readonly SensorProcessorFactory _sensorProcessorFactory;
-    private readonly IScriptService _scriptService;
-    private readonly SharedDataService _sharedDataService;
-    private readonly ResultParserFactory _resultParserFactory;
     private readonly DialogService _dialogService;
     private readonly MainViewModel _mainViewModel;
-    
-    [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
+    private readonly ResultParserFactory _resultParserFactory;
+    private readonly IScriptService _scriptService;
+    private readonly SensorProcessorFactory _sensorProcessorFactory;
+    private readonly SharedDataService _sharedDataService;
+
+    [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
     [ObservableProperty] private string _cancelText = "Cancel";
     [ObservableProperty] private string _confirmText = "Confirm";
+    private Timer? _countdownTimer;
+
+    private TimeSpan _estimatedTime;
     [ObservableProperty] private bool _isProcessing;
+    private DateTime _processingStartTime;
+    [ObservableProperty] private double _progressValue;
     [ObservableProperty] private string _scriptOutput = string.Empty;
     [ObservableProperty] private string[]? _selectedFiles;
     [ObservableProperty] private SensorTypes _selectedSensorTypes = SensorTypes.GENEActiv;
+
+    [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
+    [ObservableProperty] private bool _showProgress;
     [ObservableProperty] private bool _showScriptOutput;
     [ObservableProperty] private string _statusMessage = "No files selected";
+    [ObservableProperty] private string _timeRemaining = string.Empty;
     [ObservableProperty] private string _title = "Sensordaten analysieren";
-    
-    [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
 
-    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService, SharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService, MainViewModel mainViewModel)
+    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService,
+        SharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService,
+        MainViewModel mainViewModel)
     {
         _mainViewModel = mainViewModel;
         _dialogService = dialogService;
@@ -43,7 +51,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
         _sensorProcessorFactory = sensorProcessorFactory;
         _scriptService = scriptService;
         _sharedDataService = sharedDataService;
-        
+
         LoadDefaultArguments();
     }
 
@@ -51,11 +59,9 @@ public partial class ProcessDialogViewModel : DialogViewModel
     {
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
         Arguments.Clear();
-        
+
         foreach (var arg in processor.DefaultArguments)
-        {
             if (arg is BoolArgument boolArg)
-            {
                 Arguments.Add(new BoolArgument
                 {
                     Flag = boolArg.Flag,
@@ -63,9 +69,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
                     Description = boolArg.Description,
                     Value = boolArg.Value
                 });
-            }
             else if (arg is NumericArgument numArg)
-            {
                 Arguments.Add(new NumericArgument
                 {
                     Flag = numArg.Flag,
@@ -75,8 +79,54 @@ public partial class ProcessDialogViewModel : DialogViewModel
                     MinValue = numArg.MinValue,
                     MaxValue = numArg.MaxValue
                 });
-            }
+    }
+
+    private void StartCountdown(TimeSpan estimatedTime)
+    {
+        _estimatedTime = estimatedTime;
+        _processingStartTime = DateTime.Now;
+        ShowProgress = true;
+
+        _countdownTimer?.Dispose();
+
+        _countdownTimer = new Timer(1000);
+        _countdownTimer.Elapsed += UpdateCountdown;
+        _countdownTimer.AutoReset = true;
+        _countdownTimer.Start();
+
+        UpdateCountdown(null, null);
+    }
+
+    private void UpdateCountdown(object? sender, ElapsedEventArgs? e)
+    {
+        var elapsed = DateTime.Now - _processingStartTime;
+        var remaining = _estimatedTime - elapsed;
+
+        if (remaining.TotalSeconds <= 0)
+        {
+            TimeRemaining = "Finalizing...";
+            ProgressValue = 100;
         }
+        else
+        {
+            TimeRemaining = $"{remaining.Minutes:D2}:{remaining.Seconds:D2}";
+
+            ProgressValue = Math.Min(100, elapsed.TotalSeconds / _estimatedTime.TotalSeconds * 100);
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            TimeRemaining = TimeRemaining;
+            ProgressValue = ProgressValue;
+        });
+    }
+
+    private void StopCountdown()
+    {
+        _countdownTimer?.Stop();
+        _countdownTimer?.Dispose();
+        _countdownTimer = null;
+        ShowProgress = false;
     }
 
     [RelayCommand]
@@ -91,15 +141,11 @@ public partial class ProcessDialogViewModel : DialogViewModel
     {
         SelectedFiles = files;
         FilesSelected?.Invoke(files);
-        
+
         if (files == null || files.Length == 0)
-        {
             StatusMessage = "No files selected";
-        }
         else
-        {
             StatusMessage = $"{files.Length} file(s) selected";
-        }
     }
 
     [RelayCommand]
@@ -112,21 +158,23 @@ public partial class ProcessDialogViewModel : DialogViewModel
         }
 
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
+        var estimatedTime = processor.GetEstimatedProcessingTime(SelectedFiles);
+        StartCountdown(estimatedTime);
 
         try
         {
             IsProcessing = true;
             _sharedDataService.IsProcessingInBackground = true;
-            
+
             StatusMessage = "Copying files...";
-        
+
             var processingDirectory = _scriptService.GetScriptInputPath();
             var outputDirectory = AppConfig.OutputsDirectoryPath;
-            
+
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
-            
+
             StatusMessage = "Procesing files...";
-            
+
             var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments);
 
             ScriptOutput = output;
@@ -139,8 +187,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             }
 
             StatusMessage = "Parsing results...";
-            ParseResults();
-            IsProcessing = false;
+            await ParseResults();
         }
         catch (Exception ex)
         {
@@ -150,34 +197,18 @@ public partial class ProcessDialogViewModel : DialogViewModel
         }
         finally
         {
+            StopCountdown();
             IsProcessing = false;
             _sharedDataService.IsProcessingInBackground = false;
+            Close();
         }
     }
 
-    
-    private async void ParseResults()
+
+    private async Task ParseResults()
     {
-        try
-        {
-            var parser = _resultParserFactory.GetParser(SensorType);
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
-            _sharedDataService.UpdateAllAnalyses(files);
-        }
-        catch (Exception e)
-        {
-            var dialog = new WarningDialogViewModel
-            {
-                Title = "Fehler",
-                SubTitle =
-                    "Die Ergebnisse konnten nicht geladen werden. Die hochgeladene Datei ist möglicherweise fehlerhaft.",
-                CloseButtonText = "Abbrechen",
-                OkButtonText = "OK"
-            };
-            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
-
-            Console.WriteLine(e);
-        }
+        var parser = _resultParserFactory.GetParser(SensorType);
+        var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+        _sharedDataService.UpdateAllAnalyses(files);
     }
-
 }

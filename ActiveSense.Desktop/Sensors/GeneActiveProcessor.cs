@@ -157,5 +157,26 @@ namespace ActiveSense.Desktop.Sensors
                 }
             }
         }
+        public TimeSpan GetEstimatedProcessingTime(IEnumerable<string> files)
+        {
+            if (files == null || !files.Any())
+                return TimeSpan.Zero;
+        
+            int fileCount = files.Count();
+            long totalSize = 0;
+    
+            foreach (var file in files)
+            {
+                if (File.Exists(file))
+                {
+                    var fileInfo = new FileInfo(file);
+                    totalSize += fileInfo.Length;
+                }
+            }
+    
+            double estimatedSeconds = ((totalSize / (1024 * 1024) * 6));
+    
+            return TimeSpan.FromSeconds(Math.Max(5, estimatedSeconds));
+        }
     }
 }

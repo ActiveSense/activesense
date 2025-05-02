@@ -76,13 +76,19 @@ public class GeneActiveParser(
         {
             foreach (var file in pdfFiles)
             {
-                var pdfText = ExtractTextFromPdf(file);
-                var analysis = ExtractAnalysisFromPdfText(pdfText);
+                try
+                {
+                    var pdfText = ExtractTextFromPdf(file);
+                    var analysis = ExtractAnalysisFromPdfText(pdfText);
 
-                analysis.Exported = true;
-                analysis.FileName = Path.GetFileNameWithoutExtension(file);
-                analyses.Add(analysis);
-                Console.WriteLine("Extracted analysis from PDF: " + file);
+                    analysis.Exported = true;
+                    analysis.FileName = Path.GetFileNameWithoutExtension(file);
+                    analyses.Add(analysis);
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
             }
         });
 
@@ -96,7 +102,6 @@ public class GeneActiveParser(
 
         foreach (var directory in directories)
         {
-            Console.WriteLine("Processing directory: " + directory);
             var analysis = await ParseCsvDirectoryAsync(directory);
 
             analyses.Add(analysis);
@@ -140,7 +145,6 @@ public class GeneActiveParser(
         if (analysis is not IActivityAnalysis activityAnalysis ||
             analysis is not ISleepAnalysis sleepAnalysis)
         {
-            Console.WriteLine("Analysis does not provide required capabilities for GeneActive export");
             return false;
         }
 
@@ -200,7 +204,7 @@ public class GeneActiveParser(
         return headers.Intersect(sleepHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
     }
 
-    public IAnalysis ExtractAnalysisFromPdfText(string pdfText)
+    private IAnalysis ExtractAnalysisFromPdfText(string pdfText)
     {
         try
         {

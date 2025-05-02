@@ -184,12 +184,22 @@
                         <ProgressBar
                             Width="100"
                             Height="100"
-                            IsIndeterminate="True"
+                            IsIndeterminate="{Binding !ShowProgress}"
+                            Value="{Binding ProgressValue}"
+                            Maximum="100"
+                            Minimum="0"
                             Theme="{DynamicResource ProgressRing}"
                             ShowProgressText="False" />
+
                         <TextBlock Text="{Binding StatusMessage}"
                                    HorizontalAlignment="Center"
                                    FontWeight="Medium" />
+
+                        <TextBlock Text="{Binding TimeRemaining}"
+                                   IsVisible="{Binding ShowProgress}"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Bold"
+                                   FontSize="18" />
                     </StackPanel>
                 </Border>
             </Grid>
