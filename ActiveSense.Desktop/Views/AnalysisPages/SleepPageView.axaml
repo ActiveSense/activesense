@@ -114,6 +114,40 @@
                     </StackPanel>
                 </Expander>
                 
+                <!-- Sleep Duration With Efficiency Charts Section -->
+                <Expander Header="{Binding SleepTimeWithEfficiencyTitle}"
+                          IsExpanded="{Binding IsSleepTimeWithEfficiencyExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding SleepTimeWithEfficiencyDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding SleepTimeWithEfficiencyCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Grid.Row="0" Margin="4,10,4,4" FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Classes="Shadow"
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
                 <!-- Sleep efficiency Charts Section -->
                 <Expander Header="{Binding SleepEfficiencyTitle}"
                           IsExpanded="{Binding IsSleepEfficiencyExpanded}"

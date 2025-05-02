@@ -29,6 +29,11 @@ public partial class SleepPageViewModel : PageViewModel
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _pieCharts = [];
     [ObservableProperty] private bool _isDistributionExpanded = false;
     
+    [ObservableProperty] private string _sleepTimeWithEfficiencyTitle = "Schlafzeit mit Effizienz";
+    [ObservableProperty] private string _sleepTimeWithEfficiencyDescription = "Schlafzeit pro Nacht in Stunden mit Schlafeffizienz in %";
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepTimeWithEfficiencyCharts = [];
+    [ObservableProperty] private bool _isSleepTimeWithEfficiencyExpanded = false;
+    
     [ObservableProperty] private string _sleepTimeTitle = "Schlafzeit";
     [ObservableProperty] private string _sleepTimeDescription = "Zeitpunkt des Schlafbeginns und -endes";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepTimeCharts = [];
@@ -67,6 +72,7 @@ public partial class SleepPageViewModel : PageViewModel
         CreateTotalSleepChart();
         CreateSleepEfficiencyChart();
         CreateActivePeriodsChart();
+        CreateTotalSleepWithEfficiencyChart();
     }
 
     private void UpdateSelectedAnalyses()
@@ -100,7 +106,7 @@ public partial class SleepPageViewModel : PageViewModel
         TotalSleepCharts.Clear();
 
         var chartDataDtos = new List<ChartDataDTO>();
-
+        
         foreach (var analysis in SelectedAnalyses)
         {
             if (analysis is ISleepAnalysis sleepAnalysis &&
@@ -114,6 +120,30 @@ public partial class SleepPageViewModel : PageViewModel
         if (SelectedAnalyses.Any())
             TotalSleepCharts.Add(barChartGenerator.GenerateChart("Total Sleep Time",
                 "Durchschnittliche Schlafzeit pro Nacht"));
+    }
+
+    private void CreateTotalSleepWithEfficiencyChart()
+    {
+        
+        SleepTimeWithEfficiencyCharts.Clear();
+
+        foreach (var analysis in SelectedAnalyses)
+        {
+            var chartDataDtos = new List<ChartDataDTO>();
+            var sleepEfficiencyDtos = new List<ChartDataDTO>();
+        
+            if (analysis is ISleepAnalysis sleepAnalysis &&
+                analysis is IChartDataProvider chartProvider)
+            {
+                chartDataDtos.Add(chartProvider.GetTotalSleepTimePerDayChartData());
+                sleepEfficiencyDtos.Add(chartProvider.GetSleepEfficiencyChartData());
+            }
+       
+            var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors, sleepEfficiencyDtos.ToArray());
+            if (SelectedAnalyses.Any())
+                SleepTimeWithEfficiencyCharts.Add(barChartGenerator.GenerateChart($"{analysis.FileName}",
+                    "Sleep Time per Night with Efficiency"));
+        }
     }
     
     private void CreateSleepEfficiencyChart()
