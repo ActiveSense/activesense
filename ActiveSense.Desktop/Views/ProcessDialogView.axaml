@@ -38,7 +38,7 @@
             </Grid>
 
             <Button
-                Command="{Binding CancelCommand}"
+                Command="{Binding HideCommand}"
                 Width="32" Height="32"
                 Margin="10"
                 Padding="8"

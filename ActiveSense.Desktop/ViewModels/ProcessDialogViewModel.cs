@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using ActiveSense.Desktop.Enums;
@@ -9,6 +10,7 @@ using ActiveSense.Desktop.Services;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Timer = System.Timers.Timer;
 
 namespace ActiveSense.Desktop.ViewModels;
 
@@ -22,6 +24,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     private readonly SharedDataService _sharedDataService;
 
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
+    private CancellationTokenSource? _cancellationTokenSource;
     [ObservableProperty] private string _cancelText = "Cancel";
     [ObservableProperty] private string _confirmText = "Confirm";
     private Timer? _countdownTimer;
@@ -132,6 +135,20 @@ public partial class ProcessDialogViewModel : DialogViewModel
     [RelayCommand]
     private void Cancel()
     {
+        if (IsProcessing && _cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            StatusMessage = "Cancelling operation...";
+        }
+        else
+        {
+            Close();
+        }
+    }
+
+    [RelayCommand]
+    private void Hide()
+    {
         Close();
     }
 
@@ -165,6 +182,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
         {
             IsProcessing = true;
             _sharedDataService.IsProcessingInBackground = true;
+            _cancellationTokenSource = new CancellationTokenSource();
 
             StatusMessage = "Copying files...";
 
@@ -175,7 +193,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
             StatusMessage = "Procesing files...";
 
-            var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments);
+            var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
 
             ScriptOutput = output;
             ShowScriptOutput = true;
@@ -187,7 +205,13 @@ public partial class ProcessDialogViewModel : DialogViewModel
             }
 
             StatusMessage = "Parsing results...";
-            await ParseResults();
+            ParseResults();
+        }
+        catch (OperationCanceledException)
+        {
+            StatusMessage = "Operation was cancelled";
+            ScriptOutput = "Processing was cancelled by user.";
+            ShowScriptOutput = true;
         }
         catch (Exception ex)
         {
@@ -200,6 +224,13 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StopCountdown();
             IsProcessing = false;
             _sharedDataService.IsProcessingInBackground = false;
+            
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
+            
             Close();
         }
     }

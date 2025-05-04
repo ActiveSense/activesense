@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.HelperClasses;
@@ -44,7 +45,7 @@ public class GeneActiveProcessorTests
 
         // Override the process execution to avoid actually running the script
         protected override Task<(bool Success, string Output, string Error)> ExecuteProcessAsync(
-            string scriptPath, string arguments, string workingDirectory)
+            string scriptPath, string arguments, string workingDirectory, CancellationToken cancellationToken)
         {
             // Capture parameters for testing
             CapturedScriptPath = scriptPath;
@@ -65,6 +66,7 @@ public class GeneActiveProcessorTests
     private Mock<IScriptService> _mockScriptService;
     private TestableGeneActiveProcessor _processor;
     private ISensorProcessor _processorInterface;
+    private CancellationTokenSource _cancellationTokenSource;
 
     [SetUp]
     public void Setup()
@@ -78,6 +80,8 @@ public class GeneActiveProcessorTests
         _mockScriptService.Setup(s => s.GetScriptBasePath()).Returns("/mock/path");
         _mockScriptService.Setup(s => s.GetScriptInputPath()).Returns("/mock/path/data");
         _mockScriptService.Setup(s => s.GetScriptOutputPath()).Returns("/mock/path/outputs");
+        _cancellationTokenSource = new CancellationTokenSource();
+        
     }
 
     [Test]
@@ -112,7 +116,7 @@ public class GeneActiveProcessorTests
         _processorInterface = _processor;
 
         // Act
-        var result = await _processorInterface.ProcessAsync(null);
+        var result = await _processorInterface.ProcessAsync(null, CancellationToken.None);
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -137,7 +141,7 @@ public class GeneActiveProcessorTests
         _processorInterface = _processor;
 
         // Act
-        var result = await _processorInterface.ProcessAsync(null);
+        var result = await _processorInterface.ProcessAsync(null, CancellationToken.None);
 
         // Assert
         Assert.That(result.Success, Is.False);
@@ -155,7 +159,7 @@ public class GeneActiveProcessorTests
         _processorInterface = _processor;
 
         // Act
-        var result = await _processorInterface.ProcessAsync(null);
+        var result = await _processorInterface.ProcessAsync(null, CancellationToken.None);
 
         // Assert
         Assert.That(result.Success, Is.False);
@@ -179,7 +183,7 @@ public class GeneActiveProcessorTests
         };
 
         // Act
-        await _processorInterface.ProcessAsync(mockArguments);
+        await _processorInterface.ProcessAsync(mockArguments, CancellationToken.None);
 
         // Assert
         Assert.That(_processor.CapturedScriptPath, Is.EqualTo("mock-rscript"));
@@ -197,7 +201,7 @@ public class GeneActiveProcessorTests
         _processorInterface = _processor;
         
         // Act
-        await _processorInterface.ProcessAsync(null);
+        await _processorInterface.ProcessAsync(null, CancellationToken.None);
         
         // Assert
         Assert.That(_processor.CapturedScriptPath, Is.EqualTo("mock-rscript"));

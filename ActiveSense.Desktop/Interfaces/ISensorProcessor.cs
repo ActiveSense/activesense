@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.HelperClasses;
@@ -11,7 +12,7 @@ public interface ISensorProcessor
 {
     SensorTypes SupportedType { get; }
     IReadOnlyList<ScriptArgument> DefaultArguments { get; }
-    Task<(bool Success, string Output, string Error)> ProcessAsync(IEnumerable<ScriptArgument> arguments);
+    Task<(bool Success, string Output, string Error)> ProcessAsync(IEnumerable<ScriptArgument> arguments, CancellationToken cancellationToken);
     TimeSpan GetEstimatedProcessingTime(IEnumerable<string> files);
     void CopyFiles(string[] files, string processingDirectory, string outputDirectory);
 }

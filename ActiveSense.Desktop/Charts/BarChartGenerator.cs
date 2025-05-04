@@ -51,7 +51,6 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
         // Create primary Y axis for bar data (left side)
         var primaryAxis = new Axis
         {
-            Name = barData != null && barData.Length > 0 ? barData[0].Title : "Werte",
             NameTextSize = 12,
             TextSize = 10,
             Position = AxisPosition.Start
@@ -163,7 +162,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             Title = title,
             Description = description,
             Series = series.ToArray(),
-            XAxes = new[] { xAxis },
+            XAxes = [xAxis],
             YAxes = yAxes.ToArray()
         };
     }
