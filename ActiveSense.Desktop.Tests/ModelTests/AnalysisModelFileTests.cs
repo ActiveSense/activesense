@@ -169,8 +169,8 @@ public class AnalysisModeFileTests
         Assert.That(chartData.Labels.Length, Is.EqualTo(2));
         Assert.That(chartData.Data.Length, Is.EqualTo(2));
         
-        double expectedSleepTime = _analysis.TotalSleepTime;
-        double expectedWakeTime = _analysis.TotalWakeTime;
+        double expectedSleepTime = Math.Round(_analysis.TotalSleepTime / 3600, 1) ;
+        double expectedWakeTime = Math.Round(_analysis.TotalWakeTime / 3600, 1) ;
         
         Assert.That(chartData.Data[0], Is.EqualTo(expectedSleepTime).Within(0.01));
         Assert.That(chartData.Data[1], Is.EqualTo(expectedWakeTime).Within(0.01));
@@ -227,7 +227,7 @@ public class AnalysisModeFileTests
         // Check that the data matches the TotalSleepTimePerDay values
         for (int i = 0; i < _analysis.TotalSleepTimePerDay.Length; i++)
         {
-            Assert.That(chartData.Data[i], Is.EqualTo(_analysis.TotalSleepTimePerDay[i]).Within(0.01));
+            Assert.That(chartData.Data[i], Is.EqualTo(Math.Round(_analysis.TotalSleepTimePerDay[i] / 3600, 1)).Within(0.01));
         }
     }
     

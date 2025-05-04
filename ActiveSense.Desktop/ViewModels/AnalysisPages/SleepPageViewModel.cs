@@ -109,8 +109,7 @@ public partial class SleepPageViewModel : PageViewModel
         
         foreach (var analysis in SelectedAnalyses)
         {
-            if (analysis is ISleepAnalysis sleepAnalysis &&
-                analysis is IChartDataProvider chartProvider)
+            if (analysis is IChartDataProvider chartProvider)
             {
                 chartDataDtos.Add(chartProvider.GetTotalSleepTimePerDayChartData());
             }
