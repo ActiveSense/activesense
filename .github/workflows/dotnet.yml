@@ -60,17 +60,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '9.0.x'
-        
-    - name: Install dotnet format tool
+
+    - name: Install dotnet format
       run: dotnet tool install -g dotnet-format
-      
-    - name: Check code formatting
-      run: dotnet format ActiveSense.Desktop/ActiveSense.Desktop.sln --verify-no-changes
-      
-    - name: Run code analysis
-      run: dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --configuration Release /p:EnforceCodeStyleInBuild=true
+
+    - name: Run dotnet format (SARIF output)
+      run: dotnet format ActiveSense.Desktop/ActiveSense.Desktop.sln --verify-no-changes --report ./format-report.sarif --report-format sarif
+
+    - name: Upload SARIF Report
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ./format-report.sarif
+
+    - name: Static code analysis
+      run: dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --configuration Release /warnaserror /p:EnforceCodeStyleInBuild=true
