@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Charts.DTOs;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using CsvHelper.Configuration.Attributes;
 

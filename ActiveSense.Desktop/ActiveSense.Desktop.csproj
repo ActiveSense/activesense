@@ -57,9 +57,4 @@
       <None Remove="publish\linux\NUnit3.TestAdapter.pdb" />
       <None Remove="publish\linux\ActiveSense.Desktop.pdb" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Import\Implementations\" />
-      <Folder Include="Import\Interfaces\" />
-    </ItemGroup>
 </Project>

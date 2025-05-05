@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ActiveSense.Desktop.Charts.DTOs;
+using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Models;
 
 namespace ActiveSense.Desktop.Interfaces;

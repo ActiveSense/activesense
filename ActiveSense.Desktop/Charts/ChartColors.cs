@@ -1,7 +1,7 @@
 using System.Linq;
 using SkiaSharp;
 
-namespace ActiveSense.Desktop.Charts.Generators;
+namespace ActiveSense.Desktop.Charts;
 
 public class ChartColors
 {

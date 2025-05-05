@@ -4,9 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Models;
 
-namespace ActiveSense.Desktop.Interfaces;
+namespace ActiveSense.Desktop.Process.Interfaces;
 
 public interface ISensorProcessor
 {
