@@ -8,7 +8,7 @@ namespace ActiveSense.Desktop.Export.Implementations;
 
 public class ArchiveCreator : IArchiveCreator
 {
-    public async Task<bool> CreateArchiveAsync(string outputPath, string pdfPath, 
+    public async Task<bool> CreateArchiveAsync(string outputPath, string pdfPath,
         string fileName, string sleepCsv, string activityCsv)
     {
         try
@@ -18,10 +18,10 @@ public class ArchiveCreator : IArchiveCreator
             {
                 // Add PDF
                 await AddFileToArchiveAsync(archive, $"{fileName}_report.pdf", pdfPath);
-                
+
                 // Add sleep CSV
                 await AddTextToArchiveAsync(archive, $"{fileName}_sleep.csv", sleepCsv);
-                
+
                 // Add activity CSV
                 await AddTextToArchiveAsync(archive, $"{fileName}_activity.csv", activityCsv);
             }
@@ -29,7 +29,7 @@ public class ArchiveCreator : IArchiveCreator
             zipStream.Seek(0, SeekOrigin.Begin);
             await using var fileStream = new FileStream(outputPath, FileMode.Create);
             await zipStream.CopyToAsync(fileStream);
-            
+
             return true;
         }
         catch (Exception ex)
@@ -38,7 +38,7 @@ public class ArchiveCreator : IArchiveCreator
             return false;
         }
     }
-    
+
     private async Task AddFileToArchiveAsync(ZipArchive archive, string entryName, string filePath)
     {
         var entry = archive.CreateEntry(entryName);
@@ -46,7 +46,7 @@ public class ArchiveCreator : IArchiveCreator
         await using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         await fileStream.CopyToAsync(entryStream);
     }
-    
+
     private async Task AddTextToArchiveAsync(ZipArchive archive, string entryName, string content)
     {
         var entry = archive.CreateEntry(entryName);

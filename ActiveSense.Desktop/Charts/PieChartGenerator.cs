@@ -14,9 +14,9 @@ namespace ActiveSense.Desktop.Charts.Generators
         public PieChartViewModel GenerateChart(string title, string description)
         {
             var series = new List<ISeries>();
-            
+
             var colors = chartColors.GetColorPalette(chartDataDto.Labels.Length);
-            
+
             for (int i = 0; i < chartDataDto.Labels.Length; i++)
             {
                 series.Add(new PieSeries<double>
@@ -26,7 +26,7 @@ namespace ActiveSense.Desktop.Charts.Generators
                     Fill = new SolidColorPaint(colors[i]),
                 });
             }
-            
+
             return new PieChartViewModel
             {
                 Title = title,

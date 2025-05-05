@@ -19,7 +19,7 @@ public partial class GeneralPageViewModel : PageViewModel
     private readonly SharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible;
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
-    
+
     [ObservableProperty] private string _sleepStepsTitle = "Schlaf- und Aktivitätsverteilung";
     [ObservableProperty] private string _sleepStepsDescription = "Tägliche Schritte in Relation zur Schlafeffizienz";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepStepsCharts = [];

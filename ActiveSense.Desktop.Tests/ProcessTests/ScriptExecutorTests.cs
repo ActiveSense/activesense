@@ -14,17 +14,17 @@ public class ScriptExecutorTests
 {
     private ScriptExecutor _scriptExecutor;
     private string _tempDir;
-    
+
     [SetUp]
     public void Setup()
     {
         _scriptExecutor = new ScriptExecutor();
-        
+
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
     }
-    
+
     [TearDown]
     public void TearDown()
     {
@@ -42,7 +42,7 @@ public class ScriptExecutorTests
             }
         }
     }
-    
+
     // These tests depend on the operating system and available executables
     // We'll use a simple command that should work across platforms
 
@@ -52,96 +52,96 @@ public class ScriptExecutorTests
         // Arrange
         string scriptPath = GetCrossPlatformCommand();
         string arguments = GetCrossPlatformArguments();
-        
+
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
-            scriptPath, 
-            arguments, 
+            scriptPath,
+            arguments,
             _tempDir);
-        
+
         // Assert
         Assert.That(result.Success, Is.True);
         Assert.That(result.Output, Is.Not.Empty);
         Assert.That(result.Error, Is.Empty);
     }
-    
+
     [Test]
     public async Task ExecuteScriptAsync_WithInvalidCommand_ReturnsFalseAndError()
     {
         // Arrange
         string invalidScriptPath = Path.Combine(_tempDir, "nonexistent_script");
-        
+
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
-            invalidScriptPath, 
-            "", 
+            invalidScriptPath,
+            "",
             _tempDir);
-        
+
         // Assert
         Assert.That(result.Success, Is.False);
         Assert.That(result.Error, Is.Not.Empty);
     }
-    
+
     [Test]
     public async Task ExecuteScriptAsync_WithCancellationToken_CancelsExecution()
     {
         // Arrange
         string scriptPath = GetSleepCommand();
         string arguments = GetSleepArguments();
-        
+
         var cancellationTokenSource = new CancellationTokenSource();
-        
+
         // Act
         var executionTask = _scriptExecutor.ExecuteScriptAsync(
-            scriptPath, 
-            arguments, 
-            _tempDir, 
+            scriptPath,
+            arguments,
+            _tempDir,
             cancellationTokenSource.Token);
-        
+
         // Wait a moment then cancel
         await Task.Delay(100);
         cancellationTokenSource.Cancel();
-        
+
         var result = await executionTask;
-        
+
         // Assert
         Assert.That(result.Success, Is.False);
     }
-    
+
     [Test]
     public async Task ExecuteScriptAsync_WithOutputAndErrorStreams_CapturesBoth()
     {
         // Arrange
         string scriptPath = GetEchoToErrorCommand();
         string arguments = GetEchoToErrorArguments("This is standard output", "This is error output");
-        
+
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
-            scriptPath, 
-            arguments, 
+            scriptPath,
+            arguments,
             _tempDir);
-        
+
         // Assert
         Assert.That(result.Output, Does.Contain("standard output"));
         Assert.That(result.Error, Does.Contain("error output"));
     }
-    
+
     [Test]
     public async Task ExecuteScriptAsync_WithLongRunningProcess_CapturesAllOutput()
     {
         // Arrange
         string scriptPath = GetRepeatedOutputCommand();
         string arguments = GetRepeatedOutputArguments();
-        
+
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
-            scriptPath, 
-            arguments, 
+            scriptPath,
+            arguments,
             _tempDir);
-        
+
         // Assert
         Assert.That(result.Success, Is.True);
-        
+
         // Count the number of lines in the output
         var outputLines = result.Output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         Assert.That(outputLines.Length, Is.GreaterThanOrEqualTo(10));
@@ -172,7 +172,7 @@ public class ScriptExecutorTests
             return "Hello, World!";
         }
     }
-    
+
     private string GetSleepCommand()
     {
         if (OperatingSystem.IsWindows())
@@ -184,7 +184,7 @@ public class ScriptExecutorTests
             return "sleep";
         }
     }
-    
+
     private string GetSleepArguments()
     {
         if (OperatingSystem.IsWindows())
@@ -196,7 +196,7 @@ public class ScriptExecutorTests
             return "10";
         }
     }
-    
+
     private string GetEchoToErrorCommand()
     {
         if (OperatingSystem.IsWindows())
@@ -208,7 +208,7 @@ public class ScriptExecutorTests
             return "bash";
         }
     }
-    
+
     private string GetEchoToErrorArguments(string stdout, string stderr)
     {
         if (OperatingSystem.IsWindows())
@@ -220,7 +220,7 @@ public class ScriptExecutorTests
             return $"-c \"echo '{stdout}' && echo '{stderr}' 1>&2\"";
         }
     }
-    
+
     private string GetRepeatedOutputCommand()
     {
         if (OperatingSystem.IsWindows())
@@ -232,7 +232,7 @@ public class ScriptExecutorTests
             return "bash";
         }
     }
-    
+
     private string GetRepeatedOutputArguments()
     {
         if (OperatingSystem.IsWindows())
@@ -244,6 +244,6 @@ public class ScriptExecutorTests
             return "-c \"for i in {1..10}; do echo Line $i; sleep 0.1; done\"";
         }
     }
-    
+
     #endregion
 }

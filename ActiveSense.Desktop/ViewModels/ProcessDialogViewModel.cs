@@ -224,13 +224,13 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StopCountdown();
             IsProcessing = false;
             _sharedDataService.IsProcessingInBackground = false;
-            
+
             if (_cancellationTokenSource != null)
             {
                 _cancellationTokenSource.Dispose();
                 _cancellationTokenSource = null;
             }
-            
+
             Close();
         }
     }

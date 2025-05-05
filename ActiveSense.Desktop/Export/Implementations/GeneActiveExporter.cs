@@ -14,7 +14,7 @@ public class GeneActiveExporter(
 {
     public async Task<bool> ExportAsync(IAnalysis analysis, string outputPath, bool exportRawData = false)
     {
-        if (exportRawData) 
+        if (exportRawData)
             return await ExportPdfAndCsvZipAsync(analysis, outputPath);
 
         return await pdfReportGenerator.GeneratePdfReportAsync(analysis, outputPath);

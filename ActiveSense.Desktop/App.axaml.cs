@@ -43,19 +43,19 @@ public class App : Application
         var collection = new ServiceCollection();
 
         collection.AddTransient<AnalysisSerializer>();
-        
+
         // Register factories
         collection.AddSingleton<ResultParserFactory>();
         collection.AddSingleton<SensorProcessorFactory>();
         collection.AddSingleton<PageFactory>();
         collection.AddSingleton<ExporterFactory>();
-        
+
         // Register processor components
         collection.AddSingleton<IScriptExecutor, ScriptExecutor>();
         collection.AddSingleton<IFileManager, FileManager>();
         collection.AddSingleton<IProcessingTimeEstimator, ProcessingTimeEstimator>();
         collection.AddSingleton<GeneActiveProcessor>();
-        
+
         // Register export components
         collection.AddSingleton<IChartRenderer, ChartRenderer>();
         collection.AddSingleton<ICsvExporter, CsvExporter>();
@@ -63,9 +63,9 @@ public class App : Application
         collection.AddSingleton<IPdfReportGenerator, PdfReportGenerator>();
         collection.AddSingleton<IAnalysisSerializer, AnalysisSerializer>();
         collection.AddSingleton<IExporter, GeneActiveExporter>();
-        
+
         collection.AddSingleton<GeneActiveExporter>();
-        
+
         // Register parser components
         collection.AddTransient<IHeaderAnalyzer, HeaderAnalyzer>();
         collection.AddTransient<IFileParser, FileParser>();
@@ -75,7 +75,7 @@ public class App : Application
         // Register services
         collection.AddSingleton<IScriptService, RScriptService>();
         collection.AddSingleton<SharedDataService>();
-        
+
         // Register view models
         collection.AddSingleton<ViewModels.MainViewModel>();
         collection.AddTransient<DialogService>();
@@ -86,10 +86,10 @@ public class App : Application
         collection.AddTransient<ActivityPageViewModel>();
         collection.AddTransient<GeneralPageViewModel>();
         collection.AddTransient<ExportDialogViewModel>();
-        
+
         // Register converters
         collection.AddTransient<DateToWeekdayConverter>();
-        
+
         // Register charts
         collection.AddTransient<BarChartViewModel>();
         collection.AddTransient<PieChartViewModel>();
@@ -103,7 +103,7 @@ public class App : Application
             ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),
             _ => throw new InvalidOperationException(),
         });
-        
+
         // Register processors 
         collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
         {
@@ -117,21 +117,21 @@ public class App : Application
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
             _ => throw new InvalidOperationException(),
         });
-        
+
         // Register exporters
         collection.AddSingleton<Func<SensorTypes, IExporter>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveExporter>(),
             _ => throw new InvalidOperationException(),
         });
-        
+
         var services = collection.BuildServiceProvider();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit
             DisableAvaloniaDataAnnotationValidation();
-            
+
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView
             {

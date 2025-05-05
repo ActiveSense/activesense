@@ -34,7 +34,7 @@ public class GeneActiveProcessor : ISensorProcessor
     private static string[] SupportedFileTypes => [".bin"];
 
     public SensorTypes SupportedType => SensorTypes.GENEActiv;
-    
+
     public IReadOnlyList<ScriptArgument> DefaultArguments => _defaultArguments;
 
     public async Task<(bool Success, string Output, string Error)> ProcessAsync(

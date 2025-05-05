@@ -28,12 +28,12 @@ public partial class SleepPageViewModel : PageViewModel
     [ObservableProperty] private string _sleepDistributionDescription = "Durchschnittliche Verteilung der Schlaf- und Wachzeiten in Stunden pro Nacht";
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _pieCharts = [];
     [ObservableProperty] private bool _isDistributionExpanded = false;
-    
+
     [ObservableProperty] private string _sleepTimeWithEfficiencyTitle = "Schlafzeit mit Effizienz";
     [ObservableProperty] private string _sleepTimeWithEfficiencyDescription = "Schlafzeit pro Nacht in Stunden mit Schlafeffizienz in %";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepTimeWithEfficiencyCharts = [];
     [ObservableProperty] private bool _isSleepTimeWithEfficiencyExpanded = false;
-    
+
     [ObservableProperty] private string _sleepTimeTitle = "Schlafzeit";
     [ObservableProperty] private string _sleepTimeDescription = "Zeitpunkt des Schlafbeginns und -endes";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepTimeCharts = [];
@@ -43,17 +43,17 @@ public partial class SleepPageViewModel : PageViewModel
     [ObservableProperty] private string _totalSleepDescription = "Durchschnittliche Schlafzeit pro Nacht in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _totalSleepCharts = [];
     [ObservableProperty] private bool _isTotalSleepExpanded = false;
-    
+
     [ObservableProperty] private string _sleepEfficiencyTitle = "Schlaf-Effizienz";
     [ObservableProperty] private string _sleepEfficiencyDescription = "Schlaf-Effizienz pro Nacht in %";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepEfficiencyCharts = [];
     [ObservableProperty] private bool _isSleepEfficiencyExpanded = false;
-    
+
     [ObservableProperty] private string _activePeriodsTitle = "Aktive Perioden";
     [ObservableProperty] private string _activePeriodsDescription = "Aktive Perioden pro Nacht";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _activePeriodsCharts = [];
     [ObservableProperty] private bool _isActivePeriodsExpanded = false;
-    
+
 
     public SleepPageViewModel(SharedDataService sharedDataService,
         ChartColors chartColors)
@@ -106,7 +106,7 @@ public partial class SleepPageViewModel : PageViewModel
         TotalSleepCharts.Clear();
 
         var chartDataDtos = new List<ChartDataDTO>();
-        
+
         foreach (var analysis in SelectedAnalyses)
         {
             if (analysis is IChartDataProvider chartProvider)
@@ -123,28 +123,28 @@ public partial class SleepPageViewModel : PageViewModel
 
     private void CreateTotalSleepWithEfficiencyChart()
     {
-        
+
         SleepTimeWithEfficiencyCharts.Clear();
 
         foreach (var analysis in SelectedAnalyses)
         {
             var chartDataDtos = new List<ChartDataDTO>();
             var sleepEfficiencyDtos = new List<ChartDataDTO>();
-        
+
             if (analysis is ISleepAnalysis sleepAnalysis &&
                 analysis is IChartDataProvider chartProvider)
             {
                 chartDataDtos.Add(chartProvider.GetTotalSleepTimePerDayChartData());
                 sleepEfficiencyDtos.Add(chartProvider.GetSleepEfficiencyChartData());
             }
-       
+
             var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors, sleepEfficiencyDtos.ToArray());
             if (SelectedAnalyses.Any())
                 SleepTimeWithEfficiencyCharts.Add(barChartGenerator.GenerateChart($"{analysis.FileName}",
                     "Sleep Time per Night with Efficiency"));
         }
     }
-    
+
     private void CreateSleepEfficiencyChart()
     {
         SleepEfficiencyCharts.Clear();
@@ -164,7 +164,7 @@ public partial class SleepPageViewModel : PageViewModel
             SleepEfficiencyCharts.Add(barChartGenerator.GenerateChart("Sleep Efficiency",
                 "Durchschnittliche Schlaf-Effizienz pro Nacht"));
     }
-    
+
     private void CreateActivePeriodsChart()
     {
         ActivePeriodsCharts.Clear();
@@ -184,6 +184,6 @@ public partial class SleepPageViewModel : PageViewModel
             ActivePeriodsCharts.Add(barChartGenerator.GenerateChart("Active Periods",
                 "Aktive Perioden pro Nacht"));
     }
-    
+
     #endregion
 }

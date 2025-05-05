@@ -43,17 +43,17 @@ public partial class ProcessDialogView : UserControl
     }
 
     private IStorageProvider? GetStorageProvider()
-        {
-            var topLevel = TopLevel.GetTopLevel(this);
-            return topLevel?.StorageProvider;
-        }
-
-        List<FilePickerFileType>? GetFileTypes()
-        {
-            return
-            [
-                FilePickerFileTypes.All,
-                FilePickerFileTypes.TextPlain
-            ];
-        }
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        return topLevel?.StorageProvider;
     }
+
+    List<FilePickerFileType>? GetFileTypes()
+    {
+        return
+        [
+            FilePickerFileTypes.All,
+                FilePickerFileTypes.TextPlain
+        ];
+    }
+}

@@ -12,8 +12,8 @@ public class SharedDataService
     public ObservableCollection<IAnalysis> SelectedAnalyses { get; } = new ObservableCollection<IAnalysis>();
     public ObservableCollection<IAnalysis> AllAnalyses { get; } = new();
     private bool _isProcessingInBackground;
-    public bool IsProcessingInBackground 
-    { 
+    public bool IsProcessingInBackground
+    {
         get => _isProcessingInBackground;
         set
         {
@@ -27,7 +27,7 @@ public class SharedDataService
     public event EventHandler? BackgroundProcessingChanged;
     public event EventHandler? SelectedAnalysesChanged;
     public event EventHandler? AllAnalysesChanged;
-    
+
     public void UpdateSelectedAnalyses(ObservableCollection<IAnalysis> analyses)
     {
         SelectedAnalyses.Clear();
@@ -35,7 +35,7 @@ public class SharedDataService
         {
             SelectedAnalyses.Add(analysis);
         }
-        
+
         SelectedAnalysesChanged?.Invoke(this, EventArgs.Empty);
     }
     public void UpdateAllAnalyses(IEnumerable<IAnalysis> newAnalyses)
@@ -43,7 +43,7 @@ public class SharedDataService
         foreach (var newAnalysis in newAnalyses)
         {
             var existingItem = AllAnalyses.FirstOrDefault(a => a.FileName == newAnalysis.FileName);
-        
+
             if (existingItem != null)
             {
                 newAnalysis.Exported = existingItem.Exported;
@@ -55,7 +55,7 @@ public class SharedDataService
                 AllAnalyses.Add(newAnalysis);
             }
         }
-    
+
         AllAnalysesChanged?.Invoke(this, EventArgs.Empty);
     }
 }

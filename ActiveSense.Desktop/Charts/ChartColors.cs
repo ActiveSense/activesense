@@ -5,7 +5,7 @@ namespace ActiveSense.Desktop.Charts;
 
 public class ChartColors
 {
-    
+
     public SKColor[] GetColorPalette(int count)
     {
         var predefinedColors = new[]

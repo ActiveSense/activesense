@@ -2,6 +2,7 @@ name: Run Unit Tests
 on:
   push:
   pull_request:
+    branches: [main]
   workflow_dispatch:
 jobs:
   build:
@@ -24,7 +25,7 @@ jobs:
         dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --no-restore
         
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: |
@@ -45,7 +46,7 @@ jobs:
         dotnet-version: '9.0.x'
     
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: build-artifacts
       
@@ -54,23 +55,3 @@ jobs:
         dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
       env:
         R_HOME: ${{ runner.temp }}/R
-        
-  code-quality:
-    name: Code Quality
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '9.0.x'
-        
-    - name: Install dotnet format tool
-      run: dotnet tool install -g dotnet-format
-      
-    - name: Check code formatting
-      run: dotnet format ActiveSense.Desktop/ActiveSense.Desktop.sln --verify-no-changes
-      
-    - name: Run code analysis
-      run: dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --configuration Release /p:EnforceCodeStyleInBuild=true

@@ -6,7 +6,7 @@ using ActiveSense.Desktop.Models;
 
 namespace ActiveSense.Desktop.Interfaces;
 
-public interface IAnalysis 
+public interface IAnalysis
 {
     string FilePath { get; set; }
     string FileName { get; set; }
@@ -22,31 +22,31 @@ public interface IActivityAnalysis : IAnalysis
     double[] ModerateActivity { get; }
     double[] VigorousActivity { get; }
     double[] LightActivity { get; }
-    double [] SedentaryActivity { get; }
+    double[] SedentaryActivity { get; }
     double[] StepsPercentage { get; }
     double AverageSedentaryTime { get; }
     double AverageModerateActivity { get; }
     double AverageVigorousActivity { get; }
     double AverageLightActivity { get; }
     public string[] ActivityWeekdays();
-    
+
     void SetActivityRecords(IEnumerable<ActivityRecord> records);
 }
 
 public interface ISleepAnalysis : IAnalysis
 {
     IReadOnlyCollection<SleepRecord> SleepRecords { get; }
-    
+
     double TotalSleepTime { get; }
     double TotalWakeTime { get; }
     double AverageSleepTime { get; }
     double AverageWakeTime { get; }
     double[] SleepEfficiency { get; }
     double[] TotalSleepTimePerDay { get; }
-    
+
     string[] SleepWeekdays();
-    
-    
+
+
     void SetSleepRecords(IEnumerable<SleepRecord> records);
 }
 
