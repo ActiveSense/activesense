@@ -61,6 +61,7 @@ public class App : Application
         collection.AddSingleton<ICsvExporter, CsvExporter>();
         collection.AddSingleton<IArchiveCreator, ArchiveCreator>();
         collection.AddSingleton<IPdfReportGenerator, PdfReportGenerator>();
+        collection.AddSingleton<IAnalysisSerializer, AnalysisSerializer>();
         collection.AddSingleton<IExporter, GeneActiveExporter>();
         
         collection.AddSingleton<GeneActiveExporter>();

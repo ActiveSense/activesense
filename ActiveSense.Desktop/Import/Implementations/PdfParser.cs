@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Export.Implementations;
 using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Import.Interfaces;
 using ActiveSense.Desktop.Interfaces;

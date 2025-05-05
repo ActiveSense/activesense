@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
 using QuestPDF;
 using QuestPDF.Fluent;
@@ -13,7 +12,7 @@ namespace ActiveSense.Desktop.Export.Implementations;
 
 public class PdfReportGenerator(
     IChartRenderer chartRenderer,
-    AnalysisSerializer serializer)
+    IAnalysisSerializer serializer)
     : IPdfReportGenerator
 {
     public async Task<bool> GeneratePdfReportAsync(IAnalysis analysis, string outputPath)

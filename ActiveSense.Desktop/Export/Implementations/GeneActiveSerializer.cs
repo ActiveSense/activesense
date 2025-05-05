@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Export.Interfaces;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Models;
 using Newtonsoft.Json;
 
-namespace ActiveSense.Desktop.HelperClasses;
+namespace ActiveSense.Desktop.Export.Implementations;
 
-public class AnalysisSerializer(DateToWeekdayConverter converter)
+public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSerializer
 {
     public string ExportToBase64(IAnalysis analysis)
     {
-        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis
-           ))
+        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
         {
             throw new ArgumentException("Analysis must be an IActivityAnalysis or ISleepAnalysis.");
         }
