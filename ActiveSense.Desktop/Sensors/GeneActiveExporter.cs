@@ -36,9 +36,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis
             and IChartDataProvider chartProvider))
-        {
             return false;
-        }
 
         try
         {
@@ -77,7 +75,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                                     .Bold()
                                     .FontSize(16);
 
-                                if (sleepAnalysis.SleepRecords == null || sleepAnalysis.SleepRecords.Count == 0)
+                                if (sleepAnalysis.SleepRecords.Count == 0)
                                 {
                                     column.Item().Text("No sleep data available").Italic().FontSize(12);
                                 }
@@ -102,6 +100,10 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
                                     column.Item().PaddingVertical(10)
                                         .Height(200)
                                         .Image(GeneratePieChartImage(chartProvider));
+                                    
+                                    column.Item().PaddingVertical(10)
+                                        .Height(200)
+                                        .Image(GenerateStepsChartImage(chartProvider));
                                 }
 
                                 // Activity Data Section
@@ -135,7 +137,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
 
                                     column.Item().PaddingVertical(10)
                                         .Height(200)
-                                        .Image(GenerateStepsChartImage(chartProvider));
+                                        .Image(GenerateActivityDistributionChartImage(chartProvider));
 
                                     column.Item().ShowEntire().Column(innerColumn =>
                                     {
@@ -182,7 +184,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         }
     }
 
-    public async Task<bool> ExportPdfAndCsvZipAsync(IAnalysis analysis, string outputPath)
+    private async Task<bool> ExportPdfAndCsvZipAsync(IAnalysis analysis, string outputPath)
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
         {
@@ -246,7 +248,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         }
     }
 
-    public string SleepToCsv(IEnumerable<SleepRecord> sleepRecords)
+    private string SleepToCsv(IEnumerable<SleepRecord> sleepRecords)
     {
         using var stringWriter = new StringWriter();
         using var csv = new CsvWriter(stringWriter, CultureInfo.InvariantCulture);
@@ -257,7 +259,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         return stringWriter.ToString();
     }
 
-    public string ActivityToCsv(IEnumerable<ActivityRecord> activityRecords)
+    private string ActivityToCsv(IEnumerable<ActivityRecord> activityRecords)
     {
         using var stringWriter = new StringWriter();
         using var csv = new CsvWriter(stringWriter, CultureInfo.InvariantCulture);
@@ -274,6 +276,8 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         table.Cell().Text(value);
     }
 
+    #region Chart Generation
+    
     private byte[] GeneratePieChartImage(IChartDataProvider analysis)
     {
         var dto = analysis.GetSleepDistributionChartData();
@@ -304,7 +308,7 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
     private byte[] GenerateStepsChartImage(IChartDataProvider analysis)
     {
         var dto = analysis.GetStepsChartData();
-        var barChartGenerator = new BarChartGenerator(new[] { dto }, chartColors);
+        var barChartGenerator = new BarChartGenerator([dto], chartColors);
         var barChartViewModel = barChartGenerator.GenerateChart("Steps per Day", "");
 
         foreach (var series in barChartViewModel.Series.OfType<ColumnSeries<double>>())
@@ -357,4 +361,5 @@ public class GeneActiveExporter(ChartColors chartColors, AnalysisSerializer seri
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         return data.ToArray();
     }
+    #endregion
 }

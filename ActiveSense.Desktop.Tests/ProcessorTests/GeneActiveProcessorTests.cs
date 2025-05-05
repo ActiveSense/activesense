@@ -19,29 +19,17 @@ namespace ActiveSense.Desktop.Tests.SensorTests;
 public class GeneActiveProcessorTests
 {
     // Creating a testable subclass of GeneActivProcessor to override the process execution
-    private class TestableGeneActiveProcessor : GeneActiveProcessor
+    private class TestableGeneActiveProcessor(
+        IScriptService scriptService,
+        bool shouldSucceed = true,
+        string mockOutput = "",
+        string mockError = "",
+        Exception exceptionToThrow = null)
+        : GeneActiveProcessor(scriptService)
     {
-        private readonly bool _shouldSucceed;
-        private readonly string _mockOutput;
-        private readonly string _mockError;
-        private readonly Exception _exceptionToThrow;
-        
         public string CapturedScriptPath { get; private set; }
         public string CapturedArguments { get; private set; }
         public string CapturedWorkingDirectory { get; private set; }
-
-        public TestableGeneActiveProcessor(
-            IScriptService scriptService,
-            bool shouldSucceed = true, 
-            string mockOutput = "", 
-            string mockError = "",
-            Exception exceptionToThrow = null) : base(scriptService)
-        {
-            _shouldSucceed = shouldSucceed;
-            _mockOutput = mockOutput;
-            _mockError = mockError;
-            _exceptionToThrow = exceptionToThrow;
-        }
 
         // Override the process execution to avoid actually running the script
         protected override Task<(bool Success, string Output, string Error)> ExecuteProcessAsync(
@@ -53,13 +41,13 @@ public class GeneActiveProcessorTests
             CapturedWorkingDirectory = workingDirectory;
 
             // If an exception is specified, throw it
-            if (_exceptionToThrow != null)
+            if (exceptionToThrow != null)
             {
-                throw _exceptionToThrow;
+                throw exceptionToThrow;
             }
             
             // Return mock results without actually running a process
-            return Task.FromResult((_shouldSucceed, _mockOutput, _mockError));
+            return Task.FromResult((_shouldSucceed: shouldSucceed, _mockOutput: mockOutput, _mockError: mockError));
         }
     }
 
