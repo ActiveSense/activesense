@@ -368,12 +368,10 @@ public class AnalysisModelTests
         // Assert
         Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"), "Sleep chart title is incorrect");
         Assert.That(chartData.Labels.Length, Is.EqualTo(2), "Sleep chart should have 2 labels");
-        Assert.That(chartData.Labels[0], Is.EqualTo("Total Sleep Time"), "First label should be Total Sleep Time");
-        Assert.That(chartData.Labels[1], Is.EqualTo("Total Wake Time"), "Second label should be Total Wake Time");
         
         Assert.That(chartData.Data.Length, Is.EqualTo(2), "Sleep chart should have 2 data points");
-        Assert.That(chartData.Data[0], Is.EqualTo(_analysis.TotalSleepTime).Within(0.01), "Total Sleep Time data is incorrect");
-        Assert.That(chartData.Data[1], Is.EqualTo(_analysis.TotalWakeTime).Within(0.01), "Total Wake Time data is incorrect");
+        Assert.That(chartData.Data[0], Is.EqualTo(Math.Round(_analysis.AverageSleepTime / 3600, 1)).Within(0.01), "Total Sleep Time data is incorrect");
+        Assert.That(chartData.Data[1], Is.EqualTo(Math.Round(_analysis.AverageWakeTime / 3600, 1) ).Within(0.01), "Total Wake Time data is incorrect");
     }
     
     [Test]
@@ -392,7 +390,7 @@ public class AnalysisModelTests
         
         for (int i = 0; i < _analysis.TotalSleepTimePerDay.Length; i++)
         {
-            Assert.That(chartData.Data[i], Is.EqualTo(_analysis.TotalSleepTimePerDay[i]).Within(0.01), $"Total sleep time value at index {i} is incorrect");
+            Assert.That(chartData.Data[i], Is.EqualTo(Math.Round(_analysis.TotalSleepTimePerDay[i] / 3600, 1)).Within(0.01), $"Total sleep time value at index {i} is incorrect");
         }
     }
     

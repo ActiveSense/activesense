@@ -14,8 +14,14 @@ public class HeaderAnalyzer : IHeaderAnalyzer
             "Day.Number", "Steps", "Non_Wear", "Sleep",
             "Sedentary", "Light", "Moderate", "Vigorous"
         };
-
-        return headers.Intersect(activityHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
+        try
+        {
+            return headers.Intersect(activityHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 
     public bool IsSleepCsv(string[] headers)
@@ -25,7 +31,14 @@ public class HeaderAnalyzer : IHeaderAnalyzer
             "Night.Starting", "Sleep.Onset.Time", "Rise.Time",
             "Total.Sleep.Time", "Sleep.Efficiency"
         };
+        try
+        {
+            return headers.Intersect(sleepHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
 
-        return headers.Intersect(sleepHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
     }
 }

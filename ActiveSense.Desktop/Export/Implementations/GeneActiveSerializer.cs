@@ -11,7 +11,7 @@ namespace ActiveSense.Desktop.Export.Implementations;
 
 public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSerializer
 {
-    public string ExportToBase64(IAnalysis analysis)
+    public virtual string ExportToBase64(IAnalysis analysis)
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
         {
@@ -39,7 +39,7 @@ public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSer
         }
     }
 
-    public IAnalysis ImportFromBase64(string base64)
+    public virtual IAnalysis ImportFromBase64(string base64)
     {
         if (string.IsNullOrEmpty(base64))
             throw new ArgumentNullException(nameof(base64));

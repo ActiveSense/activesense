@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Export.Implementations;
+using ActiveSense.Desktop.Export.Interfaces;
 using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Import.Interfaces;
 using ActiveSense.Desktop.Interfaces;
@@ -14,7 +15,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 
 namespace ActiveSense.Desktop.Import.Implementations;
 
-public class PdfParser(AnalysisSerializer serializer, DateToWeekdayConverter dateConverter)
+public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter)
     : IPdfParser
 {
     private readonly DateToWeekdayConverter _dateConverter = dateConverter;
@@ -22,7 +23,13 @@ public class PdfParser(AnalysisSerializer serializer, DateToWeekdayConverter dat
     public async Task<List<IAnalysis>> ParsePdfFilesAsync(string outputDirectory)
     {
         var analyses = new List<IAnalysis>();
-        var pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
+        string[] pdfFiles = [];
+
+        try
+        {
+            pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
+        }
+        catch (Exception e) {}
 
         await Task.Run(() =>
         {
@@ -47,7 +54,7 @@ public class PdfParser(AnalysisSerializer serializer, DateToWeekdayConverter dat
         return analyses;
     }
 
-    public IAnalysis ExtractAnalysisFromPdfText(string pdfText)
+    public virtual IAnalysis ExtractAnalysisFromPdfText(string pdfText)
     {
         try
         {
@@ -71,25 +78,31 @@ public class PdfParser(AnalysisSerializer serializer, DateToWeekdayConverter dat
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error extracting Analysis from PDF text: {ex.Message}");
-            throw;
+            throw new Exception("Error extracting Analysis from PDF text", ex);
         }
     }
 
-    public string ExtractTextFromPdf(string filePath)
+    public virtual string ExtractTextFromPdf(string filePath)
     {
-        using var reader = new PdfReader(filePath);
-        using var pdfDoc = new PdfDocument(reader);
-
-        var text = new StringBuilder();
-        for (var i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+        try
         {
-            var page = pdfDoc.GetPage(i);
-            var pageText = PdfTextExtractor.GetTextFromPage(page);
-            text.Append(pageText);
-        }
+            using var reader = new PdfReader(filePath);
+            using var pdfDoc = new PdfDocument(reader);
 
-        return text.ToString();
+            var text = new StringBuilder();
+            for (var i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+            {
+                var page = pdfDoc.GetPage(i);
+                var pageText = PdfTextExtractor.GetTextFromPage(page);
+                text.Append(pageText);
+            }
+
+            return text.ToString();
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error extracting text from PDF file {filePath}: {e.Message}", e);
+        }
     }
 
     private static string CleanBase64Content(string base64Content)

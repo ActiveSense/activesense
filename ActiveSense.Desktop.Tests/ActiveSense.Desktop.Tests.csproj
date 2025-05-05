@@ -18,10 +18,5 @@
   <ItemGroup>
     <ProjectReference Include="..\ActiveSense.Desktop\ActiveSense.Desktop.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ImportTests\" />
-    <Folder Include="ProcessTests\" />
-  </ItemGroup>
   
 </Project>
