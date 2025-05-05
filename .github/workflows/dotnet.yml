@@ -14,12 +14,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '9.0.x'
-        
-    - name: Install dotnet format tool
-      run: dotnet tool install -g dotnet-format
-    
-    - name: Fix whitespace formatting
-      run: dotnet format whitespace ActiveSense.Desktop/ActiveSense.Desktop.sln
     
     - name: Restore dependencies
       run: |
