@@ -15,14 +15,14 @@ public class ExportIntegrationTests
     private IExporter _exporter;
     private GeneActiveAnalysis _analysis;
     private string _tempDir;
-    
+
     [SetUp]
     public void Setup()
     {
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
-        
+
         // Create all components directly instead of using mocks
         var dateConverter = new DateToWeekdayConverter();
         var chartColors = new ChartColors();
@@ -31,17 +31,17 @@ public class ExportIntegrationTests
         var pdfGenerator = new PdfReportGenerator(chartRenderer, serializer);
         var csvExporter = new CsvExporter();
         var archiveCreator = new ArchiveCreator();
-        
+
         // Create exporter with real components
         _exporter = new GeneActiveExporter(pdfGenerator, csvExporter, archiveCreator);
-        
+
         // Create and populate test analysis
         _analysis = new GeneActiveAnalysis(dateConverter)
         {
             FileName = "IntegrationTest",
             FilePath = Path.Combine(_tempDir, "test_path")
         };
-        
+
         // Add some sleep records
         _analysis.SetSleepRecords(new[]
         {
@@ -70,7 +70,7 @@ public class ExportIntegrationTests
                 MedianActivityLength = "84"
             }
         });
-        
+
         // Add some activity records
         _analysis.SetActivityRecords(new[]
         {
@@ -98,7 +98,7 @@ public class ExportIntegrationTests
             }
         });
     }
-    
+
     [TearDown]
     public void TearDown()
     {
@@ -108,20 +108,20 @@ public class ExportIntegrationTests
             Directory.Delete(_tempDir, true);
         }
     }
-    
+
     [Test]
     public async Task ExportAsync_WithRawDataFalse_CreatesPdfFile()
     {
         // Arrange
         string pdfPath = Path.Combine(_tempDir, "output.pdf");
-        
+
         // Act
         bool result = await _exporter.ExportAsync(_analysis, pdfPath, false);
-        
+
         // Assert
         Assert.That(result, Is.True);
         Assert.That(File.Exists(pdfPath), Is.True);
-        
+
         // Verify the file is a valid PDF by checking for the PDF header
         using (var stream = File.OpenRead(pdfPath))
         {
@@ -131,20 +131,20 @@ public class ExportIntegrationTests
             Assert.That(System.Text.Encoding.ASCII.GetString(buffer), Is.EqualTo("%PDF-"));
         }
     }
-    
+
     [Test]
     public async Task ExportAsync_WithRawDataTrue_CreatesZipFile()
     {
         // Arrange
         string zipPath = Path.Combine(_tempDir, "output.zip");
-        
+
         // Act
         bool result = await _exporter.ExportAsync(_analysis, zipPath, true);
-        
+
         // Assert
         Assert.That(result, Is.True);
         Assert.That(File.Exists(zipPath), Is.True);
-        
+
         // Verify the file is a valid ZIP by checking for the ZIP header (PK..)
         using (var stream = File.OpenRead(zipPath))
         {
@@ -157,16 +157,16 @@ public class ExportIntegrationTests
             Assert.That(buffer[3], Is.EqualTo(0x04)); // Control byte 2
         }
     }
-    
+
     [Test]
     public async Task ExportAsync_WithInvalidOutputPath_ReturnsFalse()
     {
         // Arrange
         string invalidPath = Path.Combine(_tempDir, "nonexistent", "nested", "directory", "output.pdf");
-        
+
         // Act
         bool result = await _exporter.ExportAsync(_analysis, invalidPath, false);
-        
+
         // Assert
         Assert.That(result, Is.False);
         Assert.That(File.Exists(invalidPath), Is.False);

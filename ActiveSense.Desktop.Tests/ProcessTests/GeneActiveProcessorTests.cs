@@ -131,7 +131,7 @@ public class GeneActiveProcessorTests
             new BoolArgument { Flag = "a", Value = true },
             new BoolArgument { Flag = "s", Value = false }
         };
-    
+
         // Setup mock to accept any arguments and return success
         // This is more flexible than trying to match the exact string
         _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
@@ -140,20 +140,20 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((true, "Success output", ""));
-    
+
         // Act
         var result = await _processor.ProcessAsync(arguments);
-    
+
         // Assert
         Assert.That(result.Success, Is.True);
         Assert.That(result.Output, Is.EqualTo("Success output"));
         Assert.That(result.Error, Is.Empty);
-    
+
         // Verify the script executor was called with the right executable
         _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
             "Rscript",
-            It.Is<string>(s => s.Contains("/path/to/script.R") && 
-                               s.Contains("-a TRUE") && 
+            It.Is<string>(s => s.Contains("/path/to/script.R") &&
+                               s.Contains("-a TRUE") &&
                                s.Contains("-s FALSE")),
             "/path/to",
             It.IsAny<CancellationToken>()), Times.Once);

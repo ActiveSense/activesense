@@ -31,7 +31,7 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
 
         return RenderPieChart(pieChartViewModel);
     }
-    
+
     public byte[] RenderMovementPatternChart(IChartDataProvider chartProvider)
     {
         var dto = chartProvider.GetMovementPatternChartData();
@@ -61,12 +61,12 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
 
         return RenderCartesianChart(barChartViewModel);
     }
-    
+
     public byte[] RenderSleepWithEfficiencyChart(IChartDataProvider chartProvider)
     {
         var sleepDto = chartProvider.GetTotalSleepTimePerDayChartData();
         var efficiencyDto = chartProvider.GetSleepEfficiencyChartData();
-        
+
         var barChartGenerator = new BarChartGenerator([sleepDto], chartColors, [efficiencyDto]);
         var barChartViewModel = barChartGenerator.GenerateChart("Schlafzeit mit Effizienz", "");
 
@@ -74,13 +74,13 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
 
         return RenderCartesianChart(barChartViewModel);
     }
-    
+
     public byte[] RenderStepsWithSleepEfficiencyChart(IChartDataProvider chartProvider)
     {
         // Create separate lists for bar and line data
         var barData = new List<ChartDataDTO> { chartProvider.GetStepsChartData() };
         var lineData = new List<ChartDataDTO> { chartProvider.GetSleepEfficiencyChartData() };
-        
+
         var chartGenerator = new BarChartGenerator(barData.ToArray(), chartColors, lineData.ToArray());
         var barChartViewModel = chartGenerator.GenerateChart("Schritte & Schlafeffizienz", "");
 
@@ -104,7 +104,7 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
 
         return RenderCartesianChart(chartViewModel);
     }
-    
+
     private void ConfigureBarLineChart(BarChartViewModel barChartViewModel, string barSeriesName, string lineSeriesName)
     {
         foreach (var series in barChartViewModel.Series.OfType<ColumnSeries<double>>())
@@ -112,7 +112,7 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
             series.DataLabelsSize = 0;
             series.Name = barSeriesName;
         }
-        
+
         foreach (var series in barChartViewModel.Series.OfType<LineSeries<double>>())
         {
             series.DataLabelsSize = 0;
@@ -121,7 +121,7 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
             series.Name = lineSeriesName;
         }
     }
-    
+
     private byte[] RenderPieChart(PieChartViewModel viewModel)
     {
         var pieChart = new SKPieChart
@@ -137,7 +137,7 @@ public class ChartRenderer(ChartColors chartColors) : IChartRenderer
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         return data.ToArray();
     }
-    
+
     private byte[] RenderCartesianChart(BarChartViewModel viewModel)
     {
         var barChart = new SKCartesianChart

@@ -28,10 +28,11 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 
     public async Task Initialize()
     {
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
         });
-    
+
     }
 
     public async Task<bool> ConfirmOnClose()
@@ -45,7 +46,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
         };
 
         await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(this, dialog);
-        
+
         return dialog.Confirmed;
     }
 }

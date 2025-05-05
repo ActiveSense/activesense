@@ -10,7 +10,7 @@ namespace ActiveSense.Desktop.Tests.ExportTests.Mock
         public string FileName { get; set; } = "";
         public bool Exported { get; set; } = false;
         public List<AnalysisTag> Tags { get; set; } = new();
-        
+
         public void AddTag(string name, string color)
         {
             // Do nothing

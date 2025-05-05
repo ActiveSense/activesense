@@ -18,26 +18,26 @@ public class GeneActiveExporterTests
     private GeneActiveExporter _exporter;
     private GeneActiveAnalysis _mockAnalysis;
     private DateToWeekdayConverter _dateConverter;
-    
+
     [SetUp]
     public void Setup()
     {
         _mockPdfReportGenerator = new Mock<IPdfReportGenerator>();
         _mockCsvExporter = new Mock<ICsvExporter>();
         _mockArchiveCreator = new Mock<IArchiveCreator>();
-        
+
         _exporter = new GeneActiveExporter(
             _mockPdfReportGenerator.Object,
-            _mockCsvExporter.Object, 
+            _mockCsvExporter.Object,
             _mockArchiveCreator.Object);
-        
+
         _dateConverter = new DateToWeekdayConverter();
         _mockAnalysis = new GeneActiveAnalysis(_dateConverter)
         {
             FileName = "TestAnalysis"
         };
     }
-    
+
     [Test]
     public async Task ExportAsync_WithoutRawData_CallsOnlyPdfGenerator()
     {
@@ -45,10 +45,10 @@ public class GeneActiveExporterTests
         string outputPath = "test.pdf";
         _mockPdfReportGenerator.Setup(x => x.GeneratePdfReportAsync(_mockAnalysis, outputPath))
             .ReturnsAsync(true);
-        
+
         // Act
         bool result = await _exporter.ExportAsync(_mockAnalysis, outputPath, false);
-        
+
         // Assert
         Assert.That(result, Is.True);
         _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(_mockAnalysis, outputPath), Times.Once);
@@ -56,7 +56,7 @@ public class GeneActiveExporterTests
         _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<System.Collections.Generic.IEnumerable<ActivityRecord>>()), Times.Never);
         _mockArchiveCreator.Verify(x => x.CreateArchiveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
-    
+
     [Test]
     public async Task ExportAsync_WithRawData_GeneratesPdfAndZipArchive()
     {
@@ -64,16 +64,16 @@ public class GeneActiveExporterTests
         string outputPath = "test.zip";
         string sleepCsv = "sleep data";
         string activityCsv = "activity data";
-        
+
         _mockPdfReportGenerator.Setup(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()))
             .ReturnsAsync(true);
-        
+
         _mockCsvExporter.Setup(x => x.ExportSleepRecords(It.IsAny<System.Collections.Generic.IEnumerable<SleepRecord>>()))
             .Returns(sleepCsv);
-        
+
         _mockCsvExporter.Setup(x => x.ExportActivityRecords(It.IsAny<System.Collections.Generic.IEnumerable<ActivityRecord>>()))
             .Returns(activityCsv);
-        
+
         _mockArchiveCreator.Setup(x => x.CreateArchiveAsync(
                 outputPath,
                 It.IsAny<string>(),
@@ -81,10 +81,10 @@ public class GeneActiveExporterTests
                 sleepCsv,
                 activityCsv))
             .ReturnsAsync(true);
-        
+
         // Act
         bool result = await _exporter.ExportAsync(_mockAnalysis, outputPath, true);
-        
+
         // Assert
         Assert.That(result, Is.True);
         _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()), Times.Once);
@@ -97,19 +97,19 @@ public class GeneActiveExporterTests
             sleepCsv,
             activityCsv), Times.Once);
     }
-    
+
     [Test]
     public async Task ExportAsync_WhenPdfExportFails_ReturnsFalse()
     {
         // Arrange
         string outputPath = "test.zip";
-        
+
         _mockPdfReportGenerator.Setup(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()))
             .ReturnsAsync(false);
-        
+
         // Act
         bool result = await _exporter.ExportAsync(_mockAnalysis, outputPath, true);
-        
+
         // Assert
         Assert.That(result, Is.False);
         _mockArchiveCreator.Verify(x => x.CreateArchiveAsync(
@@ -119,17 +119,17 @@ public class GeneActiveExporterTests
             It.IsAny<string>(),
             It.IsAny<string>()), Times.Never);
     }
-    
+
     [Test]
     public async Task ExportAsync_WhenAnalysisDoesNotImplementRequiredInterfaces_ReturnsFalse()
     {
         // Arrange
         string outputPath = "test.zip";
         var mockInvalidAnalysis = new Mock<IAnalysis>().Object;
-        
+
         // Act
         bool result = await _exporter.ExportAsync(mockInvalidAnalysis, outputPath, true);
-        
+
         // Assert
         Assert.That(result, Is.False);
         _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()), Times.Never);

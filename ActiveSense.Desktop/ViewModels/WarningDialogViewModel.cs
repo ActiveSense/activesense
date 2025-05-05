@@ -22,7 +22,7 @@ namespace ActiveSense.Desktop.ViewModels
             Confirmed = false;
             Close();
         }
-        
+
         [RelayCommand]
         private void Ok()
         {

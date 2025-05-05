@@ -4,6 +4,6 @@ namespace ActiveSense.Desktop.Export.Interfaces;
 
 public interface IArchiveCreator
 {
-    Task<bool> CreateArchiveAsync(string outputPath, string pdfPath, 
+    Task<bool> CreateArchiveAsync(string outputPath, string pdfPath,
         string fileName, string sleepCsv, string activityCsv);
 }

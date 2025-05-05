@@ -11,12 +11,12 @@ namespace ActiveSense.Desktop.ViewModels.Charts
         [ObservableProperty] private ICartesianAxis[] _xAxes = [];
         [ObservableProperty] private ICartesianAxis[] _yAxes = [];
         [ObservableProperty] private LegendPosition _legendPosition = LegendPosition.Bottom;
-        
 
-        public BarChartViewModel() 
+
+        public BarChartViewModel()
         {
         }
-        
+
         public BarChartViewModel(ISeries[] series, ICartesianAxis[] xAxes, ICartesianAxis[] yAxes)
         {
             Series = series;
