@@ -56,7 +56,14 @@ public class ScriptExecutor : IScriptExecutor
             }
         });
 
-        process.Start();
+        try
+        {
+            process.Start();
+        }
+        catch (Exception e)
+        {
+            return (false, outputBuilder.ToString(), $"Failed to start process: {e.Message}");
+        }
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
