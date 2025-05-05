@@ -10,7 +10,7 @@ public class DateToWeekdayConverter
         {
             return DateTime.Parse(date);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return DateTime.Parse("2000-01-01");
         }

@@ -1,10 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input.Platform;
-using Avalonia.Threading;
-using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -24,14 +17,14 @@ namespace ActiveSense.Desktop.ViewModels
         }
 
         [RelayCommand]
-        public void Cancel()
+        private void Cancel()
         {
             Confirmed = false;
             Close();
         }
-        
+
         [RelayCommand]
-        public void Ok()
+        private void Ok()
         {
             Confirmed = true;
             Close();

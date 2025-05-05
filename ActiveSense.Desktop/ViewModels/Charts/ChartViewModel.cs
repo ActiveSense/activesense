@@ -9,8 +9,8 @@ public abstract partial class ChartViewModel : PageViewModel
 {
     [ObservableProperty]
     private string _title = string.Empty;
-    
+
     [ObservableProperty]
     private string _description = string.Empty;
-    
+
 }

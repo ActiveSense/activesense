@@ -21,23 +21,24 @@ public partial class ExportDialogViewModel(
     [ObservableProperty] private string _statusMessage = "Choose export options";
     [ObservableProperty] private SensorTypes _selectedSensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _includeRawData = false;
-    
+    [ObservableProperty] private bool _exportStarted = false;
+
     public event Func<bool, Task<string?>>? FilePickerRequested;
 
     public int SelectedAnalysesCount => sharedDataService.SelectedAnalyses.Count;
-    
+
     public IAnalysis GetFirstSelectedAnalysis()
     {
-        return sharedDataService.SelectedAnalyses.FirstOrDefault();
+        return sharedDataService.SelectedAnalyses.First();
     }
-    
+
     [RelayCommand]
     private void Cancel()
     {
         Confirmed = false;
         Close();
     }
-    
+
     [RelayCommand]
     private async Task ExportAnalysis()
     {
@@ -46,21 +47,23 @@ public partial class ExportDialogViewModel(
             StatusMessage = "Please select exactly one analysis to export";
             return;
         }
-        
+
         var filePath = await FilePickerRequested?.Invoke(IncludeRawData)!;
-        
+
         if (string.IsNullOrEmpty(filePath))
         {
             return;
         }
-        
+
         try
         {
             var exporter = exporterFactory.GetExporter(SelectedSensorType);
             var analysis = sharedDataService.SelectedAnalyses.First();
-            
+
+
+            ExportStarted = true;
             var success = await exporter.ExportAsync(analysis, filePath, IncludeRawData);
-            
+
             if (success)
             {
                 analysis.Exported = true;
@@ -77,6 +80,7 @@ public partial class ExportDialogViewModel(
                 };
                 await dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(mainViewModel, dialog);
             }
+            ExportStarted = false;
 
             Close();
         }

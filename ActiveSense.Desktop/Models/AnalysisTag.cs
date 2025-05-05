@@ -20,20 +20,20 @@ public class AnalysisTag
         try
         {
             hexColor = hexColor.TrimStart('#');
-            
+
             int r = Convert.ToInt32(hexColor.Substring(0, 2), 16);
             int g = Convert.ToInt32(hexColor.Substring(2, 2), 16);
             int b = Convert.ToInt32(hexColor.Substring(4, 2), 16);
-            
+
             float darkenFactor = 0.6f;
             r = (int)(r * darkenFactor);
             g = (int)(g * darkenFactor);
             b = (int)(b * darkenFactor);
-            
+
             r = Math.Max(0, Math.Min(255, r));
             g = Math.Max(0, Math.Min(255, g));
             b = Math.Max(0, Math.Min(255, b));
-            
+
             return $"#{r:X2}{g:X2}{b:X2}";
         }
         catch

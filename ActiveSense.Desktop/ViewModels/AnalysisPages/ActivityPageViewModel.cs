@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Interfaces;
@@ -17,36 +18,36 @@ public partial class ActivityPageViewModel : PageViewModel
     private readonly ChartColors _chartColors;
     private readonly SharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible = false;
-    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
-    
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
+
     [ObservableProperty] private string _activityDistributionTitle = "Aktivitätsverteilung";
     [ObservableProperty] private string _activityDistributionDescription = "Aktivitätsverteilung pro Tag in Stunden";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _activityDistributionChart = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _activityDistributionChart = [];
     [ObservableProperty] private bool _isActivityDistributionExpanded = false;
-    
+
     [ObservableProperty] private string _stepsTitle = "Schritte pro Tag";
     [ObservableProperty] private string _stepsDescription = "Durchschnittliche Schritte pro Tag";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _stepsCharts = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _stepsCharts = [];
     [ObservableProperty] private bool _isStepsExpanded = false;
-    
+
     [ObservableProperty] private string _sedentaryTitle = "Inaktive Zeit";
     [ObservableProperty] private string _sedentaryDescription = "Inaktive Zeit pro Tag in Stunden";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sedentaryCharts = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _sedentaryCharts = [];
     [ObservableProperty] private bool _isSedentaryExpanded = false;
-    
+
     [ObservableProperty] private string _lightTitle = "Leichte Aktivität";
     [ObservableProperty] private string _lightDescription = "Leichte Aktivität pro Tag in Stunden";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _lightCharts = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _lightCharts = [];
     [ObservableProperty] private bool _isLightExpanded = false;
-    
+
     [ObservableProperty] private string _moderateTitle = "Mittlere Aktivität";
     [ObservableProperty] private string _moderateDescription = "Mittlere Aktivität pro Tag in Stunden";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _moderateCharts = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _moderateCharts = [];
     [ObservableProperty] private bool _isModerateExpanded = false;
-    
+
     [ObservableProperty] private string _vigorousTitle = "Intensive Aktivität";
     [ObservableProperty] private string _vigorousDescription = "Intensive Aktivität pro Tag in Stunden";
-    [ObservableProperty] private ObservableCollection<BarChartViewModel> _vigorousCharts = new();
+    [ObservableProperty] private ObservableCollection<BarChartViewModel> _vigorousCharts = [];
     [ObservableProperty] private bool _isVigorousExpanded = false;
 
     public ActivityPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
@@ -54,13 +55,9 @@ public partial class ActivityPageViewModel : PageViewModel
         _sharedDataService = sharedDataService;
         _chartColors = chartColors;
 
-        // Subscribe to changes in the shared data
         _sharedDataService.SelectedAnalysesChanged += OnSelectedAnalysesChanged;
 
-        // Load initial data
         UpdateSelectedAnalyses();
-        CreateStepsChart();
-        CreateActivityDistributionChart();
     }
 
     private void OnSelectedAnalysesChanged(object? sender, EventArgs e)
@@ -88,7 +85,7 @@ public partial class ActivityPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            if (analysis is IActivityAnalysis activityAnalysis && 
+            if (analysis is IActivityAnalysis activityAnalysis &&
                 analysis is IChartDataProvider chartProvider)
             {
                 var dto = chartProvider.GetActivityDistributionChartData().ToArray();
@@ -113,15 +110,13 @@ public partial class ActivityPageViewModel : PageViewModel
             }
         }
 
-        if (dtos.Any())
-        {
-            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
-            StepsCharts.Add(chartGenerator.GenerateChart(
-                "Schritte pro Tag", 
-                "Durchschnittliche Schritte pro Tag"));
-        }
+        if (dtos.Count == 0) return;
+        var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+        StepsCharts.Add(chartGenerator.GenerateChart(
+            "Schritte pro Tag",
+            "Durchschnittliche Schritte pro Tag"));
     }
-    
+
     private void CreateSedentaryChart()
     {
         SedentaryCharts.Clear();
@@ -135,15 +130,13 @@ public partial class ActivityPageViewModel : PageViewModel
             }
         }
 
-        if (dtos.Any())
-        {
-            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
-            SedentaryCharts.Add(chartGenerator.GenerateChart(
-                "Inaktive Zeit pro Tag", 
-                "Inaktive Zeit pro Tag"));
-        }
+        if (dtos.Count == 0) return;
+        var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+        SedentaryCharts.Add(chartGenerator.GenerateChart(
+            "Inaktive Zeit pro Tag",
+            "Inaktive Zeit pro Tag"));
     }
-    
+
     private void CreateLightChart()
     {
         LightCharts.Clear();
@@ -157,15 +150,13 @@ public partial class ActivityPageViewModel : PageViewModel
             }
         }
 
-        if (dtos.Any())
-        {
-            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
-            LightCharts.Add(chartGenerator.GenerateChart(
-                "Leichte Aktivität pro Tag", 
-                "Leichte Aktivität pro Tag"));
-        }
+        if (dtos.Count == 0) return;
+        var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+        LightCharts.Add(chartGenerator.GenerateChart(
+            "Leichte Aktivität pro Tag",
+            "Leichte Aktivität pro Tag"));
     }
-    
+
     private void CreateModerateChart()
     {
         ModerateCharts.Clear();
@@ -179,15 +170,13 @@ public partial class ActivityPageViewModel : PageViewModel
             }
         }
 
-        if (dtos.Any())
-        {
-            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
-            ModerateCharts.Add(chartGenerator.GenerateChart(
-                "Mittlere Aktivität pro Tag", 
-                "Mittlere Aktivität pro Tag"));
-        }
+        if (dtos.Count == 0) return;
+        var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+        ModerateCharts.Add(chartGenerator.GenerateChart(
+            "Mittlere Aktivität pro Tag",
+            "Mittlere Aktivität pro Tag"));
     }
-    
+
     private void CreateVigorousChart()
     {
         VigorousCharts.Clear();
@@ -201,13 +190,11 @@ public partial class ActivityPageViewModel : PageViewModel
             }
         }
 
-        if (dtos.Any())
-        {
-            var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
-            VigorousCharts.Add(chartGenerator.GenerateChart(
-                "Intensive Aktivität pro Tag", 
-                "Intensive Aktivität pro Tag"));
-        }
+        if (dtos.Count == 0) return;
+        var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
+        VigorousCharts.Add(chartGenerator.GenerateChart(
+            "Intensive Aktivität pro Tag",
+            "Intensive Aktivität pro Tag"));
     }
     #endregion
 }

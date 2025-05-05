@@ -3,10 +3,9 @@ using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Services;
-using ActiveSense.Desktop.ViewModels;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+
+namespace ActiveSense.Desktop.ViewModels;
 
 public partial class MainViewModel : ViewModelBase, IDialogProvider
 {
@@ -29,10 +28,11 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 
     public async Task Initialize()
     {
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
         });
-    
+
     }
 
     public async Task<bool> ConfirmOnClose()
@@ -46,7 +46,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
         };
 
         await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(this, dialog);
-        
+
         return dialog.Confirmed;
     }
 }

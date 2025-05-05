@@ -9,7 +9,7 @@ public interface IScriptService
 {
     // Task<(bool Success, string Output, string Error)> ExecuteScriptAsync(
     //     string scriptPath, string workingDirectory, string arguments = "");
-    
+
     string GetExecutablePath();
 
     string GetScriptBasePath();
@@ -25,19 +25,19 @@ public class RScriptService : IScriptService
         // Navigate up one directory from the base directory to get to the solution directory
         // and then to the ActiveSense.RScripts directory
         string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        string solutionDirectory = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName;
-        
+        string? solutionDirectory = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName;
+
         if (solutionDirectory == null)
         {
             throw new DirectoryNotFoundException("Could not determine solution directory");
         }
-        
+
         return Path.Combine(solutionDirectory, "ActiveSense.RScripts");
     }
 
     public string GetScriptPath()
     {
-        return Path.Combine(GetScriptBasePath(), "_main.R");   
+        return Path.Combine(GetScriptBasePath(), "_main.R");
     }
 
     public string GetScriptInputPath()
@@ -53,10 +53,10 @@ public class RScriptService : IScriptService
         Directory.CreateDirectory(path);
         return path;
     }
-    
+
     public string GetExecutablePath()
     {
         return "Rscript";
     }
-    
+
 }
