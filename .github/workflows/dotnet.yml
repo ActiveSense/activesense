@@ -18,6 +18,11 @@ jobs:
     - name: Restore dependencies
       run: |
         dotnet restore ActiveSense.Desktop/ActiveSense.Desktop.sln
+    
+    - name: Format code
+      run: |
+        dotnet tool install -g dotnet-format
+        dotnet format ActiveSense.Desktop/ActiveSense.Desktop.sln --fix-whitespace
       
     - name: Build
       run: |
