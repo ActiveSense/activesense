@@ -17,13 +17,6 @@ namespace ActiveSense.Desktop.Tests.ProcessTests;
 [TestFixture]
 public class GeneActiveProcessorTests
 {
-    private Mock<IScriptService> _mockScriptService;
-    private Mock<IScriptExecutor> _mockScriptExecutor;
-    private Mock<IFileManager> _mockFileManager;
-    private Mock<IProcessingTimeEstimator> _mockTimeEstimator;
-    private GeneActiveProcessor _processor;
-    private string _tempDir;
-
     [SetUp]
     public void Setup()
     {
@@ -54,11 +47,15 @@ public class GeneActiveProcessorTests
     public void TearDown()
     {
         // Clean up the temporary directory
-        if (Directory.Exists(_tempDir))
-        {
-            Directory.Delete(_tempDir, true);
-        }
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
     }
+
+    private Mock<IScriptService> _mockScriptService;
+    private Mock<IScriptExecutor> _mockScriptExecutor;
+    private Mock<IFileManager> _mockFileManager;
+    private Mock<IProcessingTimeEstimator> _mockTimeEstimator;
+    private GeneActiveProcessor _processor;
+    private string _tempDir;
 
     [Test]
     public void SupportedType_ReturnsGeneActiv()
@@ -92,8 +89,8 @@ public class GeneActiveProcessorTests
     {
         // Arrange
         string[] files = { "file1.bin", "file2.bin" };
-        string processingDir = "/path/to/processing";
-        string outputDir = "/path/to/output";
+        var processingDir = "/path/to/processing";
+        var outputDir = "/path/to/output";
 
         // Act
         _processor.CopyFiles(files, processingDir, outputDir);
@@ -107,4 +104,192 @@ public class GeneActiveProcessorTests
             Times.Once);
     }
 
+    [Test]
+    public void GetEstimatedProcessingTime_DelegatesCallToTimeEstimator()
+    {
+        // Arrange
+        string[] files = { "file1.bin", "file2.bin" };
+        var expectedTimeSpan = TimeSpan.FromMinutes(5);
+
+        _mockTimeEstimator.Setup(x => x.EstimateProcessingTime(files))
+            .Returns(expectedTimeSpan);
+
+        // Act
+        var result = _processor.GetEstimatedProcessingTime(files);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedTimeSpan));
+        _mockTimeEstimator.Verify(x => x.EstimateProcessingTime(files), Times.Once);
+    }
+
+    [Test]
+    public async Task ProcessAsync_ExecutesScriptWithCorrectArguments()
+    {
+        // Arrange
+        var arguments = new List<ScriptArgument>
+        {
+            new BoolArgument { Flag = "a", Value = true },
+            new BoolArgument { Flag = "s", Value = false }
+        };
+    
+        // Setup mock to accept any arguments and return success
+        // This is more flexible than trying to match the exact string
+        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "Success output", ""));
+    
+        // Act
+        var result = await _processor.ProcessAsync(arguments);
+    
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Output, Is.EqualTo("Success output"));
+        Assert.That(result.Error, Is.Empty);
+    
+        // Verify the script executor was called with the right executable
+        _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
+            "Rscript",
+            It.Is<string>(s => s.Contains("/path/to/script.R") && 
+                               s.Contains("-a TRUE") && 
+                               s.Contains("-s FALSE")),
+            "/path/to",
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task ProcessAsync_WhenScriptExecutorFails_ReturnsFalseWithError()
+    {
+        // Arrange
+        var arguments = new List<ScriptArgument>
+        {
+            new BoolArgument { Flag = "a", Value = true }
+        };
+
+        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((false, "", "Script execution failed"));
+
+        // Act
+        var result = await _processor.ProcessAsync(arguments);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Error, Is.EqualTo("Script execution failed"));
+    }
+
+    [Test]
+    public async Task ProcessAsync_WithCancellation_ReturnsFailureResult()
+    {
+        // Arrange
+        var arguments = new List<ScriptArgument>
+        {
+            new BoolArgument { Flag = "a", Value = true }
+        };
+
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+
+        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new OperationCanceledException());
+
+        // Act
+        var result = await _processor.ProcessAsync(arguments, cancellationTokenSource.Token);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Output, Is.EqualTo("Operation was cancelled"));
+        Assert.That(result.Error, Is.EqualTo("Processing cancelled by user"));
+    }
+
+    [Test]
+    public async Task ProcessAsync_WithException_ReturnsFalseWithErrorMessage()
+    {
+        // Arrange
+        var arguments = new List<ScriptArgument>
+        {
+            new BoolArgument { Flag = "a", Value = true }
+        };
+
+        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _processor.ProcessAsync(arguments);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Output, Is.Empty);
+        Assert.That(result.Error, Does.Contain("Failed to execute R script"));
+        Assert.That(result.Error, Does.Contain("Test exception"));
+    }
+
+    [Test]
+    public async Task ProcessAsync_WithNullArguments_UsesDefaultArguments()
+    {
+        // Arrange
+        List<ScriptArgument> arguments = null;
+
+        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "Success", ""));
+
+        // Act
+        var result = await _processor.ProcessAsync(arguments);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+
+        // Verify that the script executor was called with a command line that includes
+        // arguments corresponding to the default arguments
+        _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
+            It.IsAny<string>(),
+            It.Is<string>(s => s.Contains("-a TRUE") && s.Contains("-s TRUE")),
+            It.IsAny<string>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task ProcessAsync_WithEmptyArguments_StillBuildsCommandLine()
+    {
+        // Arrange
+        var arguments = new List<ScriptArgument>();
+
+        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "Success", ""));
+
+        // Act
+        var result = await _processor.ProcessAsync(arguments);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+
+        // Verify that the script executor was called with a command line that has the basic structure
+        // but doesn't include any arguments from the empty list
+        _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
+            It.IsAny<string>(),
+            It.Is<string>(s => s.Contains("/path/to/script.R") && s.Contains("-d")),
+            It.IsAny<string>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

@@ -57,7 +57,8 @@ public class GeneActiveProcessor : ISensorProcessor
 
             var processArguments = $"\"{scriptPath}\" {outputDir} {scriptArguments}";
 
-            return await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory, cancellationToken);
+            var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory, cancellationToken);
+            return result;
         }
         catch (OperationCanceledException)
         {
