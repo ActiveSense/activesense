@@ -3,6 +3,8 @@ using System.Linq;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Enums;
+using ActiveSense.Desktop.Export.Implementations;
+using ActiveSense.Desktop.Export.Interfaces;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.HelperClasses;
 using ActiveSense.Desktop.Interfaces;
@@ -46,7 +48,13 @@ public class App : Application
         // Register processors
         collection.AddSingleton<GeneActiveProcessor>();
         
-        // Register exporters
+        // Import
+        collection.AddSingleton<IChartRenderer, ChartRenderer>();
+        collection.AddSingleton<ICsvExporter, CsvExporter>();
+        collection.AddSingleton<IArchiveCreator, ArchiveCreator>();
+        collection.AddSingleton<IPdfReportGenerator, PdfReportGenerator>();
+        collection.AddSingleton<IExporter, GeneActiveExporter>();
+        
         collection.AddSingleton<GeneActiveExporter>();
         
         // Register parsers

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Interfaces;
 
-namespace ActiveSense.Desktop.Interfaces;
+namespace ActiveSense.Desktop.Export.Interfaces;
 
 public interface IExporter
 {
