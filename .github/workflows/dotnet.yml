@@ -83,11 +83,11 @@ jobs:
         chmod +x ActiveSense.Desktop/Publish/windows/package.sh
         chmod +x ActiveSense.Desktop/Publish/macos/package.sh
     
-    - name: Create output directories
-      run: |
-        mkdir -p publish/linux
-        mkdir -p publish/windows
-        mkdir -p publish/macos
+    # - name: Create output directories
+    #   run: |
+    #     mkdir -p publish/linux
+    #     mkdir -p publish/windows
+    #     mkdir -p publish/macos
     
     - name: Run Linux package script
       run: |
@@ -108,19 +108,19 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-linux
-        path: publish/ActiveSense-linux.tar.gz
+        path: ActiveSense.Desktop/publish/ActiveSense-linux.tar.gz
         retention-days: 7
     
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-windows
-        path: publish/ActiveSense-windows.tar.gz
+        path: ActiveSense.Desktop/publish/ActiveSense-windows.tar.gz
         retention-days: 7
     
     - name: Upload macOS artifact
       uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-macos
-        path: publish/ActiveSense-macos.tar.gz
+        path: ActiveSense.Desktop/publish/ActiveSense-macos.tar.gz
         retention-days: 7
