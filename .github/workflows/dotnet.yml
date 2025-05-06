@@ -6,6 +6,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Adding this at the top level gives these permissions to all jobs
+permissions:
+  contents: write
+  packages: read
+
 jobs:
   build:
     name: Build
@@ -107,7 +112,7 @@ jobs:
   release:
     name: Create Release
     needs: publish
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - name: Download Linux artifact
@@ -132,17 +137,28 @@ jobs:
       id: date
       run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
     
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: release-${{ steps.date.outputs.date }}
-        name: ActiveSense Release ${{ steps.date.outputs.date }}
-        draft: false
-        prerelease: false
-        files: |
-          ./artifacts/ActiveSense-linux.tar.gz
-          ./artifacts/ActiveSense-windows.tar.gz
-          ./artifacts/ActiveSense-macos.tar.gz
+    - name: Create Release with GitHub CLI
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Install GitHub CLI if not already installed
+        if ! command -v gh &> /dev/null; then
+          echo "Installing GitHub CLI..."
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh
+        fi
+        
+        # Check if the release already exists and delete it if it does
+        RELEASE_TAG="release-${{ steps.date.outputs.date }}"
+        if gh release view "$RELEASE_TAG" &>/dev/null; then
+          echo "Release $RELEASE_TAG already exists. Deleting it..."
+          gh release delete "$RELEASE_TAG" --yes
+        fi
+        
+        # Create a new release
+        gh release create "$RELEASE_TAG" \
+          --title "ActiveSense Release ${{ steps.date.outputs.date }}" \
+          --notes "Automated release built on ${{ steps.date.outputs.date }}" \
+          ./artifacts/*.tar.gz
