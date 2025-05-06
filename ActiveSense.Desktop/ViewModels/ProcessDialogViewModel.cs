@@ -1,5 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -191,19 +193,23 @@ public partial class ProcessDialogViewModel : DialogViewModel
             var outputDirectory = _pathService.OutputDirectory;
 
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
-
+            
+            
             StatusMessage = "Procesing files...";
 
-            var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
-
-            ScriptOutput = output;
-            ShowScriptOutput = true;
-
-            if (!scriptSuccess)
+            if (Directory.EnumerateFiles(processingDirectory).Any())
             {
-                StatusMessage = $"Script execution failed: {error}";
-                return;
+                var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
+                ScriptOutput = output;
+                ShowScriptOutput = true;
+
+                if (!scriptSuccess)
+                {
+                    StatusMessage = $"Script execution failed: {error}";
+                    return;
+                }
             }
+
 
             StatusMessage = "Parsing results...";
             ParseResults();
