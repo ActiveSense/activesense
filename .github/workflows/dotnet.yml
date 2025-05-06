@@ -78,6 +78,7 @@ jobs:
     
     - name: Make package scripts executable
       run: |
+        ls
         chmod +x Publish/linux/package.sh
         chmod +x Publish/windows/package.sh
         chmod +x Publish/macos/package.sh
