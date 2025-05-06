@@ -74,7 +74,7 @@ public class PathService : IPathService
         }
     }
     
-    public string OutputDirectory => CombinePaths(SolutionBasePath, "AnalysisFiles");
+    public string OutputDirectory => CombinePaths(SolutionBasePath, "AnalysisFiles/");
     
     // Script paths
     public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");

@@ -60,5 +60,20 @@
       <None Remove="publish\linux\libSkiaSharp.so" />
       <None Remove="publish\linux\NUnit3.TestAdapter.pdb" />
       <None Remove="publish\linux\ActiveSense.Desktop.pdb" />
+      <None Remove="deploy\linux\ActiveSense\RScripts\_main.R" />
+      <None Remove="deploy\linux\ActiveSense\NUnit3.TestAdapter.pdb" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\OFL.txt" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-SemiBoldItalic.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-SemiBold.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-MediumItalic.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Medium.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Light.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraLightItalic.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraBoldItalic.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraBold.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Bold.ttf" />
+      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-BlackItalic.ttf" />
+      <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop.pdb" />
+      <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop" />
     </ItemGroup>
 </Project>

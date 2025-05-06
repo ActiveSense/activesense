@@ -46,3 +46,7 @@ msbuild.wrn
 /AnalysisFiles/
 /AnalysisFiles/
 /publish/
+/deploy/linux/package/
+/deploy/linux/publish/
+/deploy/linux/ActiveSense.tar.gz
+/package/
