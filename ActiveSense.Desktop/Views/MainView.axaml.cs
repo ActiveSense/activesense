@@ -4,7 +4,7 @@ using FluentAvalonia.UI.Windowing;
 
 namespace ActiveSense.Desktop.Views;
 
-public partial class MainView : AppWindow
+public partial class MainView : Window 
 {
     private bool _closingConfirmed = false;
 
