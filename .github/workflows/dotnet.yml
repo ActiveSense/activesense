@@ -6,11 +6,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Adding this at the top level gives these permissions to all jobs
-permissions:
-  contents: write
-  packages: read
-
 jobs:
   build:
     name: Build
@@ -40,28 +35,28 @@ jobs:
           **/obj/
         retention-days: 1
         
-  # test:
-  #   name: Test
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
     
-  #   - name: Setup .NET
-  #     uses: actions/setup-dotnet@v3
-  #     with:
-  #       dotnet-version: '9.0.x'
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
     
-  #   - name: Download build artifacts
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       name: build-artifacts
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
       
-  #   - name: Test
-  #     run: |
-  #       dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
-  #     env:
-  #       R_HOME: ${{ runner.temp }}/R
+    - name: Test
+      run: |
+        dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
+      env:
+        R_HOME: ${{ runner.temp }}/R
         
   publish:
     name: Publish All Platforms
@@ -82,12 +77,6 @@ jobs:
         chmod +x ActiveSense.Desktop/Publish/linux/package.sh
         chmod +x ActiveSense.Desktop/Publish/windows/package.sh
         chmod +x ActiveSense.Desktop/Publish/macos/package.sh
-    
-    # - name: Create output directories
-    #   run: |
-    #     mkdir -p publish/linux
-    #     mkdir -p publish/windows
-    #     mkdir -p publish/macos
     
     - name: Run Linux package script
       run: |
