@@ -86,7 +86,7 @@ public class PathService : IPathService
         {
             if (OperatingSystem.IsWindows())
             {
-                return "Rscript.exe";
+                return "\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\"";
             }
             return "Rscript";
         }
