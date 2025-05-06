@@ -79,9 +79,9 @@ jobs:
     - name: Make package scripts executable
       run: |
         ls
-        chmod +x Publish/linux/package.sh
-        chmod +x Publish/windows/package.sh
-        chmod +x Publish/macos/package.sh
+        chmod +x ActiveSense.Desktop/Publish/linux/package.sh
+        chmod +x ActiveSense.Desktop/Publish/windows/package.sh
+        chmod +x ActiveSense.Desktop/Publish/macos/package.sh
     
     - name: Create output directories
       run: |
@@ -90,13 +90,13 @@ jobs:
         mkdir -p publish/macos
     
     - name: Run Linux package script
-      run: ./Publish/linux/package.sh
+      run: ./ActiveSense.Desktop/Publish/linux/package.sh
     
     - name: Run Windows package script
-      run: ./Publish/windows/package.sh
+      run: ./ActiveSense.Desktop/Publish/windows/package.sh
       
     - name: Run macOS package script
-      run: ./Publish/macos/package.sh
+      run: ./ActiveSense.Desktop/Publish/macos/package.sh
     
     - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
