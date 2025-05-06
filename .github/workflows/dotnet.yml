@@ -78,9 +78,9 @@ jobs:
     
     - name: Make package scripts executable
       run: |
-        chmod +x Package/linux/package.sh
-        chmod +x Package/windows/package.sh
-        chmod +x Package/macos/package.sh
+        chmod +x ActiveSense.Desktop/Package/linux/package.sh
+        chmod +x ActiveSense.Desktop/Package/windows/package.sh
+        chmod +x ActiveSense.Desktop/Package/macos/package.sh
     
     - name: Create output directories
       run: |
