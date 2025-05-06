@@ -90,13 +90,19 @@ jobs:
         mkdir -p publish/macos
     
     - name: Run Linux package script
-      run: ./ActiveSense.Desktop/Publish/linux/package.sh
+      run: |
+        cd ActiveSense.Desktop
+        ./Publish/linux/package.sh
     
     - name: Run Windows package script
-      run: ./ActiveSense.Desktop/Publish/windows/package.sh
+      run: |
+        cd ActiveSense.Desktop
+        ./Publish/windows/package.sh
       
     - name: Run macOS package script
-      run: ./ActiveSense.Desktop/Publish/macos/package.sh
+      run: |
+        cd ActiveSense.Desktop
+        ./Publish/macos/package.sh
     
     - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
