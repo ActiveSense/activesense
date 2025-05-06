@@ -62,24 +62,11 @@ jobs:
         dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
       env:
         R_HOME: ${{ runner.temp }}/R
-
-  publish:
-    name: Publish
+publish:
+    name: Publish All Platforms
     needs: test
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - os: linux-x64
-            name: linux
-            extension: ""
-          - os: win-x64
-            name: windows
-            extension: ".exe"
-          - os: osx-x64
-            name: macos
-            extension: ""
     steps:
     - uses: actions/checkout@v3
     
@@ -88,77 +75,44 @@ jobs:
       with:
         dotnet-version: '9.0.x'
     
-    - name: Publish ${{ matrix.name }}
+    - name: Make package scripts executable
       run: |
-        dotnet publish ActiveSense.Desktop/ActiveSense.Desktop.csproj \
-          -c Release \
-          -r ${{ matrix.os }} \
-          --self-contained true \
-          -p:PublishSingleFile=true \
-          -o ./publish/${{ matrix.name }}
+        chmod +x Package/linux/package.sh
+        chmod +x Package/windows/package.sh
+        chmod +x Package/macos/package.sh
     
-    - name: Create archive for ${{ matrix.name }}
+    - name: Create output directories
       run: |
-        cd publish
-        tar -czf ActiveSense-${{ matrix.name }}.tar.gz ${{ matrix.name }}
+        mkdir -p publish/linux
+        mkdir -p publish/windows
+        mkdir -p publish/macos
     
-    - name: Upload ${{ matrix.name }} artifact
+    - name: Run Linux package script
+      run: ./Package/linux/package.sh
+    
+    - name: Run Windows package script
+      run: ./Package/windows/package.sh
+      
+    - name: Run macOS package script
+      run: ./Package/macos/package.sh
+    
+    - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ActiveSense-${{ matrix.name }}
-        path: publish/ActiveSense-${{ matrix.name }}.tar.gz
-        retention-days: 7
-
-  release:
-    name: Create Release
-    needs: publish
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download Linux artifact
-      uses: actions/download-artifact@v4
-      with:
         name: ActiveSense-linux
-        path: ./artifacts
+        path: publish/ActiveSense-linux.tar.gz
+        retention-days: 7
     
-    - name: Download Windows artifact
-      uses: actions/download-artifact@v4
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-windows
-        path: ./artifacts
+        path: publish/ActiveSense-windows.tar.gz
+        retention-days: 7
     
-    - name: Download macOS artifact
-      uses: actions/download-artifact@v4
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-macos
-        path: ./artifacts
-    
-    - name: Get current date
-      id: date
-      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-    
-    - name: Create Release with GitHub CLI
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # Install GitHub CLI if not already installed
-        if ! command -v gh &> /dev/null; then
-          echo "Installing GitHub CLI..."
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          sudo apt update
-          sudo apt install gh
-        fi
-        
-        # Check if the release already exists and delete it if it does
-        RELEASE_TAG="release-${{ steps.date.outputs.date }}"
-        if gh release view "$RELEASE_TAG" &>/dev/null; then
-          echo "Release $RELEASE_TAG already exists. Deleting it..."
-          gh release delete "$RELEASE_TAG" --yes
-        fi
-        
-        # Create a new release
-        gh release create "$RELEASE_TAG" \
-          --title "ActiveSense Release ${{ steps.date.outputs.date }}" \
-          --notes "Automated release built on ${{ steps.date.outputs.date }}" \
-          ./artifacts/*.tar.gz
+        path: publish/ActiveSense-macos.tar.gz
+        retention-days: 7
