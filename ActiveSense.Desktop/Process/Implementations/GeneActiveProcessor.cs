@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.HelperClasses;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Process.Interfaces;
 using ActiveSense.Desktop.Services;
 
@@ -13,18 +14,18 @@ namespace ActiveSense.Desktop.Process.Implementations;
 public class GeneActiveProcessor : ISensorProcessor
 {
     private readonly List<ScriptArgument> _defaultArguments;
-    private readonly IScriptService _scriptService;
     private readonly IScriptExecutor _scriptExecutor;
     private readonly IFileManager _fileManager;
     private readonly IProcessingTimeEstimator _timeEstimator;
+    private readonly IPathService _pathService;
 
     public GeneActiveProcessor(
-        IScriptService scriptService,
+        IPathService pathService,
         IScriptExecutor scriptExecutor,
         IFileManager fileManager,
         IProcessingTimeEstimator timeEstimator)
     {
-        _scriptService = scriptService ?? throw new ArgumentNullException(nameof(scriptService));
+        _pathService = pathService ?? throw new ArgumentNullException(nameof(pathService));
         _scriptExecutor = scriptExecutor ?? throw new ArgumentNullException(nameof(scriptExecutor));
         _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
         _timeEstimator = timeEstimator ?? throw new ArgumentNullException(nameof(timeEstimator));
@@ -42,13 +43,13 @@ public class GeneActiveProcessor : ISensorProcessor
     {
         try
         {
-            var scriptPath = _scriptService.GetScriptPath();
-            var executablePath = _scriptService.GetExecutablePath();
-            var workingDirectory = _scriptService.GetScriptBasePath();
+            var scriptPath = _pathService.MainScriptPath;
+            var executablePath = _pathService.ScriptExecutablePath;
+            var workingDirectory = _pathService.ScriptBasePath;
 
             var argsToUse = arguments?.ToList() ?? _defaultArguments;
 
-            var outputDir = $"-d \"{AppConfig.OutputsDirectoryPath}\"";
+            var outputDir = $"-d \"{_pathService.OutputDirectory}\"";
 
             var scriptArguments = string.Join(" ",
                 argsToUse

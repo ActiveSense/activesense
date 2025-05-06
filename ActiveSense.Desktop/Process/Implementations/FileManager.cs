@@ -1,18 +1,18 @@
 using System;
 using System.IO;
 using System.Linq;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Process.Interfaces;
 
 namespace ActiveSense.Desktop.Process.Implementations;
 
-public class FileManager : IFileManager
+public class FileManager(IPathService pathService) : IFileManager
 {
     public void CopyFiles(string[] files, string processingDirectory, string outputDirectory, string[] supportedFileTypes)
     {
-        ClearDirectory(processingDirectory);
-        Directory.CreateDirectory(processingDirectory);
-        Directory.CreateDirectory(outputDirectory);
-
+        pathService.ClearDirectory(processingDirectory);
+        pathService.EnsureDirectoryExists(outputDirectory);
+        
         foreach (var file in files)
             try
             {
@@ -33,19 +33,6 @@ public class FileManager : IFileManager
             catch (Exception ex)
             {
                 Console.WriteLine($"Error copying file {file}: {ex.Message}");
-            }
-    }
-
-    public void ClearDirectory(string directory)
-    {
-        if (Directory.Exists(directory))
-            try
-            {
-                Directory.Delete(directory, true);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing directory: {ex.Message}");
             }
     }
 }

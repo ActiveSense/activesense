@@ -6,6 +6,7 @@ using System.Timers;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.HelperClasses;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Services;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,9 +20,9 @@ public partial class ProcessDialogViewModel : DialogViewModel
     private readonly DialogService _dialogService;
     private readonly MainViewModel _mainViewModel;
     private readonly ResultParserFactory _resultParserFactory;
-    private readonly IScriptService _scriptService;
     private readonly SensorProcessorFactory _sensorProcessorFactory;
     private readonly SharedDataService _sharedDataService;
+    private readonly IPathService _pathService;
 
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
     private CancellationTokenSource? _cancellationTokenSource;
@@ -44,16 +45,16 @@ public partial class ProcessDialogViewModel : DialogViewModel
     [ObservableProperty] private string _timeRemaining = string.Empty;
     [ObservableProperty] private string _title = "Sensordaten analysieren";
 
-    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory, IScriptService scriptService,
+    public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory,
         SharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService,
-        MainViewModel mainViewModel)
+        MainViewModel mainViewModel, IPathService pathService)
     {
         _mainViewModel = mainViewModel;
         _dialogService = dialogService;
         _resultParserFactory = resultParserFactory;
         _sensorProcessorFactory = sensorProcessorFactory;
-        _scriptService = scriptService;
         _sharedDataService = sharedDataService;
+        _pathService = pathService;
 
         LoadDefaultArguments();
     }
@@ -186,8 +187,8 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
             StatusMessage = "Copying files...";
 
-            var processingDirectory = _scriptService.GetScriptInputPath();
-            var outputDirectory = AppConfig.OutputsDirectoryPath;
+            var processingDirectory = _pathService.ScriptInputPath;
+            var outputDirectory = _pathService.OutputDirectory;
 
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
 
@@ -239,7 +240,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     private async Task ParseResults()
     {
         var parser = _resultParserFactory.GetParser(SensorType);
-        var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
+        var files = await parser.ParseResultsAsync(_pathService.OutputDirectory);
         _sharedDataService.UpdateAllAnalyses(files);
     }
 }
