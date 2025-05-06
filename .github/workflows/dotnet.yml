@@ -62,7 +62,8 @@ jobs:
         dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
       env:
         R_HOME: ${{ runner.temp }}/R
-publish:
+        
+  publish:
     name: Publish All Platforms
     needs: test
     if: github.event_name != 'pull_request'
