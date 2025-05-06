@@ -57,24 +57,12 @@ jobs:
         dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
       env:
         R_HOME: ${{ runner.temp }}/R
-
+        
   publish:
-    name: Publish
-    needs: test
+    name: Publish All Platforms
+    # needs: test
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - os: linux-x64
-            name: linux
-            extension: ""
-          - os: win-x64
-            name: windows
-            extension: ".exe"
-          - os: osx-x64
-            name: macos
-            extension: ""
     steps:
     - uses: actions/checkout@v3
     
@@ -83,66 +71,45 @@ jobs:
       with:
         dotnet-version: '9.0.x'
     
-    - name: Publish ${{ matrix.name }}
+    - name: Make package scripts executable
       run: |
-        dotnet publish ActiveSense.Desktop/ActiveSense.Desktop.csproj \
-          -c Release \
-          -r ${{ matrix.os }} \
-          --self-contained true \
-          -p:PublishSingleFile=true \
-          -o ./publish/${{ matrix.name }}
+        ls
+        chmod +x ActiveSense.Desktop/Publish/linux/package.sh
+        chmod +x ActiveSense.Desktop/Publish/windows/package.sh
+        chmod +x ActiveSense.Desktop/Publish/macos/package.sh
     
-    - name: Create archive for ${{ matrix.name }}
+    - name: Run Linux package script
       run: |
-        cd publish
-        tar -czf ActiveSense-${{ matrix.name }}.tar.gz ${{ matrix.name }}
+        cd ActiveSense.Desktop
+        ./Publish/linux/package.sh
     
-    - name: Upload ${{ matrix.name }} artifact
+    - name: Run Windows package script
+      run: |
+        cd ActiveSense.Desktop
+        ./Publish/windows/package.sh
+      
+    - name: Run macOS package script
+      run: |
+        cd ActiveSense.Desktop
+        ./Publish/macos/package.sh
+    
+    - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ActiveSense-${{ matrix.name }}
-        path: publish/ActiveSense-${{ matrix.name }}.tar.gz
-        retention-days: 7
-
-  release:
-    name: Create Release
-    needs: publish
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download Linux artifact
-      uses: actions/download-artifact@v4
-      with:
         name: ActiveSense-linux
-        path: ./artifacts
+        path: ActiveSense.Desktop/publish/ActiveSense-linux.tar.gz
+        retention-days: 7
     
-    - name: Download Windows artifact
-      uses: actions/download-artifact@v4
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-windows
-        path: ./artifacts
+        path: ActiveSense.Desktop/publish/ActiveSense-windows.tar.gz
+        retention-days: 7
     
-    - name: Download macOS artifact
-      uses: actions/download-artifact@v4
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-macos
-        path: ./artifacts
-    
-    - name: Get current date
-      id: date
-      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-    
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: release-${{ steps.date.outputs.date }}
-        name: ActiveSense Release ${{ steps.date.outputs.date }}
-        draft: false
-        prerelease: false
-        files: |
-          ./artifacts/ActiveSense-linux.tar.gz
-          ./artifacts/ActiveSense-windows.tar.gz
-          ./artifacts/ActiveSense-macos.tar.gz
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        path: ActiveSense.Desktop/publish/ActiveSense-macos.tar.gz
+        retention-days: 7

@@ -79,7 +79,18 @@ public class PathService : IPathService
     // Script paths
     public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
     public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
-    public string ScriptExecutablePath => "Rscript";
+
+    public string ScriptExecutablePath
+    {
+        get
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                return "\"C:\\Program Files\\R\\R-4.4.3\\bin\\Rscript.exe\"";
+            }
+            return "Rscript";
+        }
+    }
     
     // Utility methods
     public string CombinePaths(params string[] paths)

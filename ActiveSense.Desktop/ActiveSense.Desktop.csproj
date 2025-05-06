@@ -6,8 +6,13 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+	  <Company>Ostschweizer Fachhochschule</Company>
+	  <Product>ActiveSense</Product>
+	  <Description>Sensor Data Analysis Application</Description>
+	  <Version>1.0.0</Version>
+	  <Authors>Karim Hamscho, David Trapp</Authors>
     </PropertyGroup>
-
+	
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
 	  <Content Include="..\ActiveSense.RScripts\**\*.*">
