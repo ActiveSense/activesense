@@ -21,7 +21,34 @@ public class PathService : IPathService
     
     // Base paths
     public string ApplicationBasePath => AppDomain.CurrentDomain.BaseDirectory;
-    
+
+    public string ScriptBasePath
+    {
+        get
+        {
+            if (_customScriptPath != null)
+                return _customScriptPath;
+                
+            // Check relative to application first
+            var relativePath = CombinePaths(SolutionBasePath, "../ActiveSense.RScripts");
+            if (Directory.Exists(relativePath))
+                return relativePath;
+                
+            // Fall back to user directory
+            var userPath = Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                "ActiveSense", "RScripts");
+                
+            if (!Directory.Exists(userPath))
+            {
+                EnsureDirectoryExists(userPath);
+                CopyResourceScripts(userPath);
+            }
+            
+            return userPath;
+        } 
+    }
     public string SolutionBasePath
     {
         get
@@ -50,7 +77,6 @@ public class PathService : IPathService
     public string OutputDirectory => CombinePaths(SolutionBasePath, "AnalysisFiles");
     
     // Script paths
-    public string ScriptBasePath => _customScriptPath ?? CombinePaths(SolutionBasePath, "../ActiveSense.RScripts");
     public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
     public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
     public string ScriptExecutablePath => "Rscript";
@@ -88,6 +114,23 @@ public class PathService : IPathService
         else
         {
             Directory.CreateDirectory(path);
+        }
+    }
+    private void CopyResourceScripts(string targetPath)
+    {
+        var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
+        
+        // If we have scripts in the app directory, copy them
+        if (Directory.Exists(sourceDir))
+        {
+            foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            {
+                var relativePath = file.Substring(sourceDir.Length + 1);
+                var targetFile = Path.Combine(targetPath, relativePath);
+                
+                Directory.CreateDirectory(Path.GetDirectoryName(targetFile));
+                File.Copy(file, targetFile, true);
+            }
         }
     }
 }

@@ -45,3 +45,4 @@ msbuild.wrn
 /outputs/
 /AnalysisFiles/
 /AnalysisFiles/
+/publish/
