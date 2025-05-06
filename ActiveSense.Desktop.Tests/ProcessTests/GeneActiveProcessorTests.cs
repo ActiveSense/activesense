@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.HelperClasses;
+using ActiveSense.Desktop.Interfaces;
 using ActiveSense.Desktop.Process.Implementations;
 using ActiveSense.Desktop.Process.Interfaces;
 using ActiveSense.Desktop.Services;
@@ -20,27 +21,26 @@ public class GeneActiveProcessorTests
     [SetUp]
     public void Setup()
     {
-        _mockScriptService = new Mock<IScriptService>();
+        _mockPathService = new Mock<IPathService>();
         _mockScriptExecutor = new Mock<IScriptExecutor>();
         _mockFileManager = new Mock<IFileManager>();
         _mockTimeEstimator = new Mock<IProcessingTimeEstimator>();
-
+    
         _processor = new GeneActiveProcessor(
-            _mockScriptService.Object,
+            _mockPathService.Object,
             _mockScriptExecutor.Object,
             _mockFileManager.Object,
             _mockTimeEstimator.Object);
-
+    
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
-
-        // Set up the script service mock
-        _mockScriptService.Setup(x => x.GetScriptPath()).Returns("/path/to/script.R");
-        _mockScriptService.Setup(x => x.GetExecutablePath()).Returns("Rscript");
-        _mockScriptService.Setup(x => x.GetScriptBasePath()).Returns("/path/to");
-        _mockScriptService.Setup(x => x.GetScriptInputPath()).Returns("/path/to/data");
-        _mockScriptService.Setup(x => x.GetScriptOutputPath()).Returns("/path/to/outputs");
+    
+        // Set up the path service mock
+        _mockPathService.Setup(x => x.MainScriptPath).Returns("/path/to/script.R");
+        _mockPathService.Setup(x => x.ScriptExecutablePath).Returns("Rscript");
+        _mockPathService.Setup(x => x.ScriptBasePath).Returns("/path/to");
+        _mockPathService.Setup(x => x.OutputDirectory).Returns("/path/to/outputs");
     }
 
     [TearDown]
@@ -50,7 +50,7 @@ public class GeneActiveProcessorTests
         if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
     }
 
-    private Mock<IScriptService> _mockScriptService;
+    private Mock<IPathService> _mockPathService;
     private Mock<IScriptExecutor> _mockScriptExecutor;
     private Mock<IFileManager> _mockFileManager;
     private Mock<IProcessingTimeEstimator> _mockTimeEstimator;

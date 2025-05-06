@@ -13,6 +13,10 @@ public class ScriptExecutor : IScriptExecutor
     public async Task<(bool Success, string Output, string Error)> ExecuteScriptAsync(
         string scriptPath, string arguments, string workingDirectory, CancellationToken cancellationToken = default)
     {
+        Console.WriteLine("Executing script: " + scriptPath);
+        Console.WriteLine("Arguments: " + arguments);
+        Console.WriteLine("Working Directory: " + workingDirectory);
+        
         var process = new System.Diagnostics.Process
         {
             StartInfo = new ProcessStartInfo

@@ -73,8 +73,8 @@ public class App : Application
         collection.AddTransient<GeneActiveResultParser>();
 
         // Register services
-        collection.AddSingleton<IScriptService, RScriptService>();
         collection.AddSingleton<SharedDataService>();
+        collection.AddSingleton<IPathService, PathService>();
 
         // Register view models
         collection.AddSingleton<ViewModels.MainViewModel>();
