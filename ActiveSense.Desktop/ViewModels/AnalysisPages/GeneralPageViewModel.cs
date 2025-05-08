@@ -77,18 +77,16 @@ public partial class GeneralPageViewModel : PageViewModel
             var line = new List<ChartDataDTO>();
             var bar = new List<ChartDataDTO>();
 
-            var labels = activityAnalysis.ActivityWeekdays();
-
             bar.Add(new ChartDataDTO
             {
                 Data = activityAnalysis.StepsPerDay,
-                Labels = labels,
+                Labels = activityAnalysis.ActivityDates(),
                 Title = "Schritte pro Tag"
             });
             line.Add(new ChartDataDTO
             {
                 Data = sleepAnalysis.SleepEfficiency,
-                Labels = labels,
+                Labels = sleepAnalysis.SleepDates(),
                 Title = "Schlaf-Effizienz"
             });
             var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());

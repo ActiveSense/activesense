@@ -29,6 +29,7 @@ public interface IActivityAnalysis : IAnalysis
     double AverageVigorousActivity { get; }
     double AverageLightActivity { get; }
     public string[] ActivityWeekdays();
+    public string[] ActivityDates();
 
     void SetActivityRecords(IEnumerable<ActivityRecord> records);
 }
@@ -45,6 +46,7 @@ public interface ISleepAnalysis : IAnalysis
     double[] TotalSleepTimePerDay { get; }
 
     string[] SleepWeekdays();
+    string[] SleepDates();
 
 
     void SetSleepRecords(IEnumerable<SleepRecord> records);

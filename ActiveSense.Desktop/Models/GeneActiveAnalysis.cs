@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using ActiveSense.Desktop.Converters;
@@ -20,6 +21,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     private readonly Dictionary<string, object> _cache = new();
     private List<ActivityRecord> _activityRecords = [];
     private List<SleepRecord> _sleepRecords = [];
+    private const string DateFormat = "dd.MM.yyyy";
 
 
     #region Collections
@@ -172,10 +174,11 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         return GetUniqueWeekdayLabels(weekdays);
     }, "ActivityWeekdays");
     
+
     public string[] ActivityDates() => GetCachedValue(() =>
     {
         var dates = _activityRecords
-            .Select(r => r.Day)
+            .Select(r => ParseAndFormatDate(r.Day, DateFormat))
             .ToArray();
         return dates;
     }, "ActivityDates");
@@ -183,7 +186,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     public string[] SleepDates() => GetCachedValue(() =>
     {
         var dates = _sleepRecords
-            .Select(r => r.NightStarting)
+            .Select(r => ParseAndFormatDate(r.NightStarting, DateFormat))
             .ToArray();
         return dates;
     }, "SleepDates");
@@ -342,6 +345,16 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     {
         return double.TryParse(value, out var result) ? result : 0;
     }
+    
+    private string ParseAndFormatDate(string dateString, string format)
+    {
+        if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+        {
+            return date.ToString(format);
+        }
+            
+        return dateString;
+    }
 
     private string[] GetUniqueWeekdayLabels(string[] weekdays)
     {
@@ -362,7 +375,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
             else
             {
                 var count = ++weekdayCounts[weekday];
-                uniqueLabels[i] = $"{weekday} {count}";
+                uniqueLabels[i] = $"{count}. {weekday} ";
             }
         }
 
