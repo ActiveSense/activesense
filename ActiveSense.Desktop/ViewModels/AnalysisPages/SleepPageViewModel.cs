@@ -90,12 +90,13 @@ public partial class SleepPageViewModel : PageViewModel
 
         foreach (var analysis in SelectedAnalyses)
         {
-            if (analysis is IChartDataProvider chartProvider)
+            if (analysis is IChartDataProvider chartProvider &&
+                analysis is ISleepAnalysis sleepAnalysis)
             {
                 var dto = chartProvider.GetSleepDistributionChartData();
                 var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
                 if (SelectedAnalyses.Any())
-                    PieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                    PieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName} ({sleepAnalysis.GetSleepDateRange()})",
                         "Durchschnittliche Verteilung der Schlaf- und Wachzeiten in Stunden"));
             }
         }
@@ -136,12 +137,11 @@ public partial class SleepPageViewModel : PageViewModel
             {
                 chartDataDtos.Add(chartProvider.GetTotalSleepTimePerDayChartData());
                 sleepEfficiencyDtos.Add(chartProvider.GetSleepEfficiencyChartData());
+                var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors, sleepEfficiencyDtos.ToArray());
+                SleepTimeWithEfficiencyCharts.Add(barChartGenerator.GenerateChart($"{analysis.FileName} ({sleepAnalysis.GetSleepDateRange()})",
+                    "Sleep Time per Night with Efficiency"));
             }
 
-            var barChartGenerator = new BarChartGenerator(chartDataDtos.ToArray(), _chartColors, sleepEfficiencyDtos.ToArray());
-            if (SelectedAnalyses.Any())
-                SleepTimeWithEfficiencyCharts.Add(barChartGenerator.GenerateChart($"{analysis.FileName}",
-                    "Sleep Time per Night with Efficiency"));
         }
     }
 

@@ -163,7 +163,8 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             Description = description,
             Series = series.ToArray(),
             XAxes = [xAxis],
-            YAxes = yAxes.ToArray()
+            YAxes = yAxes.ToArray(),
+            LegendPosition = LegendPosition.Right,  // Position the legend on the right
         };
     }
 }

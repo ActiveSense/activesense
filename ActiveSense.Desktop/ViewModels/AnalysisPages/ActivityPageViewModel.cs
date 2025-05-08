@@ -91,7 +91,7 @@ public partial class ActivityPageViewModel : PageViewModel
                 var dto = chartProvider.GetActivityDistributionChartData().ToArray();
                 var chartGenerator = new StackedBarGenerator(dto, _chartColors);
                 ActivityDistributionChart.Add(chartGenerator.GenerateChart(
-                    $"{analysis.FileName}",
+                    $"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Aktivitätsverteilung pro Tag"));
             }
         }

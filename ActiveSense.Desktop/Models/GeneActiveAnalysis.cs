@@ -171,33 +171,49 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
             .ToArray();
         return GetUniqueWeekdayLabels(weekdays);
     }, "ActivityWeekdays");
+    
+    public string[] ActivityDates() => GetCachedValue(() =>
+    {
+        var dates = _activityRecords
+            .Select(r => r.Day)
+            .ToArray();
+        return dates;
+    }, "ActivityDates");
 
+    public string[] SleepDates() => GetCachedValue(() =>
+    {
+        var dates = _sleepRecords
+            .Select(r => r.NightStarting)
+            .ToArray();
+        return dates;
+    }, "SleepDates");
+    
     #endregion
 
     #region Chart Data
 
     public IEnumerable<ChartDataDTO> GetActivityDistributionChartData()
     {
-        var weekdays = ActivityWeekdays();
+        var dates = ActivityWeekdays();
 
         return new List<ChartDataDTO>
         {
             new ChartDataDTO
             {
                 Data = LightActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
-                Labels = weekdays,
+                Labels = dates,
                 Title = "Leichte Aktivität"
             },
             new ChartDataDTO
             {
                 Data = ModerateActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
-                Labels = weekdays,
+                Labels = dates,
                 Title = "Mittlere Aktivität"
             },
             new ChartDataDTO
             {
                 Data = VigorousActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
-                Labels = weekdays,
+                Labels = dates,
                 Title = "Intensive Aktivität"
             }
         };
@@ -219,7 +235,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = SleepEfficiency,
             Labels = SleepWeekdays(),
-            Title = $"Schlaf-Effizienz {FileName}"
+            Title = $"Schlaf-Effizienz {FileName} ({this.GetSleepDateRange()})"
         };
     }
 
@@ -229,7 +245,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = ActivePeriods,
             Labels = SleepWeekdays(),
-            Title = $"Aktive Perioden {FileName}"
+            Title = $"Aktive Perioden {FileName} ({this.GetSleepDateRange()})"
         };
     }
 
@@ -249,7 +265,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = TotalSleepTimePerDay.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = SleepWeekdays(),
-            Title = FileName
+            Title = $"{FileName} ({this.GetSleepDateRange()})"
         };
     }
 
@@ -259,7 +275,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = StepsPerDay,
             Labels = ActivityWeekdays(),
-            Title = FileName
+            Title = $"{FileName} ({this.GetActivityDateRange()})" 
         };
     }
 
@@ -269,7 +285,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = SedentaryActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = FileName
+            Title = $"{FileName} ({this.GetActivityDateRange()})" 
         };
     }
 
@@ -279,7 +295,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = LightActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = FileName
+            Title = $"{FileName} ({this.GetActivityDateRange()})" 
         };
     }
     public ChartDataDTO GetModerateActivityChartData()
@@ -288,7 +304,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = ModerateActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = FileName
+            Title = $"{FileName} ({this.GetActivityDateRange()})" 
         };
     }
     public ChartDataDTO GetVigorousActivityChartData()
@@ -297,7 +313,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = VigorousActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = FileName
+            Title = $"{FileName} ({this.GetActivityDateRange()})" 
         };
     }
 

@@ -63,7 +63,7 @@ public partial class GeneralPageViewModel : PageViewModel
             var dto = chartProvider.GetMovementPatternChartData();
             var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
             if (SelectedAnalyses.Any())
-                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Die durchschnittliche Verteilung der Aktivität über 24h"));
         }
     }
@@ -92,7 +92,7 @@ public partial class GeneralPageViewModel : PageViewModel
                 Title = "Schlaf-Effizienz"
             });
             var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
-            SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
+            SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})", ""));
         }
     }
 
