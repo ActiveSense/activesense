@@ -88,33 +88,33 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             foreach (var dto in barData)
             {
                 var normalizedValues = NormalizeChartData(dto, allLabels);
+                var color = colors[colorIndex++];
 
                 series.Add(new ColumnSeries<double>
                 {
                     Values = normalizedValues,
                     Stroke = null,
-                    Fill = new SolidColorPaint(colors[colorIndex++]),
+                    Fill = new SolidColorPaint(color),
                     MaxBarWidth = 15,
                     Name = dto.Title ?? $"Series {colorIndex}",
-                    ScalesYAt = 0 // Scale using the first Y axis
+                    ScalesYAt = 0
                 });
-            }
 
-            // Add mean line if only bar data is provided
-            if (lineData == null || lineData.Length == 0)
-            {
-                var allValues = barData.SelectMany(dto => dto.Data);
-                var meanValue = allValues.Any() ? allValues.Average() : 0;
+                var meanValue = normalizedValues.Any() ? normalizedValues.Average() : 0;
                 var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
                 series.Add(new LineSeries<double>
                 {
                     Values = meanValues,
-                    Stroke = new SolidColorPaint(SKColors.Gray, 2),
+                    Stroke = new SolidColorPaint(color, 2),
                     Fill = null,
                     GeometrySize = 0,
-                    Name = "Durchschnitt",
+                    GeometryFill = null,
+                    GeometryStroke = null,
+                    IsHoverable = false,
+                    IsVisibleAtLegend = false,
+                    Name = $"Durchschnitt {dto.Title ?? $"Series {colorIndex}"}",
                     LineSmoothness = 0,
-                    ScalesYAt = 0 // Scale using the first Y axis
+                    ScalesYAt = 0
                 });
             }
         }
@@ -125,8 +125,6 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             var lineColors = chartColors.GetColorPalette(lineData.Length);
             var lineColorIndex = 0;
 
-            // If we have only line data with no bars, scale it to first axis
-            // Otherwise, scale to second axis
             var scaleYAt = barData == null || barData.Length == 0 ? 0 : 1;
 
             foreach (var dto in lineData)
@@ -141,7 +139,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                     Fill = null,
                     GeometrySize = 5,
                     GeometryStroke = new SolidColorPaint(lineColor, 2),
-                    Name = dto.Title ?? "Line Series",
+                    Name = dto.Title,
                     LineSmoothness = 0.5,
                     ScalesYAt = scaleYAt
                 });
@@ -163,7 +161,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             Series = series.ToArray(),
             XAxes = [xAxis],
             YAxes = yAxes.ToArray(),
-            LegendPosition = LegendPosition.Right,  // Position the legend on the right
+            LegendPosition = LegendPosition.Right,
         };
     }
 }
