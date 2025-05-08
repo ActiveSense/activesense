@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 
-namespace ActiveSense.Desktop.Services;
+namespace ActiveSense.Desktop.Core.Services;
 
-public class SharedDataService
+public class SharedDataService : ISharedDataService
 {
     public ObservableCollection<IAnalysis> SelectedAnalyses { get; } = new ObservableCollection<IAnalysis>();
     public ObservableCollection<IAnalysis> AllAnalyses { get; } = new();

@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Interfaces;
 
-namespace ActiveSense.Desktop.Import.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
 public interface IFileParser
 {

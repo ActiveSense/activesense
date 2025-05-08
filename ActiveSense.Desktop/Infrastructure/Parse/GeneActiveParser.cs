@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
-namespace ActiveSense.Desktop.Import.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Parse;
 
 public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser) : IResultParser
 {

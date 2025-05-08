@@ -2,10 +2,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Import.Implementations;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Infrastructure.Parse;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using Moq;
 using NUnit.Framework;
 

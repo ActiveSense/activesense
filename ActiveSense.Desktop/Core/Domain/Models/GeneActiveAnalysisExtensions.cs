@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 
-namespace ActiveSense.Desktop.Models;
+namespace ActiveSense.Desktop.Core.Domain.Models;
 
-public static class AnalysisExtensions
+public static class GeneActiveAnalysisExtensions
 {
     public static string GetSleepDateRange(this ISleepAnalysis analysis, string format = "dd.MM.yyyy")
     {

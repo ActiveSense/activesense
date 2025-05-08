@@ -1,8 +1,8 @@
 using System;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
-using ActiveSense.Desktop.Export.Implementations;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Export;
 using Moq;
 using NUnit.Framework;
 

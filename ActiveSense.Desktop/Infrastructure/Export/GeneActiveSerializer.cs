@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ActiveSense.Desktop.Converters;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using Newtonsoft.Json;
 
-namespace ActiveSense.Desktop.Export.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Export;
 
 public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSerializer
 {

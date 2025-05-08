@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.HelperClasses;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
-namespace ActiveSense.Desktop.Process.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
 public interface ISensorProcessor
 {

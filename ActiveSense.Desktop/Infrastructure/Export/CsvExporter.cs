@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using CsvHelper;
 
-namespace ActiveSense.Desktop.Export.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Export;
 
 public class CsvExporter : ICsvExporter
 {

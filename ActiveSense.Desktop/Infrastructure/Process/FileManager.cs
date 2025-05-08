@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Interfaces;
+using ActiveSense.Desktop.Core.Services.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
-namespace ActiveSense.Desktop.Process.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Process;
 
 public class FileManager(IPathService pathService) : IFileManager
 {

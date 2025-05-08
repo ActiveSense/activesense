@@ -3,8 +3,8 @@ using System.Linq;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using ActiveSense.Desktop.ViewModels.Charts;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
@@ -12,7 +12,7 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.SKCharts;
 using SkiaSharp;
 
-namespace ActiveSense.Desktop.Export.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Export;
 
 public class ChartRenderer(ChartColors chartColors) : IChartRenderer
 {

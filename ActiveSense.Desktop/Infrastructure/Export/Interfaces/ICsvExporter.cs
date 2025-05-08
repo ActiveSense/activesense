@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Models;
 
-namespace ActiveSense.Desktop.Export.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 
 public interface ICsvExporter
 {

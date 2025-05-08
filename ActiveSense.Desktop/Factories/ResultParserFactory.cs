@@ -1,7 +1,6 @@
 using System;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
 namespace ActiveSense.Desktop.Factories;
 

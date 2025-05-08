@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 
-namespace ActiveSense.Desktop.Services;
+namespace ActiveSense.Desktop.Core.Services;
 
 public class PathService : IPathService
 {

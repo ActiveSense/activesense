@@ -1,6 +1,6 @@
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 
-namespace ActiveSense.Desktop.Export.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 
 public interface IChartRenderer
 {

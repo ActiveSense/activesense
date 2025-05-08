@@ -1,6 +1,6 @@
 using System;
 
-namespace ActiveSense.Desktop.HelperClasses
+namespace ActiveSense.Desktop.Infrastructure.Process.Helpers
 {
     public abstract class ScriptArgument
     {

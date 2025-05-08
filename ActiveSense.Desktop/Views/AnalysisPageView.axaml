@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:interfaces="clr-namespace:ActiveSense.Desktop.Interfaces"
+             xmlns:interfaces1="clr-namespace:ActiveSense.Desktop.Core.Domain.Interfaces"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.AnalysisPageView"
              x:DataType="viewModels:AnalysisPageViewModel">
@@ -147,7 +147,7 @@
                                 </ListBox.ItemsPanel>
 
                                 <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="interfaces:IAnalysis">
+                                    <DataTemplate x:DataType="interfaces1:IAnalysis">
                                         <Border
                                             CornerRadius="6"
                                             Padding="8,10"

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Models;
 
 namespace ActiveSense.Desktop.Tests.ExportTests.Mock
 {

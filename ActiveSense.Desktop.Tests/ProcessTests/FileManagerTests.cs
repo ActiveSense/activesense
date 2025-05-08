@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Implementations;
+using ActiveSense.Desktop.Core.Services.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Process;
 using Moq;
 using NUnit.Framework;
 

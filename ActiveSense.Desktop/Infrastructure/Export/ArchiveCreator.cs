@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Export.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 
-namespace ActiveSense.Desktop.Export.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Export;
 
 public class ArchiveCreator : IArchiveCreator
 {

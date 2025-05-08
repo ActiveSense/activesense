@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 
-namespace ActiveSense.Desktop.Import.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
 public interface IPdfParser
 {

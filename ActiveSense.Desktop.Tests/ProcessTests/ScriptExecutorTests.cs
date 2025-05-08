@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Process.Implementations;
+using ActiveSense.Desktop.Infrastructure.Process;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.ProcessTests;

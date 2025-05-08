@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.ViewModels;
 using Avalonia.Controls;
 

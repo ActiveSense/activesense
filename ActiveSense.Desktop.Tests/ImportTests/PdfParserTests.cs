@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Import.Implementations;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse;
 using Moq;
 using NUnit.Framework;
 

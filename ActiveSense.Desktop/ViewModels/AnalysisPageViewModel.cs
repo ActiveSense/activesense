@@ -1,10 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Services;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,7 +20,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     private readonly PageFactory _pageFactory;
     private readonly ProcessDialogViewModel _processDialogViewModel;
     private readonly ResultParserFactory _resultParserFactory;
-    private readonly SharedDataService _sharedDataService;
+    private readonly ISharedDataService _sharedDataService;
     [ObservableProperty] private bool _isProcessingInBackground;
 
     [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
@@ -32,7 +33,7 @@ public partial class AnalysisPageViewModel : PageViewModel
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
         PageFactory pageFactory,
-        SharedDataService sharedDataService,
+        ISharedDataService sharedDataService,
         DialogService dialogService,
         MainViewModel mainViewModel,
         ProcessDialogViewModel processDialogViewModel,

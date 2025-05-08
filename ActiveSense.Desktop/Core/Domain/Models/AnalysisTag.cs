@@ -1,6 +1,6 @@
 using System;
 
-namespace ActiveSense.Desktop.Models;
+namespace ActiveSense.Desktop.Core.Domain.Models;
 
 public class AnalysisTag
 {
@@ -21,11 +21,11 @@ public class AnalysisTag
         {
             hexColor = hexColor.TrimStart('#');
 
-            int r = Convert.ToInt32(hexColor.Substring(0, 2), 16);
-            int g = Convert.ToInt32(hexColor.Substring(2, 2), 16);
-            int b = Convert.ToInt32(hexColor.Substring(4, 2), 16);
+            var r = Convert.ToInt32(hexColor.Substring(0, 2), 16);
+            var g = Convert.ToInt32(hexColor.Substring(2, 2), 16);
+            var b = Convert.ToInt32(hexColor.Substring(4, 2), 16);
 
-            float darkenFactor = 0.6f;
+            var darkenFactor = 0.6f;
             r = (int)(r * darkenFactor);
             g = (int)(g * darkenFactor);
             b = (int)(b * darkenFactor);
