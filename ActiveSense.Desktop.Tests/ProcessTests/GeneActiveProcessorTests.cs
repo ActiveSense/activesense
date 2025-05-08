@@ -4,12 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Implementations;
-using ActiveSense.Desktop.Process.Interfaces;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Infrastructure.Process;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
+using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using Moq;
 using NUnit.Framework;
 

@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
-using ActiveSense.Desktop.Export.Implementations;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using Moq;
 using NUnit.Framework;
 

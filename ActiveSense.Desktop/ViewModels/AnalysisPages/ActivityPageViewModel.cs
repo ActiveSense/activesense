@@ -5,9 +5,10 @@ using System.Linq;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
 
@@ -16,7 +17,7 @@ namespace ActiveSense.Desktop.ViewModels.AnalysisPages;
 public partial class ActivityPageViewModel : PageViewModel
 {
     private readonly ChartColors _chartColors;
-    private readonly SharedDataService _sharedDataService;
+    private readonly ISharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible = false;
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
 
@@ -50,7 +51,7 @@ public partial class ActivityPageViewModel : PageViewModel
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _vigorousCharts = [];
     [ObservableProperty] private bool _isVigorousExpanded = false;
 
-    public ActivityPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
+    public ActivityPageViewModel(ISharedDataService sharedDataService, ChartColors chartColors)
     {
         _sharedDataService = sharedDataService;
         _chartColors = chartColors;
@@ -91,7 +92,7 @@ public partial class ActivityPageViewModel : PageViewModel
                 var dto = chartProvider.GetActivityDistributionChartData().ToArray();
                 var chartGenerator = new StackedBarGenerator(dto, _chartColors);
                 ActivityDistributionChart.Add(chartGenerator.GenerateChart(
-                    $"{analysis.FileName}",
+                    $"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Aktivitätsverteilung pro Tag"));
             }
         }

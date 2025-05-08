@@ -2,9 +2,9 @@ using System.IO;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Converters;
-using ActiveSense.Desktop.Export.Implementations;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.ExportTests;
@@ -76,7 +76,7 @@ public class ExportIntegrationTests
         {
             new ActivityRecord
             {
-                Day = "1",
+                Day = "2024-11-29",
                 Steps = "3624",
                 NonWear = "0",
                 Sleep = "12994",
@@ -87,7 +87,7 @@ public class ExportIntegrationTests
             },
             new ActivityRecord
             {
-                Day = "2",
+                Day = "2024-11-29",
                 Steps = "10217",
                 NonWear = "0",
                 Sleep = "26708",

@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ActiveSense.Desktop.ViewModels;

@@ -5,9 +5,10 @@ using System.Linq;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.ViewModels.Charts;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -16,7 +17,7 @@ namespace ActiveSense.Desktop.ViewModels.AnalysisPages;
 public partial class GeneralPageViewModel : PageViewModel
 {
     private readonly ChartColors _chartColors;
-    private readonly SharedDataService _sharedDataService;
+    private readonly ISharedDataService _sharedDataService;
     [ObservableProperty] private bool _chartsVisible;
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
 
@@ -30,7 +31,7 @@ public partial class GeneralPageViewModel : PageViewModel
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = [];
     [ObservableProperty] private bool _isMovementExpanded = false;
 
-    public GeneralPageViewModel(SharedDataService sharedDataService, ChartColors chartColors)
+    public GeneralPageViewModel(ISharedDataService sharedDataService, ChartColors chartColors)
     {
         _sharedDataService = sharedDataService;
         _chartColors = chartColors;
@@ -63,7 +64,7 @@ public partial class GeneralPageViewModel : PageViewModel
             var dto = chartProvider.GetMovementPatternChartData();
             var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
             if (SelectedAnalyses.Any())
-                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName}",
+                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Die durchschnittliche Verteilung der Aktivität über 24h"));
         }
     }
@@ -77,22 +78,20 @@ public partial class GeneralPageViewModel : PageViewModel
             var line = new List<ChartDataDTO>();
             var bar = new List<ChartDataDTO>();
 
-            var labels = activityAnalysis.ActivityWeekdays();
-
             bar.Add(new ChartDataDTO
             {
                 Data = activityAnalysis.StepsPerDay,
-                Labels = labels,
+                Labels = activityAnalysis.ActivityDates(),
                 Title = "Schritte pro Tag"
             });
             line.Add(new ChartDataDTO
             {
                 Data = sleepAnalysis.SleepEfficiency,
-                Labels = labels,
+                Labels = sleepAnalysis.SleepDates(),
                 Title = "Schlaf-Effizienz"
             });
             var chartGenerator = new BarChartGenerator(bar.ToArray(), _chartColors, line.ToArray());
-            SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName}", ""));
+            SleepStepsCharts.Add(chartGenerator.GenerateChart($"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})", ""));
         }
     }
 

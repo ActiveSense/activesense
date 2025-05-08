@@ -1,10 +1,13 @@
 using System;
+using System.Globalization;
 
 namespace ActiveSense.Desktop.Converters;
 
 public class DateToWeekdayConverter
 {
-    public DateTime ConvertStringToDate(string date)
+    private readonly CultureInfo _germanCulture = new CultureInfo("de-DE");
+
+    private DateTime ConvertStringToDate(string date)
     {
         try
         {
@@ -12,7 +15,7 @@ public class DateToWeekdayConverter
         }
         catch (Exception)
         {
-            return DateTime.Parse("2000-01-01");
+            return DateTime.Parse("Parsing Error");
         }
     }
 
@@ -21,7 +24,8 @@ public class DateToWeekdayConverter
         var dateTime = ConvertStringToDate(date);
         try
         {
-            return dateTime.ToString("dddd");
+            // Use German culture to get the weekday name
+            return dateTime.ToString("dddd", _germanCulture);
         }
         catch (Exception e)
         {

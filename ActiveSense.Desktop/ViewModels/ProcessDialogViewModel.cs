@@ -5,11 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,12 +18,10 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class ProcessDialogViewModel : DialogViewModel
 {
-    private readonly DialogService _dialogService;
-    private readonly MainViewModel _mainViewModel;
+    private readonly IPathService _pathService;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SensorProcessorFactory _sensorProcessorFactory;
-    private readonly SharedDataService _sharedDataService;
-    private readonly IPathService _pathService;
+    private readonly ISharedDataService _sharedDataService;
 
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
     private CancellationTokenSource? _cancellationTokenSource;
@@ -48,11 +45,9 @@ public partial class ProcessDialogViewModel : DialogViewModel
     [ObservableProperty] private string _title = "Sensordaten analysieren";
 
     public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory,
-        SharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService,
-        MainViewModel mainViewModel, IPathService pathService)
+        ISharedDataService sharedDataService, ResultParserFactory resultParserFactory,
+        IPathService pathService)
     {
-        _mainViewModel = mainViewModel;
-        _dialogService = dialogService;
         _resultParserFactory = resultParserFactory;
         _sensorProcessorFactory = sensorProcessorFactory;
         _sharedDataService = sharedDataService;
@@ -193,13 +188,14 @@ public partial class ProcessDialogViewModel : DialogViewModel
             var outputDirectory = _pathService.OutputDirectory;
 
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
-            
-            
+
+
             StatusMessage = "Procesing files...";
 
             if (Directory.EnumerateFiles(processingDirectory).Any())
             {
-                var (scriptSuccess, output, error) = await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
+                var (scriptSuccess, output, error) =
+                    await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
                 ScriptOutput = output;
                 ShowScriptOutput = true;
 

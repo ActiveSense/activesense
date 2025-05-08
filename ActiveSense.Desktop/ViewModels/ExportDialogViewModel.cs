@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -12,7 +13,7 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class ExportDialogViewModel(
     ExporterFactory exporterFactory,
-    SharedDataService sharedDataService,
+    ISharedDataService sharedDataService,
     MainViewModel mainViewModel,
     DialogService dialogService)
     : DialogViewModel

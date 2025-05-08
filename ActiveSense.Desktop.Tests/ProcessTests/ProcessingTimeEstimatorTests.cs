@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ActiveSense.Desktop.Sensors;
+using ActiveSense.Desktop.Infrastructure.Process;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.ProcessTests;
