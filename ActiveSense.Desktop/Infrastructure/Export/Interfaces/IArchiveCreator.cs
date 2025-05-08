@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace ActiveSense.Desktop.Export.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 
 public interface IArchiveCreator
 {

@@ -1,4 +1,4 @@
-namespace ActiveSense.Desktop.Import.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
 public interface IHeaderAnalyzer
 {

@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using ActiveSense.Desktop.Charts.DTOs;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Models;
 
-namespace ActiveSense.Desktop.Interfaces;
+namespace ActiveSense.Desktop.Core.Domain.Interfaces;
 
 public interface IAnalysis
 {
@@ -15,55 +13,6 @@ public interface IAnalysis
     void AddTag(string name, string color);
 }
 
-public interface IActivityAnalysis : IAnalysis
-{
-    IReadOnlyCollection<ActivityRecord> ActivityRecords { get; }
-    double[] StepsPerDay { get; }
-    double[] ModerateActivity { get; }
-    double[] VigorousActivity { get; }
-    double[] LightActivity { get; }
-    double[] SedentaryActivity { get; }
-    double[] StepsPercentage { get; }
-    double AverageSedentaryTime { get; }
-    double AverageModerateActivity { get; }
-    double AverageVigorousActivity { get; }
-    double AverageLightActivity { get; }
-    public string[] ActivityWeekdays();
-    public string[] ActivityDates();
-
-    void SetActivityRecords(IEnumerable<ActivityRecord> records);
-}
-
-public interface ISleepAnalysis : IAnalysis
-{
-    IReadOnlyCollection<SleepRecord> SleepRecords { get; }
-
-    double TotalSleepTime { get; }
-    double TotalWakeTime { get; }
-    double AverageSleepTime { get; }
-    double AverageWakeTime { get; }
-    double[] SleepEfficiency { get; }
-    double[] TotalSleepTimePerDay { get; }
-
-    string[] SleepWeekdays();
-    string[] SleepDates();
 
 
-    void SetSleepRecords(IEnumerable<SleepRecord> records);
-}
 
-public interface IChartDataProvider
-{
-    ChartDataDTO GetStepsChartData();
-    ChartDataDTO GetSleepDistributionChartData();
-    ChartDataDTO GetMovementPatternChartData();
-    IEnumerable<ChartDataDTO> GetActivityDistributionChartData();
-    ChartDataDTO GetTotalSleepTimePerDayChartData();
-    ChartDataDTO GetSedentaryChartData();
-    ChartDataDTO GetLightActivityChartData();
-    ChartDataDTO GetModerateActivityChartData();
-    ChartDataDTO GetVigorousActivityChartData();
-    ChartDataDTO GetSleepEfficiencyChartData();
-    ChartDataDTO GetActivePeriodsChartData();
-
-}

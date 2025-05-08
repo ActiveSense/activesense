@@ -8,7 +8,7 @@
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              x:DataType="viewModels:ProcessDialogViewModel"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:helperClasses="clr-namespace:ActiveSense.Desktop.HelperClasses"
+             xmlns:helperClasses="clr-namespace:ActiveSense.Desktop.Infrastructure.Process.Helpers"
              x:Class="ActiveSense.Desktop.Views.ProcessDialogView">
 
     <Design.DataContext>

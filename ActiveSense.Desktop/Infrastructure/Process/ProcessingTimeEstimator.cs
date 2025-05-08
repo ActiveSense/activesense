@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
-namespace ActiveSense.Desktop.Sensors;
+namespace ActiveSense.Desktop.Infrastructure.Process;
 
 public class ProcessingTimeEstimator : IProcessingTimeEstimator
 {

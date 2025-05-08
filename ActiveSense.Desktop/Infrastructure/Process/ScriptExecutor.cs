@@ -3,10 +3,9 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
-namespace ActiveSense.Desktop.Process.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Process;
 
 public class ScriptExecutor : IScriptExecutor
 {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
-using ActiveSense.Desktop.Charts.Generators;
 using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
@@ -11,7 +10,7 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
 
-namespace ActiveSense.Desktop.Charts;
+namespace ActiveSense.Desktop.Charts.Generators;
 
 public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors, ChartDataDTO[]? lineData = null)
 {

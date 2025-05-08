@@ -1,9 +1,8 @@
 using System;
 using System.Linq;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
-namespace ActiveSense.Desktop.Import.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Parse;
 
 public class HeaderAnalyzer : IHeaderAnalyzer
 {

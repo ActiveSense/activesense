@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Interfaces;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
+using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
-namespace ActiveSense.Desktop.Process.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Process;
 
 public class GeneActiveProcessor : ISensorProcessor
 {

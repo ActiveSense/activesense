@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using ActiveSense.Desktop.Export.Implementations;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.ExportTests;

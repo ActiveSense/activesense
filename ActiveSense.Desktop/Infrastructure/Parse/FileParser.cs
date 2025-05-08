@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Models;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using CsvHelper;
 
-namespace ActiveSense.Desktop.Import.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Parse;
 
 public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter)
     : IFileParser

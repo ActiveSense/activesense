@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 
-namespace ActiveSense.Desktop.Export.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Export;
 
 public class GeneActiveExporter(
     IPdfReportGenerator pdfReportGenerator,

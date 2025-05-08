@@ -5,15 +5,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
-using ActiveSense.Desktop.Export.Implementations;
-using ActiveSense.Desktop.Export.Interfaces;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 
-namespace ActiveSense.Desktop.Import.Implementations;
+namespace ActiveSense.Desktop.Infrastructure.Parse;
 
 public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter)
     : IPdfParser

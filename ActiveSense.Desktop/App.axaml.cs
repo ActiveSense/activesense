@@ -3,18 +3,16 @@ using System.Linq;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Export.Implementations;
-using ActiveSense.Desktop.Export.Interfaces;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Import.Implementations;
-using ActiveSense.Desktop.Import.Interfaces;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Process.Implementations;
-using ActiveSense.Desktop.Process.Interfaces;
-using ActiveSense.Desktop.Sensors;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse;
+using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Process;
+using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using ActiveSense.Desktop.ViewModels;
 using ActiveSense.Desktop.ViewModels.AnalysisPages;
 using ActiveSense.Desktop.ViewModels.Charts;
@@ -73,7 +71,7 @@ public class App : Application
         collection.AddTransient<GeneActiveResultParser>();
 
         // Register services
-        collection.AddSingleton<SharedDataService>();
+        collection.AddSingleton<ISharedDataService, SharedDataService>();
         collection.AddSingleton<IPathService, PathService>();
 
         // Register view models

@@ -1,9 +1,8 @@
-using System;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Interfaces;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.ViewModels;
 
-namespace ActiveSense.Desktop.Services;
+namespace ActiveSense.Desktop.Core.Services;
 
 public class DialogService
 {

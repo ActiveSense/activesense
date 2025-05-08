@@ -5,11 +5,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Interfaces;
-using ActiveSense.Desktop.Services;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,7 +23,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     private readonly MainViewModel _mainViewModel;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SensorProcessorFactory _sensorProcessorFactory;
-    private readonly SharedDataService _sharedDataService;
+    private readonly ISharedDataService _sharedDataService;
     private readonly IPathService _pathService;
 
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
@@ -48,7 +48,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     [ObservableProperty] private string _title = "Sensordaten analysieren";
 
     public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory,
-        SharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService,
+        ISharedDataService sharedDataService, ResultParserFactory resultParserFactory, DialogService dialogService,
         MainViewModel mainViewModel, IPathService pathService)
     {
         _mainViewModel = mainViewModel;

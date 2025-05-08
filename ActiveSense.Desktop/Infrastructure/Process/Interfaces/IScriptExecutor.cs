@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ActiveSense.Desktop.Process.Interfaces;
+namespace ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
 
 public interface IScriptExecutor

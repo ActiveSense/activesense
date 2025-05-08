@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Charts.DTOs;
-using ActiveSense.Desktop.HelperClasses;
-using ActiveSense.Desktop.Interfaces;
-using CsvHelper.Configuration.Attributes;
+using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
 
-namespace ActiveSense.Desktop.Models;
+namespace ActiveSense.Desktop.Core.Domain.Models;
 
-public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) : IActivityAnalysis, ISleepAnalysis, IChartDataProvider
+public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
+    : IActivityAnalysis, ISleepAnalysis, IChartDataProvider
 {
-    public string FilePath { get; set; } = string.Empty;
-    public string FileName { get; set; } = string.Empty;
-    public bool Exported { get; set; } = false;
+    private const string DateFormat = "dd.MM.yyyy";
 
 
     private readonly Dictionary<string, object> _cache = new();
     private List<ActivityRecord> _activityRecords = [];
     private List<SleepRecord> _sleepRecords = [];
-    private const string DateFormat = "dd.MM.yyyy";
+    public string FilePath { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
+    public bool Exported { get; set; } = false;
 
 
     #region Collections
@@ -34,18 +33,6 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     public void AddTag(string name, string color)
     {
         Tags.Add(new AnalysisTag(name, color));
-    }
-
-    public void AddActivityRecords(IEnumerable<ActivityRecord> records)
-    {
-        _activityRecords.AddRange(records);
-        ClearCache();
-    }
-
-    public void AddSleepRecords(IEnumerable<SleepRecord> records)
-    {
-        _sleepRecords.AddRange(records);
-        ClearCache();
     }
 
     public void SetActivityRecords(IEnumerable<ActivityRecord> records)
@@ -145,6 +132,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         _activityRecords.Any()
             ? _activityRecords.Average(record => TryParseDouble(record.Light))
             : 0);
+
     public double AverageModerateActivity => GetCachedValue(() =>
         _activityRecords.Any()
             ? _activityRecords.Average(record => TryParseDouble(record.Moderate))
@@ -154,43 +142,56 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         _activityRecords.Any()
             ? _activityRecords.Average(record => TryParseDouble(record.Vigorous))
             : 0);
+
     #endregion
 
     #region Data Access Methods
 
-    public string[] SleepWeekdays() => GetCachedValue(() =>
+    public string[] SleepWeekdays()
     {
-        var weekdays = _sleepRecords
-            .Select(r => dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
-            .ToArray();
-        return GetUniqueWeekdayLabels(weekdays);
-    }, "SleepWeekdays");
+        return GetCachedValue(() =>
+        {
+            var weekdays = _sleepRecords
+                .Select(r => dateToWeekdayConverter.ConvertDateToWeekday(r.NightStarting))
+                .ToArray();
+            return GetUniqueWeekdayLabels(weekdays);
+        });
+    }
 
-    public string[] ActivityWeekdays() => GetCachedValue(() =>
+    public string[] ActivityWeekdays()
     {
-        var weekdays = _activityRecords
-            .Select(r => dateToWeekdayConverter.ConvertDateToWeekday(r.Day))
-            .ToArray();
-        return GetUniqueWeekdayLabels(weekdays);
-    }, "ActivityWeekdays");
-    
+        return GetCachedValue(() =>
+        {
+            var weekdays = _activityRecords
+                .Select(r => dateToWeekdayConverter.ConvertDateToWeekday(r.Day))
+                .ToArray();
+            return GetUniqueWeekdayLabels(weekdays);
+        });
+    }
 
-    public string[] ActivityDates() => GetCachedValue(() =>
-    {
-        var dates = _activityRecords
-            .Select(r => ParseAndFormatDate(r.Day, DateFormat))
-            .ToArray();
-        return dates;
-    }, "ActivityDates");
 
-    public string[] SleepDates() => GetCachedValue(() =>
+    public string[] ActivityDates()
     {
-        var dates = _sleepRecords
-            .Select(r => ParseAndFormatDate(r.NightStarting, DateFormat))
-            .ToArray();
-        return dates;
-    }, "SleepDates");
-    
+        return GetCachedValue(() =>
+        {
+            var dates = _activityRecords
+                .Select(r => ParseAndFormatDate(r.Day, DateFormat))
+                .ToArray();
+            return dates;
+        });
+    }
+
+    public string[] SleepDates()
+    {
+        return GetCachedValue(() =>
+        {
+            var dates = _sleepRecords
+                .Select(r => ParseAndFormatDate(r.NightStarting, DateFormat))
+                .ToArray();
+            return dates;
+        });
+    }
+
     #endregion
 
     #region Chart Data
@@ -201,19 +202,19 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
 
         return new List<ChartDataDTO>
         {
-            new ChartDataDTO
+            new()
             {
                 Data = LightActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
                 Labels = dates,
                 Title = "Leichte Aktivität"
             },
-            new ChartDataDTO
+            new()
             {
                 Data = ModerateActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
                 Labels = dates,
                 Title = "Mittlere Aktivität"
             },
-            new ChartDataDTO
+            new()
             {
                 Data = VigorousActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
                 Labels = dates,
@@ -254,11 +255,15 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
 
     public ChartDataDTO GetMovementPatternChartData()
     {
-        return new ChartDataDTO()
+        return new ChartDataDTO
         {
             Labels = new[] { "Aktivität", "Schlaf", "Sitzzeit" },
-            Data = new[] { (AverageLightActivity + AverageModerateActivity + AverageVigorousActivity), AverageSleepTime, AverageSedentaryTime },
-            Title = $"Aktivitätsverteilung {FileName}",
+            Data = new[]
+            {
+                AverageLightActivity + AverageModerateActivity + AverageVigorousActivity, AverageSleepTime,
+                AverageSedentaryTime
+            },
+            Title = $"Aktivitätsverteilung {FileName}"
         };
     }
 
@@ -278,7 +283,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = StepsPerDay,
             Labels = ActivityWeekdays(),
-            Title = $"{FileName} ({this.GetActivityDateRange()})" 
+            Title = $"{FileName} ({this.GetActivityDateRange()})"
         };
     }
 
@@ -288,7 +293,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = SedentaryActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = $"{FileName} ({this.GetActivityDateRange()})" 
+            Title = $"{FileName} ({this.GetActivityDateRange()})"
         };
     }
 
@@ -298,25 +303,27 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         {
             Data = LightActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = $"{FileName} ({this.GetActivityDateRange()})" 
+            Title = $"{FileName} ({this.GetActivityDateRange()})"
         };
     }
+
     public ChartDataDTO GetModerateActivityChartData()
     {
         return new ChartDataDTO
         {
             Data = ModerateActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = $"{FileName} ({this.GetActivityDateRange()})" 
+            Title = $"{FileName} ({this.GetActivityDateRange()})"
         };
     }
+
     public ChartDataDTO GetVigorousActivityChartData()
     {
         return new ChartDataDTO
         {
             Data = VigorousActivity.Select(seconds => Math.Round(seconds / 3600, 1)).ToArray(),
             Labels = ActivityWeekdays(),
-            Title = $"{FileName} ({this.GetActivityDateRange()})" 
+            Title = $"{FileName} ({this.GetActivityDateRange()})"
         };
     }
 
@@ -331,10 +338,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
 
     private T GetCachedValue<T>(Func<T> valueFactory, [CallerMemberName] string key = null)
     {
-        if (_cache.TryGetValue(key, out var value) && value is T cachedValue)
-        {
-            return cachedValue;
-        }
+        if (_cache.TryGetValue(key, out var value) && value is T cachedValue) return cachedValue;
 
         var newValue = valueFactory();
         _cache[key] = newValue;
@@ -345,14 +349,12 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
     {
         return double.TryParse(value, out var result) ? result : 0;
     }
-    
+
     private string ParseAndFormatDate(string dateString, string format)
     {
-        if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
-        {
+        if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
             return date.ToString(format);
-        }
-            
+
         return dateString;
     }
 
@@ -364,7 +366,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
         var uniqueLabels = new string[weekdays.Length];
         var weekdayCounts = new Dictionary<string, int>();
 
-        for (int i = 0; i < weekdays.Length; i++)
+        for (var i = 0; i < weekdays.Length; i++)
         {
             var weekday = weekdays[i];
 
@@ -384,4 +386,3 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter) :
 
     #endregion
 }
-

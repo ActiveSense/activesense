@@ -1,6 +1,6 @@
 using ActiveSense.Desktop.ViewModels;
 
-namespace ActiveSense.Desktop.Interfaces;
+namespace ActiveSense.Desktop.Core.Services.Interfaces;
 
 public interface IDialogProvider
 {
