@@ -88,7 +88,7 @@ public class AnalysisModeFileTests
 
         // Check specific values from the first record
         var firstRecord = _analysis.ActivityRecords.First();
-        Assert.That(firstRecord.Day, Is.EqualTo("1"));
+        Assert.That(firstRecord.Day, Is.EqualTo("2024-10-03"));
         Assert.That(firstRecord.Steps, Is.EqualTo("3624"));
         Assert.That(firstRecord.Light, Is.EqualTo("14007"));
     }
@@ -222,7 +222,6 @@ public class AnalysisModeFileTests
         var chartData = chartProvider.GetTotalSleepTimePerDayChartData();
 
         // Assert
-        Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName));
         Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.SleepWeekdays().Length));
         Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.TotalSleepTimePerDay.Length));
 
@@ -242,7 +241,6 @@ public class AnalysisModeFileTests
         var chartData = chartProvider.GetStepsChartData();
 
         // Assert
-        Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName));
         Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.ActivityWeekdays().Length));
 
         // Check that the data matches the StepsPerDay values

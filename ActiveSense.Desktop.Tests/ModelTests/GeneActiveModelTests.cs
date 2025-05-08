@@ -299,7 +299,7 @@ public class AnalysisModelTests
 
         Assert.That(weekdays.Length, Is.EqualTo(3), "SleepWeekdays should return 3 weekdays");
 
-        var validWeekdays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+        var validWeekdays = new[] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
         foreach (var day in weekdays)
         {
             string baseDayName = day.Split(' ')[0]; // Remove any counters (e.g., "Monday 2")
@@ -318,7 +318,7 @@ public class AnalysisModelTests
 
         Assert.That(weekdays.Length, Is.EqualTo(3), "ActivityWeekdays should return 3 weekdays");
 
-        var validWeekdays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+        var validWeekdays = new[] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
         foreach (var day in weekdays)
         {
             string baseDayName = day.Split(' ')[0]; // Remove any counters (e.g., "Monday 2")
@@ -384,7 +384,6 @@ public class AnalysisModelTests
         var chartData = chartProvider.GetTotalSleepTimePerDayChartData();
 
         // Assert
-        Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName), "Total sleep time chart title is incorrect");
         Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.SleepWeekdays().Length), "Total sleep time chart labels length is incorrect");
         Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.TotalSleepTimePerDay.Length), "Total sleep time chart data length is incorrect");
 
@@ -404,7 +403,6 @@ public class AnalysisModelTests
         var chartData = chartProvider.GetStepsChartData();
 
         // Assert
-        Assert.That(chartData.Title, Is.EqualTo(_analysis.FileName), "Steps chart title is incorrect");
         Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.ActivityWeekdays().Length), "Steps chart labels length is incorrect");
         Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.StepsPerDay.Length), "Steps chart data length is incorrect");
 

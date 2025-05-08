@@ -76,7 +76,7 @@ public class ExportIntegrationTests
         {
             new ActivityRecord
             {
-                Day = "1",
+                Day = "2024-11-29",
                 Steps = "3624",
                 NonWear = "0",
                 Sleep = "12994",
@@ -87,7 +87,7 @@ public class ExportIntegrationTests
             },
             new ActivityRecord
             {
-                Day = "2",
+                Day = "2024-11-29",
                 Steps = "10217",
                 NonWear = "0",
                 Sleep = "26708",
