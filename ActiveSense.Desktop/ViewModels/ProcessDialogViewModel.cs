@@ -224,11 +224,13 @@ public partial class ProcessDialogViewModel : DialogViewModel
         catch (FileNotFoundException ex)
         {
             Console.WriteLine(ex.Message);
-            var dialog = new PathDialogViewModel()
+            var dialog = new PathDialogViewModel(_pathService)
             {
-                Title = "R Installation nicht gefunden",
-                SubTitle = "Es wurde kein R-Installationsverzeichnis gefunden. Bitte geben Sie den Pfad zu Ihrer R-Installation an.",
-                OkButtonText = "OK"
+                Title = "Fehler",
+                SubTitle = "R Installation nicht gefunden",
+                Message = "Es wurde kein R-Installationsverzeichnis gefunden. Bitte geben Sie den Pfad zu Ihrer R-Installation an.",
+                OkButtonText = "Speichern",
+                CloseButtonText = "Abbrechen",
             };
             await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
         }

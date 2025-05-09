@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using ActiveSense.Desktop.Core.Services.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
 namespace ActiveSense.Desktop.Core.Services;
 
@@ -132,40 +133,39 @@ public class PathService : IPathService
 
     public string FindRInstallation()
     {
-        // Check for environment variable first (allows users to override)
-        // var rPathFromEnv = Environment.GetEnvironmentVariable("ACTIVESENSE_R_PATH");
-        // if (!string.IsNullOrEmpty(rPathFromEnv) && File.Exists(rPathFromEnv)) return rPathFromEnv;
-        //
-        // if (OperatingSystem.IsWindows()) return FindWindowsRInstallation();
-        //
-        // if (OperatingSystem.IsMacOS()) return FindMacOSRInstallation();
-        //
-        // if (OperatingSystem.IsLinux()) return FindLinuxRInstallation();
+        var savedPath = RPathStorage.GetRPath();
+        if (!string.IsNullOrEmpty(savedPath) && File.Exists(savedPath) && RPathStorage.TestRExecutable(savedPath))
+            return savedPath;
+
+
+        if (OperatingSystem.IsWindows()) savedPath = FindWindowsRInstallation();
+
+        if (OperatingSystem.IsMacOS()) savedPath = FindMacOSRInstallation();
+
+        if (OperatingSystem.IsLinux()) savedPath = FindLinuxRInstallation();
+
+        if (!string.IsNullOrEmpty(savedPath) && File.Exists(savedPath) && RPathStorage.TestRExecutable(savedPath))
+            return savedPath;
 
         throw new FileNotFoundException(
-            "Could not locate R installation on this system. Please install R or set the ACTIVESENSE_R_PATH environment variable.");
+            "Could not locate R installation on this system. Please install R or set the path manually.");
     }
 
     private string FindWindowsRInstallation()
     {
-        // Check Program Files for R installations
         var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
-        // Common R installation paths on Windows
         var possiblePaths = new List<string>();
 
-        // Check Program Files R directory
         var rDir = Path.Combine(programFiles, "R");
         if (Directory.Exists(rDir))
-            // Look for R version directories like "R-4.2.2"
             foreach (var versionDir in Directory.GetDirectories(rDir))
             {
                 var rscriptPath = Path.Combine(versionDir, "bin", "Rscript.exe");
                 if (File.Exists(rscriptPath)) possiblePaths.Add(rscriptPath);
             }
 
-        // Also check specific version installations (e.g., "R\R-4.4.3\bin\Rscript.exe")
         for (var version = 4.0; version <= 5.0; version += 0.1)
         {
             var versionString = version.ToString("F1", CultureInfo.InvariantCulture);
@@ -173,16 +173,13 @@ public class PathService : IPathService
             if (File.Exists(rscriptPath)) possiblePaths.Add(rscriptPath);
         }
 
-        // Check RStudio's R installation too
         var rstudioPath = Path.Combine(programFiles, "RStudio", "resources", "R", "bin", "Rscript.exe");
         if (File.Exists(rstudioPath)) possiblePaths.Add(rstudioPath);
 
-        // Also check x86 Program Files
         var rstudioPathX86 = Path.Combine(programFilesX86, "RStudio", "resources", "R", "bin", "Rscript.exe");
         if (File.Exists(rstudioPathX86)) possiblePaths.Add(rstudioPathX86);
 
         if (possiblePaths.Count > 0)
-            // Return the highest version (assuming the last in the list is newest)
             return possiblePaths[possiblePaths.Count - 1];
 
         throw new FileNotFoundException(
@@ -234,7 +231,6 @@ public class PathService : IPathService
 
     private static string FindLinuxRInstallation()
     {
-        // Common R installation paths on Linux
         string[] possiblePaths =
         {
             "/usr/bin/Rscript",
@@ -243,10 +239,9 @@ public class PathService : IPathService
         };
 
         foreach (var path in possiblePaths)
-            if (File.Exists(path))
+            if (File.Exists(path) && RPathStorage.TestRExecutable(path))
                 return path;
 
-        // Try to find using 'which' command
         try
         {
             using var process = new Process();
@@ -267,7 +262,6 @@ public class PathService : IPathService
         }
         catch
         {
-            // Ignore errors and continue with other methods
         }
 
         throw new FileNotFoundException(
