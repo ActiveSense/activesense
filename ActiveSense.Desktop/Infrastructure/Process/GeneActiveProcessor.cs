@@ -64,10 +64,10 @@ public class GeneActiveProcessor : ISensorProcessor
         {
             return (false, "Operation was cancelled", "Processing cancelled by user");
         }
-        catch (Exception ex)
-        {
-            return (false, string.Empty, $"Failed to execute R script: {ex.Message}");
-        }
+        // catch (Exception ex)
+        // {
+        //     return (false, string.Empty, $"Failed to execute R script: {ex.Message}");
+        // }
     }
 
     public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)

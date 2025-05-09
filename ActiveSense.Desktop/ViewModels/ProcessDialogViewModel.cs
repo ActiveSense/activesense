@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
@@ -22,6 +23,8 @@ public partial class ProcessDialogViewModel : DialogViewModel
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SensorProcessorFactory _sensorProcessorFactory;
     private readonly ISharedDataService _sharedDataService;
+    private readonly DialogService _dialogService;
+    private readonly MainViewModel _mainViewModel;
 
     [ObservableProperty] private ObservableCollection<ScriptArgument> _arguments = new();
     private CancellationTokenSource? _cancellationTokenSource;
@@ -46,12 +49,14 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
     public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory,
         ISharedDataService sharedDataService, ResultParserFactory resultParserFactory,
-        IPathService pathService)
+        IPathService pathService, DialogService dialogService, MainViewModel mainViewModel)
     {
         _resultParserFactory = resultParserFactory;
         _sensorProcessorFactory = sensorProcessorFactory;
         _sharedDataService = sharedDataService;
         _pathService = pathService;
+        _dialogService = dialogService;
+        _mainViewModel = mainViewModel;
 
         LoadDefaultArguments();
     }
@@ -215,6 +220,17 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StatusMessage = "Operation was cancelled";
             ScriptOutput = "Processing was cancelled by user.";
             ShowScriptOutput = true;
+        }
+        catch (FileNotFoundException ex)
+        {
+            Console.WriteLine(ex.Message);
+            var dialog = new PathDialogViewModel()
+            {
+                Title = "R Installation nicht gefunden",
+                SubTitle = "Es wurde kein R-Installationsverzeichnis gefunden. Bitte geben Sie den Pfad zu Ihrer R-Installation an.",
+                OkButtonText = "OK"
+            };
+            await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
         }
         catch (Exception ex)
         {

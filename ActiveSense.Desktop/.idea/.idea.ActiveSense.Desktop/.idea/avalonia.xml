@@ -21,6 +21,7 @@
         <entry key="Views/GeneralPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/MainView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/MainWindow.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/PathDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ProcessDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ProcessPageView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ProcessView.axaml" value="ActiveSense.Desktop.csproj" />
