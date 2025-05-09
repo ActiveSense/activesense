@@ -98,18 +98,18 @@ jobs:
       with:
         name: ActiveSense-linux
         path: ActiveSense.Desktop/publish/ActiveSense-linux.tar.gz
-        retention-days: 7
+        retention-days: 2
     
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-windows
         path: ActiveSense.Desktop/publish/ActiveSense-windows.tar.gz
-        retention-days: 7
+        retention-days: 2
     
     - name: Upload macOS artifact
       uses: actions/upload-artifact@v4
       with:
         name: ActiveSense-macos
         path: ActiveSense.Desktop/publish/ActiveSense-macos.tar.gz
-        retention-days: 7
+        retention-days: 2
