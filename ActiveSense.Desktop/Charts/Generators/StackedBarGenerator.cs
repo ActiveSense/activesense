@@ -19,8 +19,8 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
         {
             return new BarChartViewModel
             {
-                Series = Array.Empty<ISeries>(),
-                XAxes = new[] { new Axis { Labels = new[] { "No Data" } } },
+                Series = [],
+                XAxes = new[] { new Axis { Labels = ["No Data"] } },
                 YAxes = new[] { new Axis { MinLimit = 0, MaxLimit = 100 } }
             };
         }

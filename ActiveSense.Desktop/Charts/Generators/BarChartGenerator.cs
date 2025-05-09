@@ -39,8 +39,8 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                 YAxes = new[] { new Axis { MinLimit = 0, MaxLimit = 100 } }
             };
 
-        var allLabels = (barData?.SelectMany(dto => dto.Labels) ?? Enumerable.Empty<string>())
-            .Concat(lineData?.SelectMany(dto => dto.Labels) ?? Enumerable.Empty<string>())
+        var allLabels = (barData?.SelectMany(dto => dto.Labels) ?? [])
+            .Concat(lineData?.SelectMany(dto => dto.Labels) ?? [])
             .Distinct()
             .ToArray();
 
@@ -88,6 +88,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             foreach (var dto in barData)
             {
                 var normalizedValues = NormalizeChartData(dto, allLabels);
+                var rawValues = dto.Data;
                 var color = colors[colorIndex++];
 
                 series.Add(new ColumnSeries<double>
@@ -100,7 +101,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                     ScalesYAt = 0
                 });
 
-                var meanValue = normalizedValues.Any() ? normalizedValues.Average() : 0;
+                var meanValue = rawValues.Any() ? rawValues.Average() : 0;
                 var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
                 series.Add(new LineSeries<double>
                 {
