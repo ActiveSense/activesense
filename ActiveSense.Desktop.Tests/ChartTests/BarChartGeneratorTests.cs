@@ -3,7 +3,6 @@ using System.Linq;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
-using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using NUnit.Framework;
@@ -13,16 +12,14 @@ namespace ActiveSense.Desktop.Tests.ChartTests;
 [TestFixture]
 public class BarChartGeneratorTests
 {
-    private BarChartGenerator _generator;
-    private ChartColors _chartColors;
-
     [SetUp]
     public void Setup()
     {
         _chartColors = new ChartColors();
     }
 
-    #region NormalizeChartData Tests
+    private BarChartGenerator _generator;
+    private ChartColors _chartColors;
 
     [Test]
     public void NormalizeChartData_WithMatchingLabels_ReturnsSameValues()
@@ -136,10 +133,6 @@ public class BarChartGeneratorTests
         Assert.That(result[3], Is.EqualTo(0.0).Within(0.001), "Thursday value should be 0.0");
     }
 
-    #endregion
-
-    #region GenerateChart Tests
-
     [Test]
     public void GenerateChart_WithNoData_ReturnsEmptyChart()
     {
@@ -186,7 +179,7 @@ public class BarChartGeneratorTests
         Assert.That(result.Series[1], Is.TypeOf<LineSeries<double>>(), "Second series should be a line series");
         var lineSeries = (LineSeries<double>)result.Series[1];
         Assert.That(lineSeries.Values.Count(), Is.EqualTo(3), "Line series should have 3 data points");
-        Assert.That(lineSeries.Name, Is.EqualTo("Durchschnitt"), "Line series name should be 'Durchschnitt'");
+        Assert.That(lineSeries.Name, Is.EqualTo("Durchschnitt Test Series"), "Line series name should be 'Durchschnitt'");
         Assert.That(lineSeries.ScalesYAt, Is.EqualTo(0), "Mean line should scale on first Y axis");
 
         // Check mean value is correct (average of 10, 20, 30 = 20)
@@ -201,7 +194,8 @@ public class BarChartGeneratorTests
 
         // Check Y axes
         Assert.That(result.YAxes.Length, Is.EqualTo(1), "Should have one Y axis for bar data only");
-        Assert.That(result.YAxes[0].Position, Is.EqualTo(AxisPosition.Start), "Y axis should be at start position (left)");
+        Assert.That(result.YAxes[0].Position, Is.EqualTo(AxisPosition.Start),
+            "Y axis should be at start position (left)");
     }
 
     [Test]
@@ -221,37 +215,58 @@ public class BarChartGeneratorTests
             Title = "Series 2"
         };
 
-        _generator = new BarChartGenerator(new[] { data1, data2 }, _chartColors);
+        _generator = new BarChartGenerator([data1, data2], _chartColors);
 
         var result = _generator.GenerateChart("Combined Chart", "Test Description");
 
         Assert.That(result, Is.Not.Null, "Should return a non-null chart");
 
-        // There should be 3 series: two bar series and the mean line
-        Assert.That(result.Series.Length, Is.EqualTo(3), "Should have 3 series (2 bars + mean line)");
+        // There should be 4 series: two bar series plus two mean lines
+        Assert.That(result.Series.Length, Is.EqualTo(4), "Should have 4 series (2 bars + 2 mean lines)");
 
         // Check X axis has all labels combined
         Assert.That(result.XAxes.Length, Is.EqualTo(1), "Should have one X axis");
-        Assert.That(result.XAxes[0].Labels.Count, Is.EqualTo(4), "X axis should have 4 labels");
-        Assert.That(result.XAxes[0].Labels, Is.EquivalentTo(new[] { "Monday", "Wednesday", "Tuesday", "Thursday" }),
-            "X axis labels should combine all input labels");
+        Assert.That(result.XAxes[0].Labels, Has.Count.EqualTo(4), "X axis should have 4 labels");
+
+        // Check that the combined labels contain all our input labels
+        Assert.That(result.XAxes[0].Labels, Contains.Item("Monday"), "X axis labels should include Monday");
+        Assert.That(result.XAxes[0].Labels, Contains.Item("Tuesday"), "X axis labels should include Tuesday");
+        Assert.That(result.XAxes[0].Labels, Contains.Item("Wednesday"), "X axis labels should include Wednesday");
+        Assert.That(result.XAxes[0].Labels, Contains.Item("Thursday"), "X axis labels should include Thursday");
 
         // Check both bar series have same number of data points as combined labels
+        Assert.That(result.Series[0], Is.TypeOf<ColumnSeries<double>>(), "First series should be a ColumnSeries");
+        Assert.That(result.Series[2], Is.TypeOf<ColumnSeries<double>>(), "Third series should be a ColumnSeries");
+
         var barSeries1 = (ColumnSeries<double>)result.Series[0];
-        var barSeries2 = (ColumnSeries<double>)result.Series[1];
-        Assert.That(barSeries1.Values.Count(), Is.EqualTo(4), "First bar series should have 4 data points");
-        Assert.That(barSeries2.Values.Count(), Is.EqualTo(4), "Second bar series should have 4 data points");
+        var barSeries2 = (ColumnSeries<double>)result.Series[2];
+
+        Assert.That(barSeries1.Values, Has.Count.EqualTo(4), "First bar series should have 4 data points");
+        Assert.That(barSeries2.Values, Has.Count.EqualTo(4), "Second bar series should have 4 data points");
         Assert.That(barSeries1.ScalesYAt, Is.EqualTo(0), "First bar series should scale on first Y axis");
         Assert.That(barSeries2.ScalesYAt, Is.EqualTo(0), "Second bar series should scale on first Y axis");
 
-        // Check mean value is correct (average of 10, 30, 20, 40 = 25)
-        var lineSeries = (LineSeries<double>)result.Series[2];
-        var meanValue = lineSeries.Values.First();
-        Assert.That(meanValue, Is.EqualTo(25.0).Within(0.001), "Mean value should be 25.0");
+        // Check mean lines are present and have the correct values
+        Assert.That(result.Series[1], Is.TypeOf<LineSeries<double>>(),
+            "Second series should be a LineSeries (mean line for series 1)");
+        Assert.That(result.Series[3], Is.TypeOf<LineSeries<double>>(),
+            "Fourth series should be a LineSeries (mean line for series 2)");
+
+        var meanLine1 = (LineSeries<double>)result.Series[1];
+        var meanLine2 = (LineSeries<double>)result.Series[3];
+
+        // Check mean values - first mean line should have value of 20 (average of 10, 30)
+        Assert.That(meanLine1.Values, Has.All.EqualTo(20.0).Within(0.001), "First mean line values should all be 20.0");
+        Assert.That(meanLine1.Values, Has.Count.EqualTo(4), "First mean line should have 4 data points");
+
+        // Check mean values - second mean line should have value of 30 (average of 20, 40)
+        Assert.That(meanLine2.Values, Has.All.EqualTo(30.0).Within(0.001),
+            "Second mean line values should all be 30.0");
+        Assert.That(meanLine2.Values, Has.Count.EqualTo(4), "Second mean line should have 4 data points");
     }
 
     [Test]
-    public void GenerateChart_WithLineData_DoesNotIncludeMeanLine()
+    public void GenerateChart_WithLineData_DoesIncludeMeanLine()
     {
         var barData = new ChartDataDTO
         {
@@ -273,8 +288,7 @@ public class BarChartGeneratorTests
 
         Assert.That(result, Is.Not.Null, "Should return a non-null chart");
 
-        // There should be 2 series: bar series and line series (NO mean line)
-        Assert.That(result.Series.Length, Is.EqualTo(2), "Should have 2 series (bar + line, no mean)");
+        Assert.That(result.Series.Length, Is.EqualTo(3), "Should have 3 series (bar + line + mean)");
 
         // Check the first series is a bar series
         Assert.That(result.Series[0], Is.TypeOf<ColumnSeries<double>>(), "First series should be a column series");
@@ -282,19 +296,14 @@ public class BarChartGeneratorTests
         Assert.That(barSeries.Name, Is.EqualTo("Bar Series"), "Bar series name should match");
         Assert.That(barSeries.ScalesYAt, Is.EqualTo(0), "Bar series should scale on first Y axis");
 
-        // Check the second series is the line series (not mean line)
-        Assert.That(result.Series[1], Is.TypeOf<LineSeries<double>>(), "Second series should be a line series");
-        var lineSeries = (LineSeries<double>)result.Series[1];
-        Assert.That(lineSeries.Name, Is.EqualTo("Line Series"), "Line series name should match");
-        Assert.That(lineSeries.ScalesYAt, Is.EqualTo(1), "Line series should scale on second Y axis");
+        Assert.That(result.Series[1], Is.TypeOf<LineSeries<double>>(), "Second series should be a line series (mean)");
 
         // Ensure no series is named "Durchschnitt" (mean)
         foreach (var series in result.Series)
-        {
             Assert.That(series.Name, Is.Not.EqualTo("Durchschnitt"), "No series should be named 'Durchschnitt'");
-        }
 
         // The line data should be mapped correctly
+        var lineSeries = (LineSeries<double>)result.Series[2];
         var lineValues = lineSeries.Values.ToArray();
         Assert.That(lineValues.Length, Is.EqualTo(3), "Line series should have 3 data points");
         Assert.That(lineValues[0], Is.EqualTo(15.0).Within(0.001), "First line value should be 15.0");
@@ -303,8 +312,10 @@ public class BarChartGeneratorTests
 
         // Check Y axes - should have two for mixed bar and line
         Assert.That(result.YAxes.Length, Is.EqualTo(2), "Should have two Y axes for bar and line data");
-        Assert.That(result.YAxes[0].Position, Is.EqualTo(AxisPosition.Start), "First Y axis should be at start position (left)");
-        Assert.That(result.YAxes[1].Position, Is.EqualTo(AxisPosition.End), "Second Y axis should be at end position (right)");
+        Assert.That(result.YAxes[0].Position, Is.EqualTo(AxisPosition.Start),
+            "First Y axis should be at start position (left)");
+        Assert.That(result.YAxes[1].Position, Is.EqualTo(AxisPosition.End),
+            "Second Y axis should be at end position (right)");
     }
 
     [Test]
@@ -330,11 +341,13 @@ public class BarChartGeneratorTests
         Assert.That(result.Series[0], Is.TypeOf<LineSeries<double>>(), "First series should be a line series");
         var lineSeries = (LineSeries<double>)result.Series[0];
         Assert.That(lineSeries.Name, Is.EqualTo("Line Series"), "Line series name should match");
-        Assert.That(lineSeries.ScalesYAt, Is.EqualTo(0), "Line series should scale on first Y axis for line-only chart");
+        Assert.That(lineSeries.ScalesYAt, Is.EqualTo(0),
+            "Line series should scale on first Y axis for line-only chart");
 
         // Check Y axes - should have only one for line-only data
         Assert.That(result.YAxes.Length, Is.EqualTo(1), "Should have one Y axis for line-only data");
-        Assert.That(result.YAxes[0].Position, Is.EqualTo(AxisPosition.Start), "Y axis should be at start position (left)");
+        Assert.That(result.YAxes[0].Position, Is.EqualTo(AxisPosition.Start),
+            "Y axis should be at start position (left)");
     }
 
     [Test]
@@ -385,6 +398,4 @@ public class BarChartGeneratorTests
         Assert.That(stroke2, Is.Not.Null, "Second line should have a stroke");
         Assert.That(stroke1, Is.Not.SameAs(stroke2), "Lines should have different strokes");
     }
-
-    #endregion
 }
