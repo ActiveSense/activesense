@@ -179,7 +179,8 @@ bed_rise_detect <- function(binfile,
         binfile = binfile,
         start = start,
         end = end,
-        Use.Timestamps = TRUE
+        Use.Timestamps = TRUE,
+        pagerefs = pagerefs
       )
       
       # check_positionals2(AccData, Flip = TRUE, filter = 0, density = TRUE) # No longer used.

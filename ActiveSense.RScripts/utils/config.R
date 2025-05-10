@@ -16,8 +16,6 @@ local({
 Sys.setenv(TZ = "GMT")
 
 # execution control parameters
-timer <- FALSE
-rerun <- FALSE
 mmap.load = TRUE
 
 # ==================================
@@ -138,4 +136,8 @@ getSummaryName <- function(name) {
   return(summary_name)
 }
 
+getPages <- function(binfile) {
+  initial_run_data <- read.bin(binfile, mmap.load = TRUE, pagerefs = TRUE, virtual = TRUE)
+  return(initial_run_data$pagerefs)
+}
 
