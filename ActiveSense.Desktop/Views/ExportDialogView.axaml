@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             x:Class="ActiveSense.Desktop.Views.ExportDialogView"
+             x:DataType="viewModels:ExportDialogViewModel">
+
+    <UserControl.Styles>
+        <StyleInclude Source="/Assets/DialogStyles.axaml" />
+    </UserControl.Styles>
+
+    <Border Classes="dialog-container" Width="450">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <Grid Grid.Row="0"
+                  Margin="24,24,24,0"
+                 >
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="Analyse Exportieren"
+                                   Classes="dialog-title"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*" IsVisible="{Binding !ExportStarted}">
+                <Border Grid.Row="0"
+                        Classes="dialog-content-panel"
+                        Padding="16"
+                        Margin="0,10,0,10">
+                    <StackPanel>
+                        <CheckBox Content="Rohdaten exportieren"
+                                  IsChecked="{Binding IncludeRawData}"
+                                  Margin="0,0,0,5" />
+
+                        <TextBlock Text="Zusätzlich zum Report werden die Rohdaten der Analyse exportiert."
+                                   TextWrapping="Wrap"
+                                   Foreground="#666666"
+                                   FontSize="12"
+                                   Margin="22,0,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*" IsVisible="{Binding ExportStarted}">
+                <StackPanel>
+                    <Border Margin="40">
+                        <ProgressBar
+                            Width="100"
+                            Height="100"
+                            IsIndeterminate="True"
+                            Theme="{DynamicResource ProgressRing}"
+                            ShowProgressText="False" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                  Margin="24,20"
+                  ColumnDefinitions="Auto, *, Auto"
+                  IsVisible="{Binding }">
+
+                <Button Grid.Column="0"
+                        Classes="Secondary"
+                        Command="{Binding CancelCommand}">
+                    <TextBlock>Cancel</TextBlock>
+                </Button>
+                <Button Grid.Column="2" Classes="Primary" Theme="{DynamicResource SolidButton}"
+                        Command="{Binding ExportAnalysisCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ui:SymbolIcon Symbol="Save" FontSize="16" />
+                        <TextBlock>Export</TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

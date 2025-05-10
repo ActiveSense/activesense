@@ -18,5 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ActiveSense.Desktop\ActiveSense.Desktop.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModelTests\" />
+  </ItemGroup>
   
 </Project>

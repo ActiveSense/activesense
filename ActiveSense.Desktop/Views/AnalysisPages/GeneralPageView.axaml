@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="analysisPages:GeneralPageViewModel"
+             x:Class="ActiveSense.Desktop.Views.AnalysisPages.GeneralPageView">
+    <Design.DataContext>
+        <analysisPages:GeneralPageViewModel />
+    </Design.DataContext>
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Visible"
+                  HorizontalScrollBarVisibility="Disabled">
+
+        <Grid>
+            <!-- Empty state message when no charts are visible -->
+            <Border IsVisible="{Binding !ChartsVisible}"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="400">
+                <StackPanel Spacing="15" HorizontalAlignment="Center">
+                    <!-- Message -->
+                    <TextBlock Text="Keine Daten ausgewählt"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock
+                        Text="Bitte wählen Sie eine oder mehrere Analysen aus der rechten Seitenleiste aus, um die allgemeine Übersicht anzuzeigen."
+                        TextWrapping="Wrap"
+                        TextAlignment="Center"
+                        Foreground="#666666" />
+                </StackPanel>
+            </Border>
+
+            <!-- Charts content -->
+            <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
+                <!-- Daily Steps Chart Section -->
+                <Expander Header="{Binding SleepStepsTitle}"
+                          IsExpanded="{Binding IsSleepStepsExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding SleepStepsDescription}"
+                                   Margin="0,0,0,10" />
+                        <ItemsControl ItemsSource="{Binding SleepStepsCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Margin="4,10,4,4"
+                                                   FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Classes="Shadow"
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <avalonia:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Activity Distribution Charts Section -->
+                <Expander Header="{Binding MovementTitle}"
+                          IsExpanded="{Binding IsMovementExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding MovementDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding MovementPieCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="5">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Margin="4,10,4,4"
+                                                   FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Grid.Row="1" Classes="Shadow"
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <avalonia:PieChart
+                                                Series="{Binding PieSeries}"
+                                                MinHeight="300"
+                                                MinWidth="200"
+                                                LegendPosition="Bottom"
+                                                Margin="0,5,0,0" />
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

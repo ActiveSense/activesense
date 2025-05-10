@@ -1,0 +1,215 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:analysisPages="clr-namespace:ActiveSense.Desktop.ViewModels.AnalysisPages"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ActiveSense.Desktop.Views.AnalysisPages.SleepPageView"
+             x:DataType="analysisPages:SleepPageViewModel">
+    <Design.DataContext>
+        <analysisPages:SleepPageViewModel />
+    </Design.DataContext>
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Visible"
+                  HorizontalScrollBarVisibility="Disabled">
+        <Grid>
+            <!-- Empty state message when no charts are visible -->
+            <Border IsVisible="{Binding !ChartsVisible}"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="400">
+                <StackPanel Spacing="15" HorizontalAlignment="Center">
+                    <!-- Message -->
+                    <TextBlock Text="Keine Daten ausgewählt"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock
+                        Text="Bitte wählen Sie eine oder mehrere Analysen aus der rechten Seitenleiste aus, um Schlafanalysen anzuzeigen."
+                        TextWrapping="Wrap"
+                        TextAlignment="Center"
+                        Foreground="#666666" />
+                </StackPanel>
+            </Border>
+
+            <!-- Chart content when available -->
+            <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
+
+
+                <!-- Sleep Duration Charts Section -->
+                <Expander Header="{Binding TotalSleepTitle}"
+                          IsExpanded="{Binding IsTotalSleepExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding TotalSleepDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding TotalSleepCharts}" Margin="0,0,0,12">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Pie Charts Section -->
+                <Expander Header="{Binding SleepDistributionTitle}"
+                          IsExpanded="{Binding IsDistributionExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding SleepDistributionDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding PieCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="5">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Margin="4,10,4,4" FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Grid.Row="1" Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                            <lvc:PieChart
+                                                Series="{Binding PieSeries}"
+                                                MinHeight="300"
+                                                MinWidth="200"
+                                                LegendPosition="Bottom"
+                                                Margin="0,5,0,0" />
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+                
+                <!-- Sleep Duration With Efficiency Charts Section -->
+                <Expander Header="{Binding SleepTimeWithEfficiencyTitle}"
+                          IsExpanded="{Binding IsSleepTimeWithEfficiencyExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding SleepTimeWithEfficiencyDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding SleepTimeWithEfficiencyCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Grid.Row="0" Margin="4,10,4,4" FontWeight="Medium"
+                                                   Text="{Binding Title}" />
+                                        <Border Classes="Shadow"
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+                <!-- Sleep efficiency Charts Section -->
+                <Expander Header="{Binding SleepEfficiencyTitle}"
+                          IsExpanded="{Binding IsSleepEfficiencyExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding SleepEfficiencyDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding SleepEfficiencyCharts}" Margin="0,0,0,12">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Active Periods Charts Section -->
+                <Expander Header="{Binding ActivePeriodsTitle}"
+                          IsExpanded="{Binding IsActivePeriodsExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding ActivePeriodsDescription}"
+                                   Margin="0,0,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding ActivePeriodsCharts}" Margin="0,0,0,12">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Border Classes="Shadow" Theme="{DynamicResource CardBorder}">
+                                            <lvc:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,211 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using ActiveSense.Desktop.Converters;
+using ActiveSense.Desktop.Core.Domain.Models;
+using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
+using ActiveSense.Desktop.Infrastructure.Parse;
+using Moq;
+using NUnit.Framework;
+
+namespace ActiveSense.Desktop.Tests.ImportTests;
+
+[TestFixture]
+public class PdfParserTests
+{
+    private Mock<IAnalysisSerializer> _mockSerializer;
+    private DateToWeekdayConverter _dateConverter;
+    private Mock<PdfParser> _mockPdfParser;
+    private PdfParser _realPdfParser;
+    private string _tempDir;
+
+    [SetUp]
+    public void Setup()
+    {
+        _dateConverter = new DateToWeekdayConverter();
+        _mockSerializer = new Mock<IAnalysisSerializer>();
+
+        // Create a real PdfParser for testing the actual implementations
+        _realPdfParser = new PdfParser(_mockSerializer.Object, _dateConverter);
+
+        // Create a mock PdfParser for testing with controlled behavior
+        _mockPdfParser = new Mock<PdfParser>(_mockSerializer.Object, _dateConverter);
+        // Make the mock call the real implementation by default
+        _mockPdfParser.CallBase = true;
+
+        // Create temp directory for test files
+        _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(_tempDir);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        // Clean up the temporary directory
+        if (Directory.Exists(_tempDir))
+        {
+            Directory.Delete(_tempDir, true);
+        }
+    }
+
+    [Test]
+    public void ExtractAnalysisFromPdfText_WithValidContent_ReturnsAnalysis()
+    {
+        // Arrange
+        var mockAnalysis = new GeneActiveAnalysis(_dateConverter)
+        {
+            FileName = "TestAnalysis",
+            FilePath = "/path/to/test"
+        };
+
+        _mockSerializer.Setup(x => x.ImportFromBase64("mockBase64Data"))
+            .Returns(mockAnalysis);
+
+        string pdfText = "Some PDF content ANALYSIS_DATA_BEGINmockBase64DataANALYSIS_DATA_END more PDF content";
+
+        // Act
+        var result = _realPdfParser.ExtractAnalysisFromPdfText(pdfText);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.SameAs(mockAnalysis));
+        _mockSerializer.Verify(x => x.ImportFromBase64("mockBase64Data"), Times.Once);
+    }
+
+    [Test]
+    public void ExtractAnalysisFromPdfText_WithMissingStartMarker_ThrowsException()
+    {
+        // Arrange
+        string pdfText = "Some PDF content mockBase64Data ANALYSIS_DATA_END more PDF content";
+
+        // Act & Assert
+        Assert.Throws<Exception>(() => _realPdfParser.ExtractAnalysisFromPdfText(pdfText));
+        _mockSerializer.Verify(x => x.ImportFromBase64(It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public void ExtractAnalysisFromPdfText_WithMissingEndMarker_ThrowsException()
+    {
+        // Arrange
+        string pdfText = "Some PDF content ANALYSIS_DATA_BEGIN mockBase64Data more PDF content";
+
+        // Act & Assert
+        Assert.Throws<Exception>(() => _realPdfParser.ExtractAnalysisFromPdfText(pdfText));
+        _mockSerializer.Verify(x => x.ImportFromBase64(It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public void ExtractAnalysisFromPdfText_WhenSerializerThrows_PropagatesException()
+    {
+        // Arrange
+        _mockSerializer.Setup(x => x.ImportFromBase64(It.IsAny<string>()))
+            .Throws(new Exception("Serializer error"));
+
+        string pdfText = "Some PDF content ANALYSIS_DATA_BEGIN mockBase64Data ANALYSIS_DATA_END more PDF content";
+
+        // Act & Assert
+        var ex = Assert.Throws<Exception>(() => _realPdfParser.ExtractAnalysisFromPdfText(pdfText));
+        Assert.That(ex.Message, Does.Contain("Error extracting Analysis"));
+        _mockSerializer.Verify(x => x.ImportFromBase64(It.IsAny<string>()), Times.Once);
+    }
+
+    [Test]
+    public void ExtractTextFromPdf_WithInvalidPdf_ThrowsException()
+    {
+        // Arrange
+        string invalidPdfPath = Path.Combine(_tempDir, "invalid.pdf");
+        File.WriteAllText(invalidPdfPath, "This is not a valid PDF file");
+
+        // Act & Assert
+        Assert.Throws<Exception>(() => _realPdfParser.ExtractTextFromPdf(invalidPdfPath));
+    }
+
+    [Test]
+    public async Task ParsePdfFilesAsync_WithValidPdf_ReturnsAnalysisList()
+    {
+        // Arrange
+        var mockAnalysis = new GeneActiveAnalysis(_dateConverter)
+        {
+            FileName = "TestAnalysis",
+            FilePath = "/path/to/test"
+        };
+
+        // Create a test PDF file
+        string pdfFilePath = Path.Combine(_tempDir, "test.pdf");
+        File.WriteAllText(pdfFilePath, "%PDF-1.4\nMock PDF content");
+
+        // Set up the mock to return controlled values
+        string pdfText = "ANALYSIS_DATA_BEGIN mockBase64Data ANALYSIS_DATA_END";
+        _mockPdfParser.Setup(x => x.ExtractTextFromPdf(pdfFilePath))
+            .Returns(pdfText);
+        _mockPdfParser.Setup(x => x.ExtractAnalysisFromPdfText(pdfText))
+            .Returns(mockAnalysis);
+
+        // Act
+        var result = await _mockPdfParser.Object.ParsePdfFilesAsync(_tempDir);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count, Is.EqualTo(1));
+        Assert.That(result[0], Is.SameAs(mockAnalysis));
+        Assert.That(result[0].FileName, Is.EqualTo("test"));
+        Assert.That(result[0].Exported, Is.True);
+    }
+
+    [Test]
+    public async Task ParsePdfFilesAsync_WithEmptyDirectory_ReturnsEmptyList()
+    {
+        // Act
+        var result = await _realPdfParser.ParsePdfFilesAsync(_tempDir);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task ParsePdfFilesAsync_WithNonExistingDirectory_ReturnsEmptyList()
+    {
+        // Arrange
+        string nonExistingDir = Path.Combine(_tempDir, "non_existing");
+
+        // Act
+        var result = await _realPdfParser.ParsePdfFilesAsync(nonExistingDir);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task ParsePdfFilesAsync_WhenExtractionFails_ContinuesProcessing()
+    {
+        // Arrange
+        // Create files
+        string validPdfPath = Path.Combine(_tempDir, "valid.pdf");
+        string invalidPdfPath = Path.Combine(_tempDir, "invalid.pdf");
+
+        File.WriteAllText(validPdfPath, "%PDF-1.4\nMock PDF content");
+        File.WriteAllText(invalidPdfPath, "%PDF-1.4\nInvalid PDF content");
+
+        var mockAnalysis = new GeneActiveAnalysis(_dateConverter) { FileName = "valid" };
+
+        // Set up the mock to succeed for valid file but throw for invalid file
+        string validPdfText = "ANALYSIS_DATA_BEGIN mockBase64Data ANALYSIS_DATA_END";
+        _mockPdfParser.Setup(x => x.ExtractTextFromPdf(validPdfPath))
+            .Returns(validPdfText);
+        _mockPdfParser.Setup(x => x.ExtractTextFromPdf(invalidPdfPath))
+            .Throws(new Exception("Invalid PDF"));
+        _mockPdfParser.Setup(x => x.ExtractAnalysisFromPdfText(validPdfText))
+            .Returns(mockAnalysis);
+
+        // Act
+        var result = await _mockPdfParser.Object.ParsePdfFilesAsync(_tempDir);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count, Is.EqualTo(1));
+        Assert.That(result[0], Is.SameAs(mockAnalysis));
+    }
+}

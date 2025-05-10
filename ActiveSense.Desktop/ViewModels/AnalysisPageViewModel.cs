@@ -1,11 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Data;
+using ActiveSense.Desktop.Core.Domain.Interfaces;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Models;
-using ActiveSense.Desktop.Sensors;
-using ActiveSense.Desktop.Services;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -13,76 +14,118 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class AnalysisPageViewModel : PageViewModel
 {
-    private readonly ResultParserFactory _resultParserFactory;
-    private readonly SharedDataService _sharedDataService;
+    private readonly DialogService _dialogService;
+    private readonly ExportDialogViewModel _exportDialogViewModel;
+    private readonly MainViewModel _mainViewModel;
     private readonly PageFactory _pageFactory;
+    private readonly ProcessDialogViewModel _processDialogViewModel;
+    private readonly ResultParserFactory _resultParserFactory;
+    private readonly ISharedDataService _sharedDataService;
+    [ObservableProperty] private bool _isProcessingInBackground;
 
-    [ObservableProperty] private string _title = "Sleep";
-    [ObservableProperty] private ObservableCollection<Analysis> _resultFiles = new();
-    [ObservableProperty] private ObservableCollection<Analysis> _selectedAnalyses = new();
-
-    public ObservableCollection<TabItemTemplate> TabItems { get; }
+    [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
+    [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
+    [ObservableProperty] private TabItemTemplate? _selectedTabItem = null;
+    [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
+    [ObservableProperty] private bool _showExportOption = true;
+    [ObservableProperty] private bool _showSpinner = true;
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
         PageFactory pageFactory,
-        SharedDataService sharedDataService)
+        ISharedDataService sharedDataService,
+        DialogService dialogService,
+        MainViewModel mainViewModel,
+        ProcessDialogViewModel processDialogViewModel,
+        ExportDialogViewModel exportDialogViewModel)
     {
-        PageName = ApplicationPageNames.Analyse;
         _resultParserFactory = resultParserFactory;
         _sharedDataService = sharedDataService;
         _pageFactory = pageFactory;
-
-        TabItems = new ObservableCollection<TabItemTemplate>
-        {
-            new TabItemTemplate("Sleep", ApplicationPageNames.Sleep,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.Sleep)),
-            new TabItemTemplate("Activity", ApplicationPageNames.Activity,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.Activity)),
-            new TabItemTemplate("General", ApplicationPageNames.General,
-                _pageFactory.GetPageViewModel(ApplicationPageNames.General)),
-        };
-
-        LoadResultFilesCommand.Execute(null);
+        _dialogService = dialogService;
+        _mainViewModel = mainViewModel;
+        _processDialogViewModel = processDialogViewModel;
+        _exportDialogViewModel = exportDialogViewModel;
+        ResultFiles = _sharedDataService.AllAnalyses;
+        _sharedDataService.SelectedAnalysesChanged += OnAnalysesChanged;
+        _sharedDataService.BackgroundProcessingChanged += OnBackgroundProcessingChanged;
+        _sharedDataService.AllAnalysesChanged += OnAnalysesChanged;
     }
 
-    partial void OnSelectedAnalysesChanged(ObservableCollection<Analysis> value)
+    public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
+
+    partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)
     {
         _sharedDataService.UpdateSelectedAnalyses(value);
+        ShowExportOption = SelectedAnalyses.Count == 1;
+    }
+
+    private void OnBackgroundProcessingChanged(object? sender, EventArgs e)
+    {
+        Dispatcher.UIThread.Post(() => { IsProcessingInBackground = _sharedDataService.IsProcessingInBackground; });
+    }
+
+    private void OnAnalysesChanged(object? sender, EventArgs e)
+    {
+        ResultFiles = _sharedDataService.AllAnalyses;
     }
 
     [RelayCommand]
-    private async Task LoadResultFiles()
+    public async Task Initialize()
     {
+        ShowSpinner = true;
         Console.WriteLine("Loading result files...");
-        try
-        {
-            var parser = _resultParserFactory.GetParser(SensorTypes.GENEActiv);
-            var files = await parser.ParseResultsAsync(AppConfig.OutputsDirectoryPath);
-            ResultFiles.Clear();
+        TabItems.Clear();
+        var parser = _resultParserFactory.GetParser(SensorType);
 
-            foreach (var file in files)
-            {
-                ResultFiles.Add(file);
-            }
-        }
-        catch (Exception ex)
+        await Task.Run(() =>
         {
-            Console.WriteLine(ex.Message);
+            foreach (var pageName in parser.GetAnalysisPages())
+            {
+                TabItems.Add(new TabItemTemplate(
+                    $"{pageName.ToString()}",
+                    pageName,
+                    _pageFactory.GetPageViewModel(pageName)));
+                Console.WriteLine($"Loaded {pageName.ToString()}");
+            }
+
+            if (TabItems.Count > 0) SelectedTabItem = TabItems[0];
+            return Task.CompletedTask;
+        });
+
+        ShowSpinner = false;
+    }
+
+
+
+    [RelayCommand]
+    private async Task TriggerProcessDialog()
+    {
+        await _dialogService.ShowDialog<MainViewModel, ProcessDialogViewModel>(_mainViewModel, _processDialogViewModel);
+    }
+
+    [RelayCommand]
+    private async Task TriggerExportDialog()
+    {
+        if (SelectedAnalyses.Count != 1)
+        {
+            var warningDialog = new WarningDialogViewModel
+            {
+                Title = "Export nicht möglich",
+                SubTitle = "Bitte wählen Sie genau eine Analyse zum Exportieren aus.",
+                CloseButtonText = "Schließen",
+                OkButtonText = "OK"
+            };
+            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, warningDialog);
+            return;
         }
+        await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);
     }
 }
 
-public class TabItemTemplate
+public class TabItemTemplate(string name, ApplicationPageNames pageName, ViewModelBase page)
 {
-    public TabItemTemplate(string name, ApplicationPageNames pageName, ViewModelBase page)
-    {
-        Name = name;
-        PageName = pageName;
-        Page = page;
-    }
-
-    public string Name { get; set; }
-    public ApplicationPageNames PageName { get; set; }
-    public ViewModelBase Page { get; }
+    public string Name { get; set; } = name;
+    public ApplicationPageNames PageName { get; set; } = pageName;
+    public ViewModelBase Page { get; } = page;
 }

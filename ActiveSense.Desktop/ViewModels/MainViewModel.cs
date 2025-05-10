@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using ActiveSense.Desktop.Data;
+﻿using System.Threading.Tasks;
+using ActiveSense.Desktop.Core.Services;
+using ActiveSense.Desktop.Core.Services.Interfaces;
+using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
-using ActiveSense.Desktop.Interfaces;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ActiveSense.Desktop.ViewModels;
 
@@ -16,50 +11,42 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 {
     [ObservableProperty] private bool _isPaneOpen = true;
     [ObservableProperty] private PageViewModel _activePage;
-    [ObservableProperty] private ListItemTemplate? _selectedItem;
     [ObservableProperty] private string _title = "ActiveSense";
-    
+
     [ObservableProperty] private DialogViewModel _dialog;
     private readonly PageFactory _pageFactory;
+    private readonly DialogService _dialogService;
 
     /// <inheritdoc/>
-    public MainViewModel(DialogViewModel dialog, PageFactory pageFactory)
+    public MainViewModel(DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService)
     {
         _pageFactory = pageFactory;
         _dialog = dialog;
+        _dialogService = dialogService;
     }
 
-    partial void OnSelectedItemChanged(ListItemTemplate? value)
+
+    public async Task Initialize()
     {
-        if (value is null) return;
-        ActivePage = (PageViewModel)
-            _pageFactory.GetPageViewModel(value.PageName);
+        await Task.Run(() =>
+        {
+            ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
+        });
+
     }
 
-    public ObservableCollection<ListItemTemplate> Items { get; } = new ObservableCollection<ListItemTemplate>
+    public async Task<bool> ConfirmOnClose()
     {
-        new ListItemTemplate("Analysis", ApplicationPageNames.Analyse, "DataHistogramRegular"),
-        new ListItemTemplate("Upload", ApplicationPageNames.Upload, "DataBarVerticalAddRegular"),
-    };
+        var dialog = new WarningDialogViewModel
+        {
+            Title = "Programm beenden?",
+            SubTitle = "Ungespeicherte Analysen gehen verloren.",
+            CloseButtonText = "Abbrechen",
+            OkButtonText = "Schliessen"
+        };
 
-    [RelayCommand]
-    private void TriggerPane()
-    {
-        IsPaneOpen = !IsPaneOpen;
+        await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(this, dialog);
+
+        return dialog.Confirmed;
     }
-}
-
-public class ListItemTemplate
-{
-    public ListItemTemplate(string name, ApplicationPageNames pageName, string icon)
-    {
-        Name = name;
-        PageName = pageName;
-        Application.Current!.TryFindResource(icon, out var res);
-        ListItemIcon = (StreamGeometry)res;
-    }
-
-    public string Name { get; set; }
-    public ApplicationPageNames PageName { get; set; }
-    public StreamGeometry ListItemIcon { get; }
 }
