@@ -1,4 +1,4 @@
-activity_analysis <- function(binfile, summary_name) {
+activity_analysis <- function(binfile, summary_name, pagerefs) {
   
   # ==================================
   # CONFIGURATION
@@ -14,16 +14,12 @@ activity_analysis <- function(binfile, summary_name) {
   # DATA SEGMENTATION 
   # ==================================
   
-  if (timer) {
-    my_timer <- create_timer(summary_name)
-    my_timer <- append.timer(my_timer, "Segmentation") 
-  }
-  
   # Segment the data using the Awake Sleep Model.
   segment_data = activity_combine_segment_data(binfile,
                                       start_time,
                                       datacols,
-                                      mmap.load = mmap.load
+                                      mmap.load = mmap.load,
+                                      pagerefs = pagerefs
   )
   
   # Routine to remove overlap segments
@@ -40,8 +36,6 @@ activity_analysis <- function(binfile, summary_name) {
   # ==================================
   # DATA CLASSIFICATION
   # ==================================
-
-  if (timer) my_timer <- append.timer(my_timer, "Classification")
   
   header = header.info(binfile)
   
@@ -89,8 +83,6 @@ activity_analysis <- function(binfile, summary_name) {
   # ==================================
   # BED RISE DETECTION
   # ==================================
-  
-  if (timer) my_timer <- append.timer(my_timer, "Bed Rise Algorithm")
   
   # Find the Bed and Rise times
   bed_rise_df = bed_rise_detect(binfile,
@@ -146,13 +138,5 @@ activity_analysis <- function(binfile, summary_name) {
   dir.create(file.path(new_path), showWarnings = FALSE)
   
   write.csv(activity_df, file.path(paste0(new_path, summary_name, ".csv")), row.names = FALSE)
-  
-  # ==================================
-  # END OF SCRIPT // TIMER
-  # ==================================
-  if (timer) {
-    my_timer <- append.timer(my_timer, "End of activity analysis")
-    return(my_timer)
-  }
   
 }

@@ -47,6 +47,10 @@ test_that("regression_test_typical", {
   
 })
 
+#test_that("regression_test_typical_without_mmap", {
+#  
+#}
+
 #test_that("regression_test_empty", {
 #  
 #}

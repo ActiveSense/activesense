@@ -1,4 +1,4 @@
-sleep_analysis <- function(binfile, summary_name) {
+sleep_analysis <- function(binfile, summary_name, pagerefs) {
   
   # ==================================
   # CONFIGURATION
@@ -11,17 +11,13 @@ sleep_analysis <- function(binfile, summary_name) {
   # ==================================
   # DATA SEGMENTATION 
   # ==================================
-  
-  if (timer) {
-    my_timer <- create_timer(summary_name)
-    my_timer <- append.timer(my_timer, "Data segmentation") 
-  }
-  
+
   # Segment the data.
   segment_data = sleep_combine_segment_data(binfile,
                                       start_time,
                                       datacols,
-                                      mmap.load = mmap.load
+                                      mmap.load = mmap.load,
+                                      pagerefs = pagerefs
   )
   
   # Routine to remove overlap segments.
@@ -38,8 +34,6 @@ sleep_analysis <- function(binfile, summary_name) {
   # ==================================
   # DATA CLASSIFICATION
   # ==================================
-  
-  if (timer) my_timer <- append.timer(my_timer, "Classification") 
   
   df_pcp = sleep_create_df_pcp(segment_data,
                          summary_name,
@@ -81,8 +75,6 @@ sleep_analysis <- function(binfile, summary_name) {
   # ==================================
   # BED RISE DETECTION
   # ==================================
-  
-  if (timer) my_timer <- append.timer(my_timer, "Bed Rise Algorithm") 
   
   # Find the Bed and Rise times
   bed_rise_df = bed_rise_detect(binfile,
@@ -131,17 +123,6 @@ sleep_analysis <- function(binfile, summary_name) {
   dir.create(file.path(new_path), showWarnings = FALSE)
   
   write.csv(statistics, file.path(paste0(new_path, summary_name, ".csv")), row.names = FALSE)
-  
-  
-  # ==================================
-  # END OF SCRIPT // TIMER
-  # ==================================
-  
-  # Outputting additional information to identify issues
-  if (timer) {
-    my_timer <- append.timer(my_timer, "End of sleep analysis")
-    return(my_timer)
-  }
   
 }
 

@@ -12,7 +12,8 @@
 sleep_combine_segment_data <- function(binfile,
                                  start_time,
                                  datacols,
-                                 mmap.load = T) {
+                                 mmap.load = T,
+                                 pagerefs) {
   
   # Naming of the csv file protocol.
   dataname <- naming_protocol(binfile)
@@ -21,12 +22,12 @@ sleep_combine_segment_data <- function(binfile,
   header <- header.info(binfile)
 
   # Finding the first time
-  AccData1 <- read.bin(binfile, start = 0, end = 0.01)
+  AccData1 <- read.bin(binfile, start = 0, end = 0.01, pagerefs = pagerefs)
   First_Time <- as.numeric(AccData1$data.out[1, 1])
   
   # Now I need to check that there is at least 24 hours of data
   # Last Time
-  AccData2 <- read.bin(binfile, start = 0.99, end = 1)
+  AccData2 <- read.bin(binfile, start = 0.99, end = 1, pagerefs = pagerefs)
   Last_Time <- as.numeric(AccData2$data.out[length(AccData2$data.out[, 1]), 1])
   
   DayNo <- as.numeric(ceiling((Last_Time - First_Time) / 86400))
@@ -68,7 +69,8 @@ sleep_combine_segment_data <- function(binfile,
                                         datacols = datacols,
                                         intervalseconds = 30,
                                         mininterval = 1,
-                                        downsample = as.numeric(unlist(header$Value[2]))
+                                        downsample = as.numeric(unlist(header$Value[2])),
+                                        pagerefs = pagerefs
                                         )
     } else if (i == DayNo){
       segment_data1 <- getGENEAsegments(binfile,
@@ -84,7 +86,8 @@ sleep_combine_segment_data <- function(binfile,
                                         datacols = datacols,
                                         intervalseconds = 30,
                                         mininterval = 1,
-                                        downsample = as.numeric(unlist(header$Value[2]))
+                                        downsample = as.numeric(unlist(header$Value[2])),
+                                        pagerefs = pagerefs
                                         )
     } else {
       segment_data1 <- getGENEAsegments(binfile,
@@ -100,7 +103,8 @@ sleep_combine_segment_data <- function(binfile,
                                         datacols = datacols,
                                         intervalseconds = 30,
                                         mininterval = 1,
-                                        downsample = as.numeric(unlist(header$Value[2]))
+                                        downsample = as.numeric(unlist(header$Value[2])),
+                                        pagerefs = pagerefs
                                         )
     }
     
