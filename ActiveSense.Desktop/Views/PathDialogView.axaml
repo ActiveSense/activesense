@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ActiveSense.Desktop.Views.PathDialogView"
+             x:DataType="viewModels:PathDialogViewModel">
+    
+    <!-- Reference to centralized styles -->
+    <UserControl.Styles>
+        <StyleInclude Source="/Assets/DialogStyles.axaml" />
+    </UserControl.Styles>
+
+    <Border Classes="dialog-container" MaxWidth="480">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <!-- Header -->
+            <Grid Grid.Row="0" Margin="24,24,24,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{Binding Title}"
+                                   Classes="dialog-title"
+                                    />
+                    </StackPanel>
+                    <TextBlock Text="{Binding SubTitle}"
+                               Classes="dialog-subtitle"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="24,16" RowDefinitions="Auto,Auto,Auto,*">
+                <!-- Path input and browse button -->
+                <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <TextBox Grid.Column="0"
+                             Watermark="Pfad zu R-Installation"
+                             Text="{Binding SelectedRInstallationPath}"
+                             Classes="pathTextBox" 
+                             VerticalAlignment="Center"
+                             ContextFlyout="{x:Null}"/>
+                    
+                    <Button Name="OpenFileButton" 
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Classes="Primary"
+                            Theme="{DynamicResource SolidButton}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <ui:SymbolIcon Symbol="Folder" FontSize="16" />
+                            <TextBlock Text="Durchsuchen..." />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                
+                <!-- Help text -->
+                <TextBlock Grid.Row="1" 
+                           Text="Wählen Sie den Pfad zu Ihrer R-Installation."
+                           TextWrapping="Wrap"
+                           Margin="0,8,0,0"
+                           Foreground="#666666"
+                           FontSize="12" />
+                
+                <!-- Status/Message area -->
+                <Border Grid.Row="2"
+                        BorderThickness="1"
+                        BorderBrush="#DDDDDD"
+                        Background="#F6F6F6"
+                        CornerRadius="4"
+                        Padding="12"
+                        Margin="0,16,0,0"
+                        IsVisible="{Binding !!Message}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <ui:SymbolIcon Grid.Column="0"
+                                       Symbol="Important" 
+                                       Foreground="#E81123" 
+                                       FontSize="16"
+                                       VerticalAlignment="Top"
+                                       Margin="0,2,8,0" />
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Message}"
+                                   TextWrapping="Wrap"
+                                   Foreground="#333333" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Footer -->
+            <Grid Grid.Row="2"
+                  Margin="24,20"
+                  ColumnDefinitions="Auto, *, Auto">
+                <Button Grid.Column="0"
+                        Classes="Secondary"
+                        Command="{Binding CancelCommand}">
+                    <TextBlock Text="{Binding CloseButtonText}" />
+                </Button>
+                
+                <Button Grid.Column="2" 
+                        Classes="Primary" 
+                        Theme="{DynamicResource SolidButton}" 
+                        Command="{Binding OkCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ui:SymbolIcon Symbol="Accept" FontSize="16" />
+                        <TextBlock Text="{Binding OkButtonText}" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

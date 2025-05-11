@@ -1,5 +1,4 @@
-name: .NET Build, Test and Publish
-
+name: .NET Build and Test
 on:
   push:
   pull_request:
@@ -7,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build
+  build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -24,92 +23,10 @@ jobs:
       
     - name: Build
       run: |
-        dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --no-restore
+        dotnet build ActiveSense.Desktop/ActiveSense.Desktop.sln --no-restore -c Debug
         
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts
-        path: |
-          **/bin/
-          **/obj/
-        retention-days: 1
-        
-  test:
-    name: Test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '9.0.x'
-    
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-      
     - name: Test
       run: |
         dotnet test ActiveSense.Desktop/ActiveSense.Desktop.sln --no-build --verbosity normal
       env:
         R_HOME: ${{ runner.temp }}/R
-        
-  publish:
-    name: Publish All Platforms
-    # needs: test
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '9.0.x'
-    
-    - name: Make package scripts executable
-      run: |
-        ls
-        chmod +x ActiveSense.Desktop/Publish/linux/package.sh
-        chmod +x ActiveSense.Desktop/Publish/windows/package.sh
-        chmod +x ActiveSense.Desktop/Publish/macos/package.sh
-    
-    - name: Run Linux package script
-      run: |
-        cd ActiveSense.Desktop
-        ./Publish/linux/package.sh
-    
-    - name: Run Windows package script
-      run: |
-        cd ActiveSense.Desktop
-        ./Publish/windows/package.sh
-      
-    - name: Run macOS package script
-      run: |
-        cd ActiveSense.Desktop
-        ./Publish/macos/package.sh
-    
-    - name: Upload Linux artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ActiveSense-linux
-        path: ActiveSense.Desktop/publish/ActiveSense-linux.tar.gz
-        retention-days: 7
-    
-    - name: Upload Windows artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ActiveSense-windows
-        path: ActiveSense.Desktop/publish/ActiveSense-windows.tar.gz
-        retention-days: 7
-    
-    - name: Upload macOS artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ActiveSense-macos
-        path: ActiveSense.Desktop/publish/ActiveSense-macos.tar.gz
-        retention-days: 7
