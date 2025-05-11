@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             x:Class="ActiveSense.Desktop.Views.WarningDialogView"
-             x:DataType="viewModels:WarningDialogViewModel">
+             xmlns:dialogs="clr-namespace:ActiveSense.Desktop.ViewModels.Dialogs"
+             x:Class="ActiveSense.Desktop.Views.Dialogs.WarningDialogView"
+             x:DataType="dialogs:WarningDialogViewModel">
     <!-- Reference to centralized styles -->
     <UserControl.Styles>
         <StyleInclude Source="/Assets/DialogStyles.axaml" />

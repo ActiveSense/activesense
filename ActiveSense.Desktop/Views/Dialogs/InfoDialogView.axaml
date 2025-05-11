@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialogs="clr-namespace:ActiveSense.Desktop.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ActiveSense.Desktop.Views.Dialogs.InfoDialogView"
+             x:DataType="dialogs:InfoDialogViewModel">
+      <!-- Reference to centralized styles -->
+    <UserControl.Styles>
+        <StyleInclude Source="/Assets/DialogStyles.axaml" />
+    </UserControl.Styles>
+
+    <Border Classes="dialog-container" MaxWidth="300">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <!-- Header -->
+            <Grid Grid.Row="0"
+                  Margin="24,24,24,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{Binding Title}"
+                                   Classes="dialog-title"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="12,10,12,0" RowDefinitions="Auto,Auto,*">
+                <StackPanel Grid.Row="0">
+                    <Border>
+                        <TextBlock Text="{Binding Message}"
+                                   Classes="dialog-content-text"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+                </StackPanel>
+                
+                <!-- Details Expander with proper scrolling -->
+                <Border Grid.Row="1" IsVisible="{Binding !!ExtendedMessage}" 
+                        Margin="0,10,0,0">
+                    <Expander Header="Details">
+                        <ScrollViewer MaxHeight="200" 
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding ExtendedMessage}"
+                                     TextWrapping="Wrap"
+                                     ContextFlyout="{x:Null}"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     AcceptsTab="True"
+                                     Padding="8,6"
+                                     Background="Transparent"
+                                     BorderThickness="0"/>
+                        </ScrollViewer>
+                    </Expander>
+                </Border>
+            </Grid>
+
+            <!-- Footer -->
+            <Grid Grid.Row="2"
+                  Margin="24,20"
+                  ColumnDefinitions="Auto, *, Auto">
+                <Button Grid.Column="2" Classes="Primary" Theme="{DynamicResource SolidButton}" Command="{Binding OkCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding OkButtonText}"></TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

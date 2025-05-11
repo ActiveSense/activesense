@@ -1,4 +1,5 @@
 using ActiveSense.Desktop.ViewModels;
+using DialogViewModel = ActiveSense.Desktop.ViewModels.Dialogs.DialogViewModel;
 
 namespace ActiveSense.Desktop.Core.Services.Interfaces;
 

@@ -3,8 +3,9 @@ using ActiveSense.Desktop.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using PathDialogViewModel = ActiveSense.Desktop.ViewModels.Dialogs.PathDialogViewModel;
 
-namespace ActiveSense.Desktop.Views;
+namespace ActiveSense.Desktop.Views.Dialogs;
 
 public partial class PathDialogView : UserControl
 {

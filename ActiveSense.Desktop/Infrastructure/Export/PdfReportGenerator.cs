@@ -61,8 +61,7 @@ public class PdfReportGenerator(
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"PDF export failed: {ex.Message}");
-            return false;
+            throw new Exception($"Error generating PDF report: {ex.Message}");
         }
     }
 

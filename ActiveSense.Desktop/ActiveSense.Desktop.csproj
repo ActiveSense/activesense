@@ -61,6 +61,14 @@
         <SubType>Code</SubType>
       </Compile>
       <Compile Remove="ViewModels\Charts\DataListViewModel.cs" />
+      <Compile Update="Views\Dialogs\WarningDialogView.axaml.cs">
+        <DependentUpon>WarningDialogView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\Dialogs\PathDialogView.axaml.cs">
+        <DependentUpon>PathDialogView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
