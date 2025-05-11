@@ -13,7 +13,8 @@
 activity_combine_segment_data = function(binfile,
                                  start_time,
                                  datacols,
-                                 mmap.load = T) {
+                                 mmap.load = T,
+                                 pagerefs) {
 
   # Naming of the csv file protocol.
   dataname = naming_protocol(binfile)
@@ -23,14 +24,14 @@ activity_combine_segment_data = function(binfile,
 
 
   # Finding the first time
-  AccData1 = read.bin(binfile, start = 0, end = 0.01)
+  AccData1 = read.bin(binfile, start = 0, end = 0.01, pagerefs = pagerefs)
   First_Time = AccData1$data.out[1, 1]
   
   # Need to add the first_time at 03:00! Dam 
 
   # Now I need to check that there is at least 24 hours of data
   # Last Time
-  AccData2 = read.bin(binfile, start = 0.99, end = 1)
+  AccData2 = read.bin(binfile, start = 0.99, end = 1, pagerefs = pagerefs)
   Last_Time = AccData2$data.out[length(AccData2$data.out[, 1]), 1]
 
   # Should return this as the first and last time
@@ -50,7 +51,7 @@ activity_combine_segment_data = function(binfile,
 
   # Initialize the segmented data
   segment_data = c()
-  
+    
   for (i in 0:DayNo) {
     if (i == 0){
       segment_data1 = getGENEAsegments(binfile,
@@ -72,9 +73,11 @@ activity_combine_segment_data = function(binfile,
                                         filterorder = 2, 
                                         boundaries = c(0.5, 5),
                                         Rp = 3,
-                                        hysteresis = 0.1)
+                                        hysteresis = 0.1,
+                                        pagerefs = pagerefs)
       )
-    } else if (i == DayNo){
+      
+    } else if (i == DayNo) {
       segment_data1 = getGENEAsegments(binfile,
                                         start = First_Start_time + 86400 * (i - 1) ,
                                         end = Last_Time,
@@ -90,11 +93,12 @@ activity_combine_segment_data = function(binfile,
                                         intervalseconds = 30,
                                         mininterval = 1,
                                         downsample = as.numeric(unlist(header$Value[2])),
-                                        samplefreq = as.numeric(unlist(header$Value[2])), 
-                                        filterorder = 2, 
+                                        samplefreq = as.numeric(unlist(header$Value[2])),
+                                        filterorder = 2,
                                         boundaries = c(0.5, 5),
                                         Rp = 3,
-                                        hysteresis = 0.1)
+                                        hysteresis = 0.1,
+                                        pagerefs = pagerefs)
     } else {
       segment_data1 = getGENEAsegments(binfile,
                                         start = First_Start_time + 86400 * (i - 1),
@@ -111,12 +115,13 @@ activity_combine_segment_data = function(binfile,
                                         intervalseconds = 30,
                                         mininterval = 1,
                                         downsample = as.numeric(unlist(header$Value[2])),
-                                        samplefreq = as.numeric(unlist(header$Value[2])), 
-                                        filterorder = 2, 
+                                        samplefreq = as.numeric(unlist(header$Value[2])),
+                                        filterorder = 2,
                                         boundaries = c(0.5, 5),
                                         Rp = 3,
-                                        hysteresis = 0.1)
-      
+                                        hysteresis = 0.1,
+                                        pagerefs = pagerefs)
+
     }
     
   segment_data = rbind(segment_data, segment_data1)
