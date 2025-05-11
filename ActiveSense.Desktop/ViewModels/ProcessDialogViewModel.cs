@@ -207,7 +207,17 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
                 if (!scriptSuccess)
                 {
-                    StatusMessage = $"Script execution failed: {error}";
+                    StatusMessage = $"";
+                    var dialog = new InfoDialogViewModel()
+                    {
+                        Title = "Fehler",
+                        Message =
+                            "Script Execution failed",
+                        ExtendedMessage = 
+                            $"Error: {error} Output: {output}",
+                        OkButtonText = "Schliessen",
+                    };
+                    await _dialogService.ShowDialog<MainViewModel, InfoDialogViewModel>(_mainViewModel, dialog);
                     return;
                 }
             }
@@ -224,7 +234,6 @@ public partial class ProcessDialogViewModel : DialogViewModel
         }
         catch (FileNotFoundException ex)
         {
-            Console.WriteLine(ex.Message);
             var dialog = new PathDialogViewModel(_pathService)
             {
                 Title = "Fehler",
