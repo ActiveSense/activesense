@@ -6,6 +6,7 @@ using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.ViewModels.Dialogs;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -54,10 +55,24 @@ public partial class AnalysisPageViewModel : PageViewModel
 
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
 
-    partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)
+    async partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)
     {
-        _sharedDataService.UpdateSelectedAnalyses(value);
-        ShowExportOption = SelectedAnalyses.Count == 1;
+        try
+        {
+            _sharedDataService.UpdateSelectedAnalyses(value);
+            ShowExportOption = SelectedAnalyses.Count == 1;
+        }
+        catch (Exception e)
+        {
+            var dialog = new InfoDialogViewModel()
+            {
+                Title = "Fehler",
+                Message = "Fehler beim Aktualisieren der Analysen.",
+                OkButtonText = "Schliessen",
+                ExtendedMessage = e.Message
+            };
+            await _dialogService.ShowDialog<MainViewModel, InfoDialogViewModel>(_mainViewModel, dialog);
+        }
     }
 
     private void OnBackgroundProcessingChanged(object? sender, EventArgs e)
@@ -109,14 +124,13 @@ public partial class AnalysisPageViewModel : PageViewModel
     {
         if (SelectedAnalyses.Count != 1)
         {
-            var warningDialog = new WarningDialogViewModel
+            var dialog = new Dialogs.InfoDialogViewModel()
             {
                 Title = "Export nicht möglich",
-                SubTitle = "Bitte wählen Sie genau eine Analyse zum Exportieren aus.",
-                CloseButtonText = "Schließen",
-                OkButtonText = "OK"
+                Message = "Bitte wählen Sie eine Analyse zum Exportieren aus.",
+                OkButtonText = "Schliessen"
             };
-            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, warningDialog);
+            await _dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(_mainViewModel, dialog);
             return;
         }
         await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);

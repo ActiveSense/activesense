@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ActiveSense.Desktop.ViewModels;
+namespace ActiveSense.Desktop.ViewModels.Dialogs;
 
 public partial class DialogViewModel : ViewModelBase
 {

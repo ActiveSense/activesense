@@ -16,6 +16,8 @@
         <entry key="Views/Charts/ActivityDistributionChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Charts/SleepDurationChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Charts/StepsChartView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/Dialogs/InfoDialogView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/Dialogs/PathDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ErrorDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ExportDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/GeneralPageView.axaml" value="ActiveSense.Desktop.csproj" />

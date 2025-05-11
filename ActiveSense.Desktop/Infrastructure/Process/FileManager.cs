@@ -32,7 +32,7 @@ public class FileManager(IPathService pathService) : IFileManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error copying file {file}: {ex.Message}");
+                throw new Exception($"Fehler beim Kopieren des Files {file}." + ex.Message);
             }
     }
 }

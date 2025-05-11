@@ -4,9 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:dialogs="clr-namespace:ActiveSense.Desktop.ViewModels.Dialogs"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ActiveSense.Desktop.Views.PathDialogView"
-             x:DataType="viewModels:PathDialogViewModel">
+             x:Class="ActiveSense.Desktop.Views.Dialogs.PathDialogView"
+             x:DataType="dialogs:PathDialogViewModel">
     
     <!-- Reference to centralized styles -->
     <UserControl.Styles>

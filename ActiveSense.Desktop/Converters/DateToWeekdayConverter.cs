@@ -15,7 +15,7 @@ public class DateToWeekdayConverter
         }
         catch (Exception)
         {
-            return DateTime.Parse("Parsing Error");
+            throw new Exception("Invalid date format: " + date);
         }
     }
 

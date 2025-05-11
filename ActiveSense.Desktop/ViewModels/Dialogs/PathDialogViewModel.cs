@@ -4,9 +4,9 @@ using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace ActiveSense.Desktop.ViewModels;
+namespace ActiveSense.Desktop.ViewModels.Dialogs;
 
-public partial class PathDialogViewModel(IPathService pathService) : DialogViewModel
+public partial class PathDialogViewModel(IPathService pathService) : Dialogs.DialogViewModel
 {
     [ObservableProperty] private string _closeButtonText = "Close";
 
