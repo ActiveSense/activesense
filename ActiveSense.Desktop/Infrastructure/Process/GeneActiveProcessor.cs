@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,17 +58,22 @@ public class GeneActiveProcessor : ISensorProcessor
 
             var processArguments = $"\"{scriptPath}\" {outputDir} {scriptArguments}";
 
-            var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory, cancellationToken);
+            var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
+                cancellationToken);
             return result;
         }
         catch (OperationCanceledException)
         {
             return (false, "Operation was cancelled", "Processing cancelled by user");
         }
-        // catch (Exception ex)
-        // {
-        //     return (false, string.Empty, $"Failed to execute R script: {ex.Message}");
-        // }
+        catch (FileNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return (false, string.Empty, $"Failed to execute R script: {ex.Message}");
+        }
     }
 
     public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
