@@ -80,6 +80,7 @@ public partial class ExportDialogViewModel(
                 };
                 await dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(mainViewModel, dialog);
             }
+            Close();
         }
         catch (Exception ex)
         {
