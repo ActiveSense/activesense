@@ -366,7 +366,7 @@ public class AnalysisModelTests
         var chartData = chartProvider.GetSleepDistributionChartData();
 
         // Assert
-        Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"), "Sleep chart title is incorrect");
+        Assert.That(chartData.Title, Is.EqualTo($"{_analysis.FileName}"), "Sleep chart title is incorrect");
         Assert.That(chartData.Labels.Length, Is.EqualTo(2), "Sleep chart should have 2 labels");
 
         Assert.That(chartData.Data.Length, Is.EqualTo(2), "Sleep chart should have 2 data points");

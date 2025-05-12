@@ -39,7 +39,7 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
 
         foreach (var dto in chartDataDtos)
         {
-            double mean = dto.Data.Length > 0 ? dto.Data.Average() : 0;
+            double mean = dto.Data.Length > 0 ? Math.Round(dto.Data.Average(), 2)  : 0;
             
             string seriesName = dto.Title;
             seriesMeans[seriesName] = mean;
@@ -72,7 +72,7 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
                 GeometrySize = 0,
                 GeometryFill = null,
                 GeometryStroke = null,
-                Name = $"Durchschnitt {seriesName}",
+                Name = $"Durchschnitt",
                 LineSmoothness = 0,
                 IsVisibleAtLegend = false,
             });

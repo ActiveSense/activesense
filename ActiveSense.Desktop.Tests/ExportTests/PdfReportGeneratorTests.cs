@@ -8,6 +8,7 @@ using ActiveSense.Desktop.Infrastructure.Export;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace ActiveSense.Desktop.Tests.ExportTests;
 
@@ -128,16 +129,18 @@ public class PdfReportGeneratorTests
     }
 
     [Test]
-    public async Task GeneratePdfReportAsync_WithInvalidOutput_ReturnsFalse()
+    public async Task GeneratePdfReportAsync_WithInvalidOutput_Throws()
     {
         // Arrange
         string invalidPath = Path.Combine(Path.GetTempPath(), "invalid/path/that/does/not/exist.pdf");
 
         // Act
-        bool result = await _pdfGenerator.GeneratePdfReportAsync(_analysis, invalidPath);
+        var ex = Assert.ThrowsAsync<Exception>(async () =>
+        {
+            await _pdfGenerator.GeneratePdfReportAsync(_analysis, invalidPath);
+        });
 
-        // Assert
-        Assert.That(result, Is.False);
+        StringAssert.Contains("Error", ex.Message);
     }
 
     [Test]
@@ -166,7 +169,7 @@ public class PdfReportGeneratorTests
     }
 
     [Test]
-    public void GeneratePdfReportAsync_WhenSerializerThrows_ReturnsFalse()
+    public void GeneratePdfReportAsync_WhenSerializerThrows()
     {
         // Arrange
         string tempFilePath = Path.GetTempFileName();
@@ -176,11 +179,12 @@ public class PdfReportGeneratorTests
             throwingSerializer);
 
         // Act & Assert
-        Assert.DoesNotThrowAsync(async () =>
+        var ex = Assert.ThrowsAsync<Exception>(async () =>
         {
-            bool result = await pdfGeneratorWithThrowingSerializer.GeneratePdfReportAsync(_analysis, tempFilePath);
-            Assert.That(result, Is.False);
+            await pdfGeneratorWithThrowingSerializer.GeneratePdfReportAsync(_analysis, tempFilePath);
         });
+
+        StringAssert.Contains("Serializer error", ex.Message);
 
         // Cleanup
         if (File.Exists(tempFilePath))

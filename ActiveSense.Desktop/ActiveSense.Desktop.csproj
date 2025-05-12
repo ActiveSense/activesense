@@ -19,8 +19,6 @@
 	    <Link>RScripts\%(RecursiveDir)%(Filename)%(Extension)</Link>
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="AnalysisFiles\Patienendaten Februar\.DS_Store" />
-	  <Content Include="AnalysisFiles\Patientendaten Januar\.DS_Store" />
     </ItemGroup>
 
     <ItemGroup>
