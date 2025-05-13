@@ -2,6 +2,9 @@
 # BASIC
 # ==================================
 
+# Sets up renv // automatic dependency management
+source("utils/renv_setup.R")
+
 # clears persistent data objects
 rm(list=ls())
 
@@ -17,6 +20,27 @@ Sys.setenv(TZ = "GMT")
 
 # execution control parameters
 mmap.load = TRUE
+
+# ==================================
+# LIBRARIES
+# ==================================
+
+library(GENEAread)
+library(GENEAclassify)
+library(profvis)
+library(scales)
+library(reshape2)
+library(future)
+library(promises)
+library(optparse)
+library(testthat)
+library(bitops)
+library(mmap)
+library(MASS)
+library(changepoint)
+library(zoo)
+library(signal)
+library(rpart)
 
 # ==================================
 # SOURCE
@@ -41,35 +65,6 @@ source("functions/08_sleep_summary.R")
 # utils
 source("utils/timer.R")
 source("utils/cleanup.R")
-
-# ==================================
-# LIBRARIES
-# ==================================
-
-librarys <- c(
-  "GENEAread",
-  "GENEAclassify",
-  "profvis",
-  "scales",
-  "reshape2",
-  "future",
-  "promises",
-  "versions",
-  "optparse",
-  "testthat"
-)
-
-library_installer(librarys)
-
-library(GENEAread)
-library(GENEAclassify)
-library(profvis)
-library(scales)
-library(reshape2)
-library(future)
-library(promises)
-library(optparse)
-library(testthat)
 
 # ==================================
 # PARAMETERS
