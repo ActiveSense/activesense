@@ -21,6 +21,12 @@ jobs:
         with:
           r-version: 'release'
 
+      - name: Install testthat (if not automatically handled)
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::testthat
+
       - name: Run testthat tests
         run: |
           # This command assumes 'ActiveSense.RScripts/testing/tests.R'
