@@ -29,7 +29,7 @@ for (binfile in files) {
       binfile = binfile,
       summary_name = getSummaryName("Sleep_Summary_Metrics_"),
       pagerefs = my_pagerefs
-    ) 
+    )
   }
   
 }

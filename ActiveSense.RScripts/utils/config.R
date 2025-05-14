@@ -18,8 +18,16 @@ local({
 # time zone
 Sys.setenv(TZ = "GMT")
 
-# execution control parameters
-mmap.load = TRUE
+# mmap configuration
+mmap_setting_from_test <- getOption("myapp_use_mmap")
+
+if (!is.null(mmap_setting_from_test)) {
+  print(paste0("Using testing mmap.load via options: ", mmap_setting_from_test))
+  mmap.load <- mmap_setting_from_test
+} else {
+  mmap.load <- (.Machine$sizeof.pointer >= 8)
+  print(paste0("Using default mmap.load: ", mmap.load))
+}
 
 # ==================================
 # LIBRARIES
@@ -72,12 +80,32 @@ source("utils/cleanup.R")
 
 # Define command line options
 option_list <- list(
-  make_option(c("-d", "--directory"), type="character", default=paste0(getwd(), "/outputs/"),
+  make_option("--directory", type="character", default=paste0(getwd(), "/outputs/"),
               help="Base directory for output [default: current directory]"),
-  make_option(c("-a", "--activity"), type="logical", default=TRUE,
+  make_option("--activity", type="logical", default=TRUE,
               help="Run activity analysis [default: %default]"),
-  make_option(c("-s", "--sleep"), type="logical", default=TRUE,
-              help="Run sleep analysis [default: %default]")
+  make_option("--sleep", type="logical", default=TRUE,
+              help="Run sleep analysis [default: %default]"),
+  
+  # --- LEFT WRIST ---
+  make_option("--sedentary_left", type="double", default=0.04,
+              help="Pass sedentary threshold (left wrist) [default: %default]"),
+  make_option("--light_left", type="double", default=217,
+              help="Pass light threshold (left wrist) [default: %default]"),
+  make_option("--moderate_left", type="double", default=644,
+              help="Pass moderate threshold (left wrist) [default: %default]"),
+  make_option("--vigorous_left", type="double", default=1810,
+              help="Pass Vigorous threshold (left wrist) [default: %default]"),
+  
+  # --- RIGHT WRIST ---
+  make_option("--sedentary_right", type="double", default=0.04,
+              help="Pass sedentary threshold (right wrist) [default: %default]"),
+  make_option("--light_right", type="double", default=386,
+              help="Pass light threshold (right wrist) [default: %default]"),
+  make_option("--moderate_right", type="double", default=439,
+              help="Pass moderate threshold (right wrist) [default: %default]"),
+  make_option("--vigorous_right", type="double", default=2098,
+              help="Pass Vigorous threshold (right wrist) [default: %default]")
 )
 
 # Parse command line arguments
@@ -88,6 +116,18 @@ opt <- parse_args(opt_parser)
 output_dir <- opt$directory
 analyze_activity <- opt$activity
 analyze_sleep <- opt$sleep
+
+# left wrist
+sedentary_left <- opt$sedentary_left
+light_left <- opt$light_left
+moderate_left <- opt$moderate_left
+vigorous_left <- opt$vigorous_left
+
+# right wrist
+sedentary_right <- opt$sedentary_right
+light_right <- opt$light_right
+moderate_right <- opt$moderate_right
+vigorous_right <- opt$vigorous_right
 
 # Create directories
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
