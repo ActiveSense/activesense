@@ -16,7 +16,7 @@ public partial class ExportDialogViewModel(
     ISharedDataService sharedDataService,
     MainViewModel mainViewModel,
     DialogService dialogService)
-    : DialogViewModel
+    : Dialogs.DialogViewModel
 {
     [ObservableProperty] private bool _confirmed;
     [ObservableProperty] private string _statusMessage = "Choose export options";
@@ -72,22 +72,30 @@ public partial class ExportDialogViewModel(
             }
             else
             {
-                var dialog = new WarningDialogViewModel()
+                var dialog = new Dialogs.InfoDialogViewModel()
                 {
                     Title = "Export fehlgeschlagen",
                     Message = "Export failed. Please check the file path and try again.",
-                    OkButtonText = "OK",
-                    CloseButtonText = "Abbrechen"
+                    OkButtonText = "Schliessen",
                 };
-                await dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(mainViewModel, dialog);
+                await dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(mainViewModel, dialog);
             }
-            ExportStarted = false;
-
             Close();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error during export: {ex.Message}";
+            var dialog = new Dialogs.InfoDialogViewModel()
+            {
+                Title = "Export fehlgeschlagen",
+                Message = "Fehler beim Exportieren",
+                ExtendedMessage = "" + ex.Message,
+                OkButtonText = "Schliessen",
+            };
+            await dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(mainViewModel, dialog);
+        }
+        finally
+        {
+            ExportStarted = false;
         }
     }
 }

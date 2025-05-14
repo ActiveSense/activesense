@@ -25,6 +25,7 @@ using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
 using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
 using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
+using DialogViewModel = ActiveSense.Desktop.ViewModels.Dialogs.DialogViewModel;
 using SleepPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.SleepPageViewModel;
 
 namespace ActiveSense.Desktop;

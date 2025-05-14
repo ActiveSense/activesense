@@ -52,8 +52,7 @@ public class GeneActiveExporter(
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error exporting PDF and CSV data to zip: {ex.Message}");
-            return false;
+            throw new Exception($"Error exporting PDF and CSV data to zip: {ex.Message}");
         }
     }
 }

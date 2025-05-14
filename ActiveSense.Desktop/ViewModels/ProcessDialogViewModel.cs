@@ -5,10 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
+using ActiveSense.Desktop.ViewModels.Dialogs;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,6 +20,8 @@ namespace ActiveSense.Desktop.ViewModels;
 
 public partial class ProcessDialogViewModel : DialogViewModel
 {
+    private readonly DialogService _dialogService;
+    private readonly MainViewModel _mainViewModel;
     private readonly IPathService _pathService;
     private readonly ResultParserFactory _resultParserFactory;
     private readonly SensorProcessorFactory _sensorProcessorFactory;
@@ -46,12 +50,14 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
     public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory,
         ISharedDataService sharedDataService, ResultParserFactory resultParserFactory,
-        IPathService pathService)
+        IPathService pathService, DialogService dialogService, MainViewModel mainViewModel)
     {
         _resultParserFactory = resultParserFactory;
         _sensorProcessorFactory = sensorProcessorFactory;
         _sharedDataService = sharedDataService;
         _pathService = pathService;
+        _dialogService = dialogService;
+        _mainViewModel = mainViewModel;
 
         LoadDefaultArguments();
     }
@@ -201,7 +207,17 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
                 if (!scriptSuccess)
                 {
-                    StatusMessage = $"Script execution failed: {error}";
+                    StatusMessage = $"";
+                    var dialog = new InfoDialogViewModel()
+                    {
+                        Title = "Fehler",
+                        Message =
+                            "Script Execution failed",
+                        ExtendedMessage = 
+                            $"Error: {error} Output: {output}",
+                        OkButtonText = "Schliessen",
+                    };
+                    await _dialogService.ShowDialog<MainViewModel, InfoDialogViewModel>(_mainViewModel, dialog);
                     return;
                 }
             }
@@ -216,11 +232,30 @@ public partial class ProcessDialogViewModel : DialogViewModel
             ScriptOutput = "Processing was cancelled by user.";
             ShowScriptOutput = true;
         }
+        catch (FileNotFoundException ex)
+        {
+            var dialog = new PathDialogViewModel(_pathService)
+            {
+                Title = "Fehler",
+                SubTitle = "R Installation nicht gefunden",
+                Message =
+                    "Es wurde kein R-Installationsverzeichnis gefunden. Bitte geben Sie den Pfad zu Ihrer R-Installation an.",
+                OkButtonText = "Speichern",
+                CloseButtonText = "Abbrechen"
+            };
+            await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
+        }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
-            ScriptOutput = ex.ToString();
-            ShowScriptOutput = true;
+            var dialog = new InfoDialogViewModel
+            {
+                Title = "Fehler",
+                Message =
+                    "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Eingabedateien und versuchen Sie es erneut.",
+                ExtendedMessage = ex.Message,
+                OkButtonText = "Schliessen"
+            };
+            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
         }
         finally
         {

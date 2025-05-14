@@ -13,12 +13,12 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     [ObservableProperty] private PageViewModel _activePage;
     [ObservableProperty] private string _title = "ActiveSense";
 
-    [ObservableProperty] private DialogViewModel _dialog;
+    [ObservableProperty] private Dialogs.DialogViewModel _dialog;
     private readonly PageFactory _pageFactory;
     private readonly DialogService _dialogService;
 
     /// <inheritdoc/>
-    public MainViewModel(DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService)
+    public MainViewModel(Dialogs.DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService)
     {
         _pageFactory = pageFactory;
         _dialog = dialog;
@@ -37,7 +37,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 
     public async Task<bool> ConfirmOnClose()
     {
-        var dialog = new WarningDialogViewModel
+        var dialog = new Dialogs.WarningDialogViewModel
         {
             Title = "Programm beenden?",
             SubTitle = "Ungespeicherte Analysen gehen verloren.",
@@ -45,7 +45,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
             OkButtonText = "Schliessen"
         };
 
-        await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(this, dialog);
+        await _dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(this, dialog);
 
         return dialog.Confirmed;
     }
