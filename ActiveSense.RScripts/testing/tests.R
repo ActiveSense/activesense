@@ -16,9 +16,6 @@ run_regression <- function(test_description, use_mmap) {
       options(myapp_use_mmap = NULL)
     }, add = TRUE)
     
-    print("WORKING DIRECTORY")
-    print(getwd())
-    
     # clean up
     directories <- c(
       file.path(getwd(), "data"),

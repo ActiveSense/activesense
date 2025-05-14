@@ -12,7 +12,7 @@
     "GENEAclassify": {
       "Package": "GENEAclassify",
       "Version": "1.5.5",
-      "Source": "git",
+      "Source": "Local",
       "Type": "Package",
       "Title": "Segmentation and Classification of Accelerometer Data",
       "Date": "2024-02-07",
@@ -42,14 +42,13 @@
       "NeedsCompilation": "yes",
       "Maintainer": "Jia Ying Chua <jiayingc@activinsights.com>",
       "Repository": "CRAN",
-      "RemoteType": "git",
-      "RemoteUrl": "git@github.com:ActiveSense/GENEAclassify.git",
-      "RemoteRef": ""
+      "RemoteType": "local",
+      "RemoteUrl": "renv/GENEApackages/GENEAclassify.zip"
     },
     "GENEAread": {
       "Package": "GENEAread",
       "Version": "2.0.10",
-      "Source": "git",
+      "Source": "Local",
       "Type": "Package",
       "Title": "Package for Reading Binary Files",
       "Date": "2024-03-05",
@@ -70,9 +69,8 @@
       "NeedsCompilation": "yes",
       "Author": "Zhou Fang [aut], Joss Langford [aut], Charles Sweetland [aut], Jia Ying Chua [aut, cre]",
       "Repository": "CRAN",
-      "RemoteType": "git",
-      "RemoteUrl": "git@github.com:ActiveSense/GENEAread.git",
-      "RemoteRef": ""
+      "RemoteType": "local",
+      "RemoteUrl": "renv/GENEApackages/GENEAread.zip"
     },
     "MASS": {
       "Package": "MASS",
