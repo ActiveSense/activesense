@@ -2,6 +2,9 @@
 # REGRESSION TESTING
 # ==================================
 
+# Setting the working directory
+setwd(dirname(getwd()))
+
 run_regression <- function(test_description, use_mmap) {
   test_that(test_description, {
     
@@ -13,13 +16,7 @@ run_regression <- function(test_description, use_mmap) {
       options(myapp_use_mmap = NULL)
     }, add = TRUE)
     
-    print("WORKING DIRECTORY BEFORE")
-    print(getwd())
-    
-    # set working directory
-    setwd(dirname(getwd()))
-    
-    print("WORKING DIRECTORY AFTER")
+    print("WORKING DIRECTORY")
     print(getwd())
     
     # clean up
