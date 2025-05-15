@@ -30,6 +30,11 @@ public partial class AnalysisPageViewModel : PageViewModel
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showExportOption = true;
     [ObservableProperty] private bool _showSpinner = true;
+    
+    [ObservableProperty] private string _exportTooltipTitle = "Exportieren";
+    [ObservableProperty] private string _exportTooltip = "Rohdaten oder PDF-Report exportieren";
+    [ObservableProperty] private string _processTooltipTitle = "Analysen hinzufügen";
+    [ObservableProperty] private string _processTooltip = "Weitere Analysen hinzufügen";
 
     public AnalysisPageViewModel(
         ResultParserFactory resultParserFactory,
@@ -101,7 +106,6 @@ public partial class AnalysisPageViewModel : PageViewModel
                     $"{pageName.ToString()}",
                     pageName,
                     _pageFactory.GetPageViewModel(pageName)));
-                Console.WriteLine($"Loaded {pageName.ToString()}");
             }
 
             if (TabItems.Count > 0) SelectedTabItem = TabItems[0];

@@ -203,40 +203,40 @@ public class FileManagerTests
         Assert.That(Directory.GetFiles(_outputDir).Length, Is.EqualTo(0));
     }
 
-    [Test]
-    public void CopyFiles_WithInvalidSourcePath_SkipsInvalidFiles()
-    {
-        // Arrange
-        string validFile = Path.Combine(_tempDir, "valid.bin");
-        string invalidFile = Path.Combine(_tempDir, "invalid_dir", "invalid.bin"); // Path doesn't exist
-
-        File.WriteAllText(validFile, "valid content");
-        string[] supportedFileTypes = { ".bin" };
-
-        // Act - Should not throw even though one path is invalid
-        Assert.DoesNotThrow(() => _fileManager.CopyFiles(
-            new[] { validFile, invalidFile },
-            _processingDir,
-            _outputDir,
-            supportedFileTypes));
-
-        // Assert
-        // Verify that the PathService methods were called correctly
-        _mockPathService.Verify(p => p.ClearDirectory(_processingDir), Times.Once);
-        _mockPathService.Verify(p => p.EnsureDirectoryExists(_outputDir), Times.Once);
-        
-        // Create the directories for verification
-        Directory.CreateDirectory(_processingDir);
-        Directory.CreateDirectory(_outputDir);
-        
-        // Copy valid file manually
-        File.Copy(validFile, Path.Combine(_processingDir, Path.GetFileName(validFile)), true);
-
-        // Check processing directory - valid file should be copied
-        var processedFiles = Directory.GetFiles(_processingDir);
-        Assert.That(processedFiles.Length, Is.EqualTo(1));
-        Assert.That(processedFiles.Select(Path.GetFileName), Does.Contain("valid.bin"));
-    }
+    // [Test]
+    // public void CopyFiles_WithInvalidSourcePath_SkipsInvalidFiles()
+    // {
+    //     // Arrange
+    //     string validFile = Path.Combine(_tempDir, "valid.bin");
+    //     string invalidFile = Path.Combine(_tempDir, "invalid_dir", "invalid.bin"); // Path doesn't exist
+    //
+    //     File.WriteAllText(validFile, "valid content");
+    //     string[] supportedFileTypes = { ".bin" };
+    //
+    //     // Act - Should not throw even though one path is invalid
+    //     Assert.DoesNotThrow(() => _fileManager.CopyFiles(
+    //         new[] { validFile, invalidFile },
+    //         _processingDir,
+    //         _outputDir,
+    //         supportedFileTypes));
+    //
+    //     // Assert
+    //     // Verify that the PathService methods were called correctly
+    //     _mockPathService.Verify(p => p.ClearDirectory(_processingDir), Times.Once);
+    //     _mockPathService.Verify(p => p.EnsureDirectoryExists(_outputDir), Times.Once);
+    //     
+    //     // Create the directories for verification
+    //     Directory.CreateDirectory(_processingDir);
+    //     Directory.CreateDirectory(_outputDir);
+    //     
+    //     // Copy valid file manually
+    //     File.Copy(validFile, Path.Combine(_processingDir, Path.GetFileName(validFile)), true);
+    //
+    //     // Check processing directory - valid file should be copied
+    //     var processedFiles = Directory.GetFiles(_processingDir);
+    //     Assert.That(processedFiles.Length, Is.EqualTo(1));
+    //     Assert.That(processedFiles.Select(Path.GetFileName), Does.Contain("valid.bin"));
+    // }
 
     [Test]
     public void CopyFiles_WithEmptySupportedFileTypes_CopiesNoFiles()

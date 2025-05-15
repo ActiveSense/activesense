@@ -97,9 +97,9 @@ public class App : Application
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
             ApplicationPageNames.Analyse => x.GetRequiredService<AnalysisPageViewModel>(),
-            ApplicationPageNames.Sleep => x.GetRequiredService<SleepPageViewModel>(),
-            ApplicationPageNames.Activity => x.GetRequiredService<ActivityPageViewModel>(),
-            ApplicationPageNames.General => x.GetRequiredService<GeneralPageViewModel>(),
+            ApplicationPageNames.Schlaf => x.GetRequiredService<SleepPageViewModel>(),
+            ApplicationPageNames.Aktivität => x.GetRequiredService<ActivityPageViewModel>(),
+            ApplicationPageNames.Allgemein => x.GetRequiredService<GeneralPageViewModel>(),
             _ => throw new InvalidOperationException(),
         });
 

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Charts;
@@ -6,6 +7,7 @@ using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Infrastructure.Export;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace ActiveSense.Desktop.Tests.ExportTests;
 
@@ -158,17 +160,18 @@ public class ExportIntegrationTests
         }
     }
 
-    [Test]
-    public async Task ExportAsync_WithInvalidOutputPath_ReturnsFalse()
+   [Test]
+    public async Task ExportAsync_WithInvalidOutputPath_ThrowsException()
     {
         // Arrange
         string invalidPath = Path.Combine(_tempDir, "nonexistent", "nested", "directory", "output.pdf");
-
-        // Act
-        bool result = await _exporter.ExportAsync(_analysis, invalidPath, false);
-
-        // Assert
-        Assert.That(result, Is.False);
-        Assert.That(File.Exists(invalidPath), Is.False);
+    
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<Exception>(async () =>
+        {
+            await _exporter.ExportAsync(_analysis, invalidPath, false);
+        });
+    
+        StringAssert.Contains("Error generating PDF report", ex.Message);
     }
 }

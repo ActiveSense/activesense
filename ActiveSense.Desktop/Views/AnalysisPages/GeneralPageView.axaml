@@ -40,40 +40,6 @@
 
             <!-- Charts content -->
             <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
-                <!-- Daily Steps Chart Section -->
-                <Expander Header="{Binding SleepStepsTitle}"
-                          IsExpanded="{Binding IsSleepStepsExpanded}"
-                          FontSize="16"
-                          Margin="4,4,4,0"
-                          HorizontalAlignment="Stretch">
-                    <StackPanel>
-                        <TextBlock Classes="description"
-                                   Text="{Binding SleepStepsDescription}"
-                                   Margin="0,0,0,10" />
-                        <ItemsControl ItemsSource="{Binding SleepStepsCharts}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock Margin="4,10,4,4"
-                                                   FontWeight="Medium"
-                                                   Text="{Binding Title}" />
-                                        <Border Classes="Shadow"
-                                                Theme="{DynamicResource CardBorder}"
-                                                Margin="0,0,0,12">
-                                            <avalonia:CartesianChart
-                                                Series="{Binding Series}"
-                                                XAxes="{Binding XAxes}"
-                                                YAxes="{Binding YAxes}"
-                                                LegendPosition="{Binding LegendPosition}"
-                                                Margin="0,5,0,0"
-                                                MinHeight="400" />
-                                        </Border>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Expander>
 
                 <!-- Activity Distribution Charts Section -->
                 <Expander Header="{Binding MovementTitle}"
@@ -119,6 +85,70 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
+
+                <!-- Average Charts -->
+                <Expander Header="{Binding AverageSleepTitle}"
+                          IsExpanded="{Binding IsAverageSleepExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding AverageSleepDescription}"
+                                   Margin="0,0,0,10" />
+                        <ItemsControl ItemsSource="{Binding AverageSleepCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Border Classes="Shadow"
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <avalonia:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+                <!-- Average Charts -->
+                <Expander Header="{Binding AverageActivityTitle}"
+                          IsExpanded="{Binding IsAverageActivityExpanded}"
+                          FontSize="16"
+                          Margin="4,4,4,0"
+                          HorizontalAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock Classes="description"
+                                   Text="{Binding AverageActivityDescription}"
+                                   Margin="0,0,0,10" />
+                        <ItemsControl ItemsSource="{Binding AverageActivityCharts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Border Classes="Shadow"
+                                                Theme="{DynamicResource CardBorder}"
+                                                Margin="0,0,0,12">
+                                            <avalonia:CartesianChart
+                                                Series="{Binding Series}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                LegendPosition="{Binding LegendPosition}"
+                                                Margin="0,5,0,0"
+                                                MinHeight="400" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+
             </StackPanel>
         </Grid>
     </ScrollViewer>

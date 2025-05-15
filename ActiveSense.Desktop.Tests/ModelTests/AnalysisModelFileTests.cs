@@ -163,7 +163,7 @@ public class AnalysisModeFileTests
         var chartData = chartProvider.GetSleepDistributionChartData();
 
         // Assert
-        Assert.That(chartData.Title, Is.EqualTo($"Schlafverteilung {_analysis.FileName}"));
+        Assert.That(chartData.Title, Is.EqualTo($"{_analysis.FileName}"));
         Assert.That(chartData.Labels.Length, Is.EqualTo(2));
         Assert.That(chartData.Data.Length, Is.EqualTo(2));
 

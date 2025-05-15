@@ -166,7 +166,7 @@
                                     Classes="dialog-secondary-button">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <ui:SymbolIcon Symbol="Folder" FontSize="14" />
-                                    <TextBlock>Select Files</TextBlock>
+                                    <TextBlock>Dateien auswählen</TextBlock>
                                 </StackPanel>
                             </Button>
                         </Grid>
@@ -222,7 +222,7 @@
                         Command="{Binding ProcessFilesCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ui:SymbolIcon Symbol="Play" FontSize="16" />
-                        <TextBlock>Analyse Starten</TextBlock>
+                        <TextBlock>Analyse starten</TextBlock>
                     </StackPanel>
                 </Button>
             </Grid>
