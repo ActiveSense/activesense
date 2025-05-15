@@ -55,9 +55,9 @@ public class GeneActiveResultParserTests
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Length, Is.EqualTo(3));
-        Assert.That(result, Does.Contain(ApplicationPageNames.Activity));
-        Assert.That(result, Does.Contain(ApplicationPageNames.Sleep));
-        Assert.That(result, Does.Contain(ApplicationPageNames.General));
+        Assert.That(result, Does.Contain(ApplicationPageNames.Aktivität));
+        Assert.That(result, Does.Contain(ApplicationPageNames.Schlaf));
+        Assert.That(result, Does.Contain(ApplicationPageNames.Allgemein));
     }
 
     [Test]

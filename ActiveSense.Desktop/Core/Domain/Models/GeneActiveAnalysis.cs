@@ -260,8 +260,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
             Labels = new[] { "Aktivität", "Schlaf", "Sitzzeit" },
             Data = new[]
             {
-                AverageLightActivity + AverageModerateActivity + AverageVigorousActivity, AverageSleepTime,
-                AverageSedentaryTime
+                Math.Round((AverageLightActivity + AverageModerateActivity + AverageVigorousActivity) / 3600, 2), Math.Round(AverageSleepTime / 3600, 2) , Math.Round(AverageSedentaryTime / 3600, 2) 
             },
             Title = $"{FileName}"
         };

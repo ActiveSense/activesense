@@ -12,9 +12,9 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
 {
     private readonly ApplicationPageNames[] _analysisPages =
     [
-        ApplicationPageNames.Activity,
-        ApplicationPageNames.Sleep,
-        ApplicationPageNames.General
+        ApplicationPageNames.Allgemein,
+        ApplicationPageNames.Aktivität,
+        ApplicationPageNames.Schlaf,
     ];
 
     public ApplicationPageNames[] GetAnalysisPages()
