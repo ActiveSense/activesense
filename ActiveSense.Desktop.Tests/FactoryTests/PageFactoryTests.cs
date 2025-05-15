@@ -22,9 +22,9 @@ public class PageFactoryTests
         // Configure mock factory to return different view models based on page name
         _mockFactory = new Mock<Func<ApplicationPageNames, PageViewModel>>();
         _mockFactory.Setup(f => f(ApplicationPageNames.Analyse)).Returns(_mockAnalysisPageViewModel.Object);
-        _mockFactory.Setup(f => f(ApplicationPageNames.Sleep)).Returns(_mockSleepPageViewModel.Object);
-        _mockFactory.Setup(f => f(ApplicationPageNames.Activity)).Returns(_mockActivityPageViewModel.Object);
-        _mockFactory.Setup(f => f(ApplicationPageNames.General)).Returns(_mockGeneralPageViewModel.Object);
+        _mockFactory.Setup(f => f(ApplicationPageNames.Schlaf)).Returns(_mockSleepPageViewModel.Object);
+        _mockFactory.Setup(f => f(ApplicationPageNames.Aktivität)).Returns(_mockActivityPageViewModel.Object);
+        _mockFactory.Setup(f => f(ApplicationPageNames.Allgemein)).Returns(_mockGeneralPageViewModel.Object);
 
         // Throw for unknown page names to test error handling
         _mockFactory.Setup(f => f(ApplicationPageNames.Unknown)).Throws<InvalidOperationException>();
@@ -55,33 +55,33 @@ public class PageFactoryTests
     public void GetPageViewModel_ForSleepPage_ReturnsSleepViewModel()
     {
         // Act
-        var result = _pageFactory.GetPageViewModel(ApplicationPageNames.Sleep);
+        var result = _pageFactory.GetPageViewModel(ApplicationPageNames.Schlaf);
 
         // Assert
         Assert.That(result, Is.SameAs(_mockSleepPageViewModel.Object));
-        _mockFactory.Verify(f => f(ApplicationPageNames.Sleep), Times.Once);
+        _mockFactory.Verify(f => f(ApplicationPageNames.Schlaf), Times.Once);
     }
 
     [Test]
     public void GetPageViewModel_ForActivityPage_ReturnsActivityViewModel()
     {
         // Act
-        var result = _pageFactory.GetPageViewModel(ApplicationPageNames.Activity);
+        var result = _pageFactory.GetPageViewModel(ApplicationPageNames.Aktivität);
 
         // Assert
         Assert.That(result, Is.SameAs(_mockActivityPageViewModel.Object));
-        _mockFactory.Verify(f => f(ApplicationPageNames.Activity), Times.Once);
+        _mockFactory.Verify(f => f(ApplicationPageNames.Aktivität), Times.Once);
     }
 
     [Test]
     public void GetPageViewModel_ForGeneralPage_ReturnsGeneralViewModel()
     {
         // Act
-        var result = _pageFactory.GetPageViewModel(ApplicationPageNames.General);
+        var result = _pageFactory.GetPageViewModel(ApplicationPageNames.Allgemein);
 
         // Assert
         Assert.That(result, Is.SameAs(_mockGeneralPageViewModel.Object));
-        _mockFactory.Verify(f => f(ApplicationPageNames.General), Times.Once);
+        _mockFactory.Verify(f => f(ApplicationPageNames.Allgemein), Times.Once);
     }
 
     [Test]

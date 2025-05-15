@@ -179,7 +179,7 @@ public class BarChartGeneratorTests
         Assert.That(result.Series[1], Is.TypeOf<LineSeries<double>>(), "Second series should be a line series");
         var lineSeries = (LineSeries<double>)result.Series[1];
         Assert.That(lineSeries.Values.Count(), Is.EqualTo(3), "Line series should have 3 data points");
-        Assert.That(lineSeries.Name, Is.EqualTo("Durchschnitt Test Series"), "Line series name should be 'Durchschnitt'");
+        Assert.That(lineSeries.Name, Is.EqualTo("Durchschnitt"), "Line series name should be 'Durchschnitt'");
         Assert.That(lineSeries.ScalesYAt, Is.EqualTo(0), "Mean line should scale on first Y axis");
 
         // Check mean value is correct (average of 10, 20, 30 = 20)
@@ -297,10 +297,6 @@ public class BarChartGeneratorTests
         Assert.That(barSeries.ScalesYAt, Is.EqualTo(0), "Bar series should scale on first Y axis");
 
         Assert.That(result.Series[1], Is.TypeOf<LineSeries<double>>(), "Second series should be a line series (mean)");
-
-        // Ensure no series is named "Durchschnitt" (mean)
-        foreach (var series in result.Series)
-            Assert.That(series.Name, Is.Not.EqualTo("Durchschnitt"), "No series should be named 'Durchschnitt'");
 
         // The line data should be mapped correctly
         var lineSeries = (LineSeries<double>)result.Series[2];

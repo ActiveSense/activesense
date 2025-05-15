@@ -85,6 +85,8 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             var colors = chartColors.GetColorPalette(barData.Length);
             var colorIndex = 0;
 
+            bool hasSingleBarSeries = barData.Length == 1;
+
             foreach (var dto in barData)
             {
                 var normalizedValues = NormalizeChartData(dto, allLabels);
@@ -101,7 +103,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                     ScalesYAt = 0
                 });
 
-                var meanValue = rawValues.Any() ? rawValues.Average() : 0;
+                var meanValue = rawValues.Any() ? Math.Round(rawValues.Average(), 2)  : 0;
                 var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
                 series.Add(new LineSeries<double>
                 {
@@ -111,9 +113,9 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                     GeometrySize = 0,
                     GeometryFill = null,
                     GeometryStroke = null,
-                    IsHoverable = false,
+                    IsHoverable = hasSingleBarSeries, // Make hoverable only if single bar series
                     IsVisibleAtLegend = false,
-                    Name = $"Durchschnitt {dto.Title ?? $"Series {colorIndex}"}",
+                    Name = "Durchschnitt",
                     LineSmoothness = 0,
                     ScalesYAt = 0
                 });

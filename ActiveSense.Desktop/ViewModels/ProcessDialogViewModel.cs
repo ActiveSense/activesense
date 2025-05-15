@@ -196,7 +196,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
 
 
-            StatusMessage = "Procesing files...";
+            StatusMessage = "Processing files...";
 
             if (Directory.EnumerateFiles(processingDirectory).Any())
             {

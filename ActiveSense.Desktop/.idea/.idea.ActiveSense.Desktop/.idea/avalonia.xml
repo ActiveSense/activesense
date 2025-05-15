@@ -18,6 +18,7 @@
         <entry key="Views/Charts/StepsChartView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Dialogs/InfoDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/Dialogs/PathDialogView.axaml" value="ActiveSense.Desktop.csproj" />
+        <entry key="Views/Dialogs/WarningDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ErrorDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/ExportDialogView.axaml" value="ActiveSense.Desktop.csproj" />
         <entry key="Views/GeneralPageView.axaml" value="ActiveSense.Desktop.csproj" />

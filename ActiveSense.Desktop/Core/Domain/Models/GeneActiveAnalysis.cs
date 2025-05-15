@@ -229,7 +229,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
         {
             Labels = new[] { "Zeit Schlafend", "Zeit Wach" },
             Data = new[] { Math.Round(AverageSleepTime / 3600, 1), Math.Round(AverageWakeTime / 3600, 1) },
-            Title = $"Schlafverteilung {FileName}"
+            Title = $"{FileName}"
         };
     }
 
@@ -239,7 +239,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
         {
             Data = SleepEfficiency,
             Labels = SleepWeekdays(),
-            Title = $"Schlaf-Effizienz {FileName} ({this.GetSleepDateRange()})"
+            Title = $"{FileName} ({this.GetSleepDateRange()})"
         };
     }
 
@@ -249,7 +249,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
         {
             Data = ActivePeriods,
             Labels = SleepWeekdays(),
-            Title = $"Aktive Perioden {FileName} ({this.GetSleepDateRange()})"
+            Title = $"{FileName} ({this.GetSleepDateRange()})"
         };
     }
 
@@ -260,10 +260,9 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
             Labels = new[] { "Aktivität", "Schlaf", "Sitzzeit" },
             Data = new[]
             {
-                AverageLightActivity + AverageModerateActivity + AverageVigorousActivity, AverageSleepTime,
-                AverageSedentaryTime
+                Math.Round((AverageLightActivity + AverageModerateActivity + AverageVigorousActivity) / 3600, 2), Math.Round(AverageSleepTime / 3600, 2) , Math.Round(AverageSedentaryTime / 3600, 2) 
             },
-            Title = $"Aktivitätsverteilung {FileName}"
+            Title = $"{FileName}"
         };
     }
 

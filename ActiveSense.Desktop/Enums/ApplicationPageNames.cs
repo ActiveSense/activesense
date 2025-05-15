@@ -5,7 +5,7 @@ public enum ApplicationPageNames
     Unknown,
     Analyse,
     Upload,
-    Activity,
-    Sleep,
-    General,
+    Aktivität,
+    Schlaf,
+    Allgemein,
 }

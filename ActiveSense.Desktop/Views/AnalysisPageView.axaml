@@ -87,8 +87,8 @@
                             ToolTip.ShowDelay="400">
                         <ToolTip.Tip>
                             <StackPanel Width="200">
-                                <TextBlock Classes="h1" FontWeight="SemiBold">Export Analyses</TextBlock>
-                                <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">Export selected analyses as PDF documents for sharing or archiving</TextBlock>
+                                <TextBlock Classes="h1" FontWeight="SemiBold" Text="{Binding ExportTooltipTitle}"></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="{Binding ExportTooltip}"></TextBlock>
                             </StackPanel>
                         </ToolTip.Tip>
                         <ui:SymbolIcon Symbol="Download" FontSize="16" Foreground="White" />
@@ -118,8 +118,8 @@
                         </StackPanel>
                         <ToolTip.Tip>
                             <StackPanel Width="200">
-                                <TextBlock Classes="h1" FontWeight="SemiBold">Add Files</TextBlock>
-                                <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">Upload and analyze new sensor data files</TextBlock>
+                                <TextBlock Classes="h1" FontWeight="SemiBold" Text="{Binding ProcessTooltipTitle}"></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="{Binding ProcessTooltip}"></TextBlock>
                             </StackPanel>
                         </ToolTip.Tip>
 
