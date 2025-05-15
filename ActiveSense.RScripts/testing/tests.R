@@ -5,10 +5,7 @@
 # Setting the working directory
 setwd(dirname(getwd()))
 
-run_regression <- function(test_description, use_mmap) {
-  test_that(test_description, {
-    
-    # Sets option
+run_regression <- function(use_mmap) {
     options(myapp_use_mmap = use_mmap)
     
     # make sure to reset the option
@@ -55,10 +52,12 @@ run_regression <- function(test_description, use_mmap) {
                   info = paste("Files differ:", file_name, "-", comparison))
     }
     
-  })
-  
-}
+  }
 
-run_regression("Regression test: run with mmap enabled", TRUE)
+test_that("Regression test: run with mmap enabled", {
+  run_regression(TRUE)
+})
 
-run_regression("Regression test: run with mmap disabled", FALSE)
+test_that("Regression test: run with mmap disabled", {
+  run_regression(FALSE)
+})
