@@ -58,6 +58,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         _sharedDataService.AllAnalysesChanged += OnAnalysesChanged;
     }
 
+    public AnalysisPageViewModel(){}
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
 
     async partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)

@@ -85,6 +85,8 @@ public class GeneActiveProcessor : ISensorProcessor
     {
         return _timeEstimator.EstimateProcessingTime(files);
     }
+    
+    public string ProcessingInfo => "Einstellungen werden nur auf die Verarbeitung von .bin-Dateien angewendet. Beim Import als PDF werden die Einstellungen ignoriert.";
 
     private List<ScriptArgument> CreateDefaultArguments()
     {
@@ -104,7 +106,88 @@ public class GeneActiveProcessor : ISensorProcessor
                 Name = "Sleep Analysis",
                 Description = "Run sleep analysis",
                 Value = true
-            }
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
+            new NumericArgument
+            {
+                Flag = "n",
+                Name = "Number of days",
+                Description = "Number of days to process",
+                MaxValue = 10,
+                MinValue = 1,
+                Value = 7
+            },
         ];
     }
 }

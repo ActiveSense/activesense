@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ActiveSense.Desktop.App"
              xmlns:local="using:ActiveSense.Desktop"
-             xmlns:style="using:FluentAvalonia.Styling"
              RequestedThemeVariant="Default"
              xmlns:semi="https://irihi.tech/semi">
 

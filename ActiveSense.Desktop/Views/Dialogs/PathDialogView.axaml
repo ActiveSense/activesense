@@ -2,14 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
-             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:dialogs="clr-namespace:ActiveSense.Desktop.ViewModels.Dialogs"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ActiveSense.Desktop.Views.Dialogs.PathDialogView"
              x:DataType="dialogs:PathDialogViewModel">
     
-    <!-- Reference to centralized styles -->
     <UserControl.Styles>
         <StyleInclude Source="/Assets/DialogStyles.axaml" />
     </UserControl.Styles>
@@ -48,19 +45,11 @@
                             Classes="Primary"
                             Theme="{DynamicResource SolidButton}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <ui:SymbolIcon Symbol="Folder" FontSize="16" />
+                            <PathIcon Data="{StaticResource folder_regular}" Height="10"></PathIcon>
                             <TextBlock Text="Durchsuchen..." />
                         </StackPanel>
                     </Button>
                 </Grid>
-                
-                <!-- Help text -->
-                <TextBlock Grid.Row="1" 
-                           Text="Wählen Sie den Pfad zu Ihrer R-Installation."
-                           TextWrapping="Wrap"
-                           Margin="0,8,0,0"
-                           Foreground="#666666"
-                           FontSize="12" />
                 
                 <!-- Status/Message area -->
                 <Border Grid.Row="2"
@@ -72,8 +61,8 @@
                         Margin="0,16,0,0"
                         IsVisible="{Binding !!Message}">
                     <Grid ColumnDefinitions="Auto,*">
-                        <ui:SymbolIcon Grid.Column="0"
-                                       Symbol="Important" 
+                        <PathIcon Grid.Column="0"
+                                       Data="{StaticResource important_regular}" 
                                        Foreground="#E81123" 
                                        FontSize="16"
                                        VerticalAlignment="Top"
@@ -101,7 +90,6 @@
                         Theme="{DynamicResource SolidButton}" 
                         Command="{Binding OkCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <ui:SymbolIcon Symbol="Accept" FontSize="16" />
                         <TextBlock Text="{Binding OkButtonText}" />
                     </StackPanel>
                 </Button>

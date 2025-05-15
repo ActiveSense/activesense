@@ -47,6 +47,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
     [ObservableProperty] private string _statusMessage = "No files selected";
     [ObservableProperty] private string _timeRemaining = string.Empty;
     [ObservableProperty] private string _title = "Sensordaten analysieren";
+    [ObservableProperty] private string _processingInfo = "";
 
     public ProcessDialogViewModel(SensorProcessorFactory sensorProcessorFactory,
         ISharedDataService sharedDataService, ResultParserFactory resultParserFactory,
@@ -59,12 +60,16 @@ public partial class ProcessDialogViewModel : DialogViewModel
         _dialogService = dialogService;
         _mainViewModel = mainViewModel;
 
-        LoadDefaultArguments();
+        LoadDefaultInformation();
     }
+    
+    public ProcessDialogViewModel() {}
 
-    private void LoadDefaultArguments()
+    private void LoadDefaultInformation()
     {
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
+        ProcessingInfo = processor.ProcessingInfo;
+        
         Arguments.Clear();
 
         foreach (var arg in processor.DefaultArguments)
@@ -224,7 +229,8 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
 
             StatusMessage = "Parsing results...";
-            ParseResults();
+            StopCountdown();
+            await ParseResults();
         }
         catch (OperationCanceledException)
         {
