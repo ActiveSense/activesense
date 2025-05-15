@@ -80,11 +80,11 @@ source("utils/cleanup.R")
 
 # Define command line options
 option_list <- list(
-  make_option("--directory", type="character", default=paste0(getwd(), "/outputs/"),
+  make_option(c( "-d", "--directory"), type="character", default=paste0(getwd(), "/outputs/"),
               help="Base directory for output [default: current directory]"),
-  make_option("--activity", type="logical", default=TRUE,
+  make_option(c("-a", "--activity"), type="logical", default=TRUE,
               help="Run activity analysis [default: %default]"),
-  make_option("--sleep", type="logical", default=TRUE,
+  make_option(c("-s", "--sleep"), type="logical", default=TRUE,
               help="Run sleep analysis [default: %default]"),
   
   # --- LEFT WRIST ---
