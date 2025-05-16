@@ -14,10 +14,10 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
 public class GeneActiveProcessor : ISensorProcessor
 {
     private readonly List<ScriptArgument> _defaultArguments;
-    private readonly IScriptExecutor _scriptExecutor;
     private readonly IFileManager _fileManager;
-    private readonly IProcessingTimeEstimator _timeEstimator;
     private readonly IPathService _pathService;
+    private readonly IScriptExecutor _scriptExecutor;
+    private readonly IProcessingTimeEstimator _timeEstimator;
 
     public GeneActiveProcessor(
         IPathService pathService,
@@ -85,8 +85,9 @@ public class GeneActiveProcessor : ISensorProcessor
     {
         return _timeEstimator.EstimateProcessingTime(files);
     }
-    
-    public string ProcessingInfo => "Einstellungen werden nur auf die Verarbeitung von .bin-Dateien angewendet. Beim Import als PDF werden die Einstellungen ignoriert.";
+
+    public string ProcessingInfo =>
+        "Einstellungen werden nur auf die Verarbeitung von .bin-Dateien angewendet. Beim Import als PDF werden die Einstellungen ignoriert.";
 
     private List<ScriptArgument> CreateDefaultArguments()
     {
@@ -94,7 +95,7 @@ public class GeneActiveProcessor : ISensorProcessor
         [
             new BoolArgument
             {
-                Flag = "a",
+                Flag = "activity",
                 Name = "Activity Analysis",
                 Description = "Run activity analysis",
                 Value = true
@@ -102,92 +103,93 @@ public class GeneActiveProcessor : ISensorProcessor
 
             new BoolArgument
             {
-                Flag = "s",
+                Flag = "sleep",
                 Name = "Sleep Analysis",
                 Description = "Run sleep analysis",
                 Value = true
             },
+            
+            // Left wrist thresholds
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "sedentary_left",
+                Name = "Sedentary Threshold (Left)",
+                Description = "Threshold for sedentary activity on left wrist (in g)",
+                MinValue = 0.01,
+                MaxValue = 0.1,
+                Value = 0.04
             },
+
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "light_left",
+                Name = "Light Threshold (Left)",
+                Description = "Threshold for light activity on left wrist",
+                MinValue = 100,
+                MaxValue = 500,
+                Value = 217
             },
+
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "moderate_left",
+                Name = "Moderate Threshold (Left)",
+                Description = "Threshold for moderate activity on left wrist",
+                MinValue = 300,
+                MaxValue = 1000,
+                Value = 644
             },
+
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "vigorous_left",
+                Name = "Vigorous Threshold (Left)",
+                Description = "Threshold for vigorous activity on left wrist",
+                MinValue = 1000,
+                MaxValue = 3000,
+                Value = 1810
             },
+
+            // Right wrist thresholds
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "sedentary_right",
+                Name = "Sedentary Threshold (Right)",
+                Description = "Threshold for sedentary activity on right wrist (in g)",
+                MinValue = 0.01,
+                MaxValue = 0.1,
+                Value = 0.04
             },
+
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "light_right",
+                Name = "Light Threshold (Right)",
+                Description = "Threshold for light activity on right wrist",
+                MinValue = 100,
+                MaxValue = 800,
+                Value = 386
             },
+
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
+                Flag = "moderate_right",
+                Name = "Moderate Threshold (Right)",
+                Description = "Threshold for moderate activity on right wrist",
+                MinValue = 200,
+                MaxValue = 800,
+                Value = 439
             },
+
             new NumericArgument
             {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
-            },
-            new NumericArgument
-            {
-                Flag = "n",
-                Name = "Number of days",
-                Description = "Number of days to process",
-                MaxValue = 10,
-                MinValue = 1,
-                Value = 7
-            },
+                Flag = "vigorous_right",
+                Name = "Vigorous Threshold (Right)",
+                Description = "Threshold for vigorous activity on right wrist",
+                MinValue = 1000,
+                MaxValue = 3500,
+                Value = 2098
+            }
         ];
     }
 }

@@ -19,10 +19,10 @@ namespace ActiveSense.Desktop.Infrastructure.Process.Helpers
         {
             if (Value == false)
             {
-                return $"-{Flag} FALSE";
+                return $"--{Flag} FALSE";
             }
 
-            return $"-{Flag} TRUE";
+            return $"--{Flag} TRUE";
         }
     }
 
@@ -34,7 +34,7 @@ namespace ActiveSense.Desktop.Infrastructure.Process.Helpers
 
         public override string ToCommandLineArgument()
         {
-            return $"-{Flag} {Value}";
+            return $"--{Flag} {Value}";
         }
     }
 }

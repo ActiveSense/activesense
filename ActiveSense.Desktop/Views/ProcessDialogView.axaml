@@ -20,7 +20,7 @@
 
     <Border Classes="dialog-container"
             Height="530"
-            Width="600">
+            Width="650">
         <Grid RowDefinitions="Auto, *, Auto, Auto">
             <!-- Header -->
             <Grid Grid.Row="0" IsVisible="{Binding !IsProcessing}"
@@ -53,7 +53,7 @@
                 <Grid ColumnDefinitions="*, 16, Auto" IsVisible="{Binding !IsProcessing}">
                     <!-- Left column - Settings -->
                     <StackPanel Grid.Column="0" Spacing="12">
-                        <Border Classes="setting-card">
+                        <Border Classes="setting-card" MaxWidth="350">
                             <ScrollViewer Height="275">
                                 <StackPanel Spacing="8">
                                     <ItemsControl ItemsSource="{Binding Arguments}">

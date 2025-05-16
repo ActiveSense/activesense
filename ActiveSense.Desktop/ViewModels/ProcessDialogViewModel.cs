@@ -212,7 +212,6 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
                 if (!scriptSuccess)
                 {
-                    StatusMessage = $"";
                     var dialog = new InfoDialogViewModel()
                     {
                         Title = "Fehler",
