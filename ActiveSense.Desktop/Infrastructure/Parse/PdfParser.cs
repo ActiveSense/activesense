@@ -27,7 +27,10 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
         {
             pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
         }
-        catch (Exception e) { }
+        catch
+        {
+            // ignored
+        }
 
         await Task.Run(() =>
         {
@@ -44,7 +47,7 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error parsing PDF file {file}: {e.Message}");
+                    throw new InvalidDataException($"Error parsing PDF file {file}: {e.Message}");
                 }
             }
         });

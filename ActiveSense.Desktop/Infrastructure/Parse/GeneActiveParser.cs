@@ -28,7 +28,6 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
 
         if (!Directory.Exists(outputDirectory))
         {
-            Console.WriteLine($"Directory {outputDirectory} does not exist.");
             return analyses;
         }
 

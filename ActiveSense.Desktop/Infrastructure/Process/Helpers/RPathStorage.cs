@@ -29,7 +29,7 @@ public static class RPathStorage
     {
         try
         {
-            string directory = Path.GetDirectoryName(FilePath);
+            string? directory = Path.GetDirectoryName(FilePath);
             if (!Directory.Exists(directory) && directory != null)
             {
                 Directory.CreateDirectory(directory);
@@ -63,7 +63,6 @@ public static class RPathStorage
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error testing R executable: {ex.Message}");
             return false;
         }
     }

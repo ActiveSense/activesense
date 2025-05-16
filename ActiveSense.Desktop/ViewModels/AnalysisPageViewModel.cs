@@ -58,6 +58,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         _sharedDataService.AllAnalysesChanged += OnAnalysesChanged;
     }
 
+    // public AnalysisPageViewModel(){}
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
 
     async partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)
@@ -94,7 +95,6 @@ public partial class AnalysisPageViewModel : PageViewModel
     public async Task Initialize()
     {
         ShowSpinner = true;
-        Console.WriteLine("Loading result files...");
         TabItems.Clear();
         var parser = _resultParserFactory.GetParser(SensorType);
 

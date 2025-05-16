@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -87,40 +88,21 @@ public class ArchiveCreatorTests
     }
 
     [Test]
-    public async Task CreateArchiveAsync_WithInvalidOutputPath_ReturnsFalse()
+    public async Task CreateArchiveAsync_WithInvalidOutputPath_Throws()
     {
         // Arrange
         string invalidPath = Path.Combine(_tempDir, "invalid", "nested", "path", "output.zip");
 
-        // Act
-        bool result = await _archiveCreator.CreateArchiveAsync(
-            invalidPath,
-            _tempPdfPath,
-            "TestAnalysis",
-            "sleep data",
-            "activity data");
-
-        // Assert
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public async Task CreateArchiveAsync_WithInvalidPdfPath_ReturnsFalse()
-    {
-        // Arrange
-        string outputPath = Path.Combine(_tempDir, "output.zip");
-        string invalidPdfPath = Path.Combine(_tempDir, "nonexistent.pdf");
-
-        // Act
-        bool result = await _archiveCreator.CreateArchiveAsync(
-            outputPath,
-            invalidPdfPath,
-            "TestAnalysis",
-            "sleep data",
-            "activity data");
-
-        // Assert
-        Assert.That(result, Is.False);
+        // Act & Assert
+        Assert.ThrowsAsync<Exception>(async () =>
+        {
+            await _archiveCreator.CreateArchiveAsync(
+                invalidPath,
+                _tempPdfPath,
+                "TestAnalysis",
+                "sleep data",
+                "activity data");
+        });
     }
 
     [Test]
