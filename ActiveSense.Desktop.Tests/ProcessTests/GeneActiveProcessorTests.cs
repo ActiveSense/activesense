@@ -216,7 +216,7 @@ public class GeneActiveProcessorTests
     }
 
     [Test]
-    public async Task ProcessAsync_WithCancellation_ReturnsFailureResult()
+    public async Task ProcessAsync_WithCancellation_Throws()
     {
         // Arrange
         var arguments = new List<ScriptArgument>
@@ -234,12 +234,11 @@ public class GeneActiveProcessorTests
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(new OperationCanceledException());
 
-        // Act
-        var result = await _processor.ProcessAsync(arguments, cancellationTokenSource.Token);
-
-        // Assert
-        Assert.That(result.Success, Is.False);
-        Assert.That(result.Output, Is.EqualTo("Failed to execute R script: The operation was canceled."));
+        // Act & Assert
+        Assert.ThrowsAsync<OperationCanceledException>(async () =>
+        {
+            await _processor.ProcessAsync(arguments, cancellationTokenSource.Token);
+        });
     }
 
     [Test]
