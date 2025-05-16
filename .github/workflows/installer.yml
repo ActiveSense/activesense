@@ -55,8 +55,8 @@ jobs:
 
       - name: Build Linux Installer
         run: |
-          chmod +x Publish/linux/package.sh
-          ./Publish/linux/package.sh
+          chmod +x Publish/linux/package-linux.sh
+          ./Publish/linux/package-linux.sh
 
       - name: Upload Linux Installer
         uses: actions/upload-artifact@v4
@@ -79,8 +79,8 @@ jobs:
 
       - name: Build macOS Installer
         run: |
-          chmod +x Publish/macos/package-macos.sh
-          ./Publish/macos/package-macos.sh
+          chmod +x Publish/macos/package-dmg.sh
+          ./Publish/macos/package-dmg.sh
 
       - name: Upload macOS Installer
         uses: actions/upload-artifact@v4
