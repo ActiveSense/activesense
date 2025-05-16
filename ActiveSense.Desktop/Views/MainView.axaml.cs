@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Avalonia.Controls;
-using FluentAvalonia.UI.Windowing;
 
 namespace ActiveSense.Desktop.Views;
 

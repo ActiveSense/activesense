@@ -11,7 +11,7 @@
         <StyleInclude Source="/Assets/DialogStyles.axaml" />
     </UserControl.Styles>
 
-    <Border Classes="dialog-container" MaxWidth="300">
+    <Border Classes="dialog-container" MaxWidth="400">
         <Grid RowDefinitions="Auto, *, Auto">
             <!-- Header -->
             <Grid Grid.Row="0"

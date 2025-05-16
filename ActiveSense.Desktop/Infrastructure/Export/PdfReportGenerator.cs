@@ -14,7 +14,6 @@ using QuestPDF.Infrastructure;
 namespace ActiveSense.Desktop.Infrastructure.Export;
 
 public class PdfReportGenerator(
-    IChartRenderer chartRenderer,
     IAnalysisSerializer serializer)
     : IPdfReportGenerator
 {

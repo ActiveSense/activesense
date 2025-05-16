@@ -9,7 +9,7 @@ namespace ActiveSense.Desktop.ViewModels.Dialogs
         [ObservableProperty] private string _subTitle = "";
         [ObservableProperty] private string _okButtonText = "Ok";
         [ObservableProperty] private string _message = "asdf asd fs df";
-        [ObservableProperty] private string _extendedMessage;
+        [ObservableProperty] private string _extendedMessage = "";
         [ObservableProperty] private bool _confirmed;
 
         [RelayCommand]

@@ -17,7 +17,7 @@ public class HeaderAnalyzer : IHeaderAnalyzer
         {
             return headers.Intersect(activityHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
         }
-        catch (Exception e)
+        catch
         {
             return false;
         }
@@ -34,7 +34,7 @@ public class HeaderAnalyzer : IHeaderAnalyzer
         {
             return headers.Intersect(sleepHeaders, StringComparer.OrdinalIgnoreCase).Count() >= 3;
         }
-        catch (Exception e)
+        catch
         {
             return false;
         }

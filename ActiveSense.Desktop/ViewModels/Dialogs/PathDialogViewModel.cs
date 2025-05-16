@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels.Dialogs;
 
-public partial class PathDialogViewModel(IPathService pathService) : Dialogs.DialogViewModel
+public partial class PathDialogViewModel() : Dialogs.DialogViewModel
 {
     [ObservableProperty] private string _closeButtonText = "Close";
 

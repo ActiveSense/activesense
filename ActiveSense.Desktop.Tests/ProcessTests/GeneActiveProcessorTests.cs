@@ -24,17 +24,17 @@ public class GeneActiveProcessorTests
         _mockScriptExecutor = new Mock<IScriptExecutor>();
         _mockFileManager = new Mock<IFileManager>();
         _mockTimeEstimator = new Mock<IProcessingTimeEstimator>();
-    
+
         _processor = new GeneActiveProcessor(
             _mockPathService.Object,
             _mockScriptExecutor.Object,
             _mockFileManager.Object,
             _mockTimeEstimator.Object);
-    
+
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
-    
+
         // Set up the path service mock
         _mockPathService.Setup(x => x.MainScriptPath).Returns("/path/to/script.R");
         _mockPathService.Setup(x => x.ScriptExecutablePath).Returns("Rscript");
@@ -70,17 +70,51 @@ public class GeneActiveProcessorTests
 
         // Assert
         Assert.That(args, Is.Not.Null);
-        Assert.That(args.Count, Is.EqualTo(2));
+        Assert.That(args.Count, Is.EqualTo(10));
 
         // Check for activity analysis argument
-        var activityArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "a");
+        var activityArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "activity");
         Assert.That(activityArg, Is.Not.Null);
         Assert.That((activityArg as BoolArgument)?.Value, Is.True);
 
         // Check for sleep analysis argument
-        var sleepArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "s");
+        var sleepArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "sleep");
         Assert.That(sleepArg, Is.Not.Null);
         Assert.That((sleepArg as BoolArgument)?.Value, Is.True);
+
+        // Check for left wrist thresholds
+        var sedentaryLeftArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "sedentary_left");
+        Assert.That(sedentaryLeftArg, Is.Not.Null);
+        Assert.That((sedentaryLeftArg as NumericArgument)?.Value, Is.EqualTo(0.04));
+
+        var lightLeftArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "light_left");
+        Assert.That(lightLeftArg, Is.Not.Null);
+        Assert.That((lightLeftArg as NumericArgument)?.Value, Is.EqualTo(217));
+
+        var moderateLeftArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "moderate_left");
+        Assert.That(moderateLeftArg, Is.Not.Null);
+        Assert.That((moderateLeftArg as NumericArgument)?.Value, Is.EqualTo(644));
+
+        var vigorousLeftArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "vigorous_left");
+        Assert.That(vigorousLeftArg, Is.Not.Null);
+        Assert.That((vigorousLeftArg as NumericArgument)?.Value, Is.EqualTo(1810));
+
+        // Check for right wrist thresholds
+        var sedentaryRightArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "sedentary_right");
+        Assert.That(sedentaryRightArg, Is.Not.Null);
+        Assert.That((sedentaryRightArg as NumericArgument)?.Value, Is.EqualTo(0.04));
+
+        var lightRightArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "light_right");
+        Assert.That(lightRightArg, Is.Not.Null);
+        Assert.That((lightRightArg as NumericArgument)?.Value, Is.EqualTo(386));
+
+        var moderateRightArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "moderate_right");
+        Assert.That(moderateRightArg, Is.Not.Null);
+        Assert.That((moderateRightArg as NumericArgument)?.Value, Is.EqualTo(439));
+
+        var vigorousRightArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "vigorous_right");
+        Assert.That(vigorousRightArg, Is.Not.Null);
+        Assert.That((vigorousRightArg as NumericArgument)?.Value, Is.EqualTo(2098));
     }
 
     [Test]
@@ -138,7 +172,7 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success output", ""));
+            .ReturnsAsync((true, "Success output"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);
@@ -146,7 +180,6 @@ public class GeneActiveProcessorTests
         // Assert
         Assert.That(result.Success, Is.True);
         Assert.That(result.Output, Is.EqualTo("Success output"));
-        Assert.That(result.Error, Is.Empty);
 
         // Verify the script executor was called with the right executable
         _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
@@ -172,18 +205,18 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((false, "", "Script execution failed"));
+            .ReturnsAsync((false, "Script execution failed"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);
 
         // Assert
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Error, Is.EqualTo("Script execution failed"));
+        Assert.That(result.Output, Is.EqualTo("Script execution failed"));
     }
 
     [Test]
-    public async Task ProcessAsync_WithCancellation_ReturnsFailureResult()
+    public async Task ProcessAsync_WithCancellation_Throws()
     {
         // Arrange
         var arguments = new List<ScriptArgument>
@@ -201,13 +234,11 @@ public class GeneActiveProcessorTests
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(new OperationCanceledException());
 
-        // Act
-        var result = await _processor.ProcessAsync(arguments, cancellationTokenSource.Token);
-
-        // Assert
-        Assert.That(result.Success, Is.False);
-        Assert.That(result.Output, Is.EqualTo("Operation was cancelled"));
-        Assert.That(result.Error, Is.EqualTo("Processing cancelled by user"));
+        // Act & Assert
+        Assert.ThrowsAsync<OperationCanceledException>(async () =>
+        {
+            await _processor.ProcessAsync(arguments, cancellationTokenSource.Token);
+        });
     }
 
     [Test]
@@ -231,9 +262,8 @@ public class GeneActiveProcessorTests
 
         // Assert
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Output, Is.Empty);
-        Assert.That(result.Error, Does.Contain("Failed to execute R script"));
-        Assert.That(result.Error, Does.Contain("Test exception"));
+        Assert.That(result.Output, Does.Contain("Failed to execute R script"));
+        Assert.That(result.Output, Does.Contain("Test exception"));
     }
 
     [Test]
@@ -247,7 +277,7 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success", ""));
+            .ReturnsAsync((true, "Success"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);
@@ -259,7 +289,7 @@ public class GeneActiveProcessorTests
         // arguments corresponding to the default arguments
         _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
             It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("-a TRUE") && s.Contains("-s TRUE")),
+            It.Is<string>(s => s.Contains("--activity TRUE") && s.Contains("--sleep TRUE")),
             It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -275,7 +305,7 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success", ""));
+            .ReturnsAsync((true, "Success"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);

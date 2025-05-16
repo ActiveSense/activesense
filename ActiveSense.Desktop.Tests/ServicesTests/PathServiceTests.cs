@@ -42,14 +42,7 @@ public class PathServiceTests
     {
         // Assert
         Assert.That(_pathService.OutputDirectory,
-            Is.EqualTo(Path.Combine(_pathService.SolutionBasePath, "AnalysisFiles/")));
-    }
-
-    [Test]
-    public void ScriptBasePath_WithCustomPath_ReturnsCustomPath()
-    {
-        // Assert
-        Assert.That(_pathService.ScriptBasePath, Is.EqualTo(_tempDir));
+            Is.EqualTo(Path.Combine(_pathService.BasePath, "AnalysisFiles/")));
     }
 
     [Test]

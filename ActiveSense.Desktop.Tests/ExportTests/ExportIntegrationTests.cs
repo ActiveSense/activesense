@@ -30,7 +30,7 @@ public class ExportIntegrationTests
         var chartColors = new ChartColors();
         var chartRenderer = new ChartRenderer(chartColors);
         var serializer = new AnalysisSerializer(dateConverter);
-        var pdfGenerator = new PdfReportGenerator(chartRenderer, serializer);
+        var pdfGenerator = new PdfReportGenerator(serializer);
         var csvExporter = new CsvExporter();
         var archiveCreator = new ArchiveCreator();
 
@@ -45,8 +45,7 @@ public class ExportIntegrationTests
         };
 
         // Add some sleep records
-        _analysis.SetSleepRecords(new[]
-        {
+        _analysis.SetSleepRecords([
             new SleepRecord
             {
                 NightStarting = "2024-11-29",
@@ -71,7 +70,7 @@ public class ExportIntegrationTests
                 NumActivePeriods = "67",
                 MedianActivityLength = "84"
             }
-        });
+        ]);
 
         // Add some activity records
         _analysis.SetActivityRecords(new[]

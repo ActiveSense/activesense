@@ -42,7 +42,6 @@ public class PdfReportGeneratorTests
         _serializer = new TestAnalysisSerializer();
 
         _pdfGenerator = new PdfReportGenerator(
-            _mockChartRenderer.Object,
             _serializer);
 
         // Setup a valid analysis with some data
@@ -176,7 +175,6 @@ public class PdfReportGeneratorTests
         string tempFilePath = Path.GetTempFileName();
         var throwingSerializer = new ThrowingAnalysisSerializer();
         var pdfGeneratorWithThrowingSerializer = new PdfReportGenerator(
-            _mockChartRenderer.Object,
             throwingSerializer);
 
         // Act & Assert

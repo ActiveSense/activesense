@@ -22,6 +22,33 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
         return AnalysisType.Unknown;
     }
 
+    public async Task<IAnalysis> ParseCsvDirectoryAsync(string directory)
+    {
+        var analysis = new GeneActiveAnalysis(dateConverter)
+        {
+            FilePath = directory,
+            FileName = Path.GetFileName(directory)
+        };
+
+        var csvFiles = Directory.GetFiles(directory, "*.csv");
+
+        await Task.Run(() =>
+        {
+            foreach (var file in csvFiles)
+            {
+                try
+                {
+                    ParseCsvFile(file, analysis);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Error parsing file {file}: {e.Message}", e);
+                }
+            }
+        });
+
+        return analysis;
+    }
     public bool ParseCsvFile(string filePath, IAnalysis analysis)
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
@@ -44,42 +71,17 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
             case AnalysisType.Activity:
                 activityAnalysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
                 return true;
+            
             case AnalysisType.Sleep:
                 sleepAnalysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
                 return true;
+            
             case AnalysisType.Unknown:
+                
             default:
                 return false;
         }
     }
 
-    public async Task<IAnalysis> ParseCsvDirectoryAsync(string directory)
-    {
-        var analysis = new GeneActiveAnalysis(dateConverter)
-        {
-            FilePath = directory,
-            FileName = Path.GetFileName(directory)
-        };
 
-        var csvFiles = Directory.GetFiles(directory, "*.csv");
-        var hasValidData = false;
-
-        await Task.Run(() =>
-        {
-            foreach (var file in csvFiles)
-            {
-                Console.WriteLine("Parsing file: " + file);
-                try
-                {
-                    if (ParseCsvFile(file, analysis)) hasValidData = true;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Error parsing file {file}: {e.Message}");
-                }
-            }
-        });
-
-        return hasValidData ? analysis : null;
-    }
 }

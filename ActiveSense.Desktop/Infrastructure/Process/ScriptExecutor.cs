@@ -9,13 +9,13 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
 
 public class ScriptExecutor : IScriptExecutor
 {
-    public async Task<(bool Success, string Output, string Error)> ExecuteScriptAsync(
+    public async Task<(bool Success, string Output)> ExecuteScriptAsync(
         string scriptPath, string arguments, string workingDirectory, CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Executing script: " + scriptPath);
         Console.WriteLine("Arguments: " + arguments);
         Console.WriteLine("Working Directory: " + workingDirectory);
-        
+
         var process = new System.Diagnostics.Process
         {
             StartInfo = new ProcessStartInfo
@@ -32,18 +32,31 @@ public class ScriptExecutor : IScriptExecutor
         };
 
         var outputBuilder = new StringBuilder();
-        var errorBuilder = new StringBuilder();
 
         process.OutputDataReceived += (sender, args) =>
         {
-            if (args.Data != null)
+            if (args.Data == null) return;
+            try
+            {
                 outputBuilder.AppendLine(args.Data);
+            }
+            catch
+            {
+                // ignored
+            }
         };
 
         process.ErrorDataReceived += (sender, args) =>
         {
-            if (args.Data != null)
-                errorBuilder.AppendLine(args.Data);
+            if (args.Data == null) return;
+            try
+            {
+                outputBuilder.AppendLine(args.Data);
+            }
+            catch
+            {
+                // ignored
+            }
         };
 
         // Register for cancellation
@@ -55,7 +68,7 @@ public class ScriptExecutor : IScriptExecutor
             }
             catch
             {
-                /* Ignore errors during cancellation */
+                // ignored
             }
         });
 
@@ -65,8 +78,9 @@ public class ScriptExecutor : IScriptExecutor
         }
         catch (Exception e)
         {
-            return (false, outputBuilder.ToString(), $"Failed to start process: {e.Message}");
+            return (false, $"Failed to start process: {e.Message}");
         }
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
@@ -76,9 +90,9 @@ public class ScriptExecutor : IScriptExecutor
         }
         catch (OperationCanceledException)
         {
-            return (false, outputBuilder.ToString(), "Operation was cancelled");
+            throw new OperationCanceledException();
         }
 
-        return (process.ExitCode == 0, outputBuilder.ToString(), errorBuilder.ToString());
+        return (process.ExitCode == 0, outputBuilder.ToString());
     }
 }

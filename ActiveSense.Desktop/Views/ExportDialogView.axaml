@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
-             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              x:Class="ActiveSense.Desktop.Views.ExportDialogView"
              x:DataType="viewModels:ExportDialogViewModel">
 
@@ -63,13 +62,13 @@
                 <Button Grid.Column="0"
                         Classes="Secondary"
                         Command="{Binding CancelCommand}">
-                    <TextBlock>Cancel</TextBlock>
+                    <TextBlock>Abbrechen</TextBlock>
                 </Button>
                 <Button Grid.Column="2" Classes="Primary" Theme="{DynamicResource SolidButton}"
                         Command="{Binding ExportAnalysisCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <ui:SymbolIcon Symbol="Save" FontSize="16" />
-                        <TextBlock>Export</TextBlock>
+                        <PathIcon Data="{StaticResource save_regular}" Height="15"></PathIcon>
+                        <TextBlock>Speichern</TextBlock>
                     </StackPanel>
                 </Button>
             </Grid>

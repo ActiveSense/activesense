@@ -18,71 +18,54 @@ public class PathService : IPathService
         _customOutputPath = customOutputPath;
         _customScriptPath = customScriptPath;
 
-        // Ensure critical directories exist on initialization
+        // directories exist
         EnsureDirectoryExists(OutputDirectory);
         EnsureDirectoryExists(ScriptInputPath);
     }
 
-    // Base paths
+    public string OutputDirectory => CombinePaths(BasePath, "AnalysisFiles/");
+    public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
+    public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
+    public string ScriptExecutablePath => FindRInstallation();
     public string ApplicationBasePath => AppDomain.CurrentDomain.BaseDirectory;
 
     public string ScriptBasePath
     {
         get
         {
-            if (_customScriptPath != null)
-                return _customScriptPath;
-
-            // Check relative to application first
-            var relativePath = CombinePaths(SolutionBasePath, "../ActiveSense.RScripts");
+            // Check relative to application first, for dev environment
+            var relativePath = CombinePaths(BasePath, "../ActiveSense.RScripts");
             if (Directory.Exists(relativePath))
                 return relativePath;
 
-            // Fall back to user directory
-            var userPath = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData),
-                "ActiveSense", "RScripts");
-
-            if (!Directory.Exists(userPath))
-            {
-                EnsureDirectoryExists(userPath);
-                CopyResourceScripts(userPath);
-            }
+            var userPath = CombinePaths(BasePath, "RScripts");
 
             return userPath;
         }
     }
 
-    public string SolutionBasePath
+    public string BasePath
     {
         get
         {
             var directory = ApplicationBasePath;
 
-            if (directory.Contains("bin"))
-                while (!Directory.Exists(Path.Combine(directory, "ActiveSense.Desktop")) &&
-                       !File.Exists(Path.Combine(directory, "ActiveSense.Desktop.sln")))
-                {
-                    var parentDir = Directory.GetParent(directory);
-                    if (parentDir == null) return ApplicationBasePath;
+            if (!directory.Contains("bin")) return directory;
+            while (!Directory.Exists(Path.Combine(directory, "ActiveSense.Desktop")) &&
+                   !File.Exists(Path.Combine(directory, "ActiveSense.Desktop.sln")))
+            {
+                var parentDir = Directory.GetParent(directory);
+                if (parentDir == null) return ApplicationBasePath;
 
-                    directory = parentDir.FullName;
-                }
+                directory = parentDir.FullName;
+            }
 
             return directory;
         }
     }
 
-    public string OutputDirectory => CombinePaths(SolutionBasePath, "AnalysisFiles/");
+    #region helpers
 
-    // Script paths
-    public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
-    public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
-
-    public string ScriptExecutablePath => FindRInstallation();
-
-    // Utility methods
     public string CombinePaths(params string[] paths)
     {
         return Path.Combine(paths);
@@ -113,22 +96,6 @@ public class PathService : IPathService
             }
         else
             Directory.CreateDirectory(path);
-    }
-
-    private void CopyResourceScripts(string targetPath)
-    {
-        var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
-
-        // If we have scripts in the app directory, copy them
-        if (Directory.Exists(sourceDir))
-            foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-            {
-                var relativePath = file.Substring(sourceDir.Length + 1);
-                var targetFile = Path.Combine(targetPath, relativePath);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(targetFile));
-                File.Copy(file, targetFile, true);
-            }
     }
 
     public string FindRInstallation()
@@ -267,4 +234,6 @@ public class PathService : IPathService
         throw new FileNotFoundException(
             "Could not locate R installation on Linux. Please install R using your package manager (e.g., 'sudo apt install r-base' on Debian/Ubuntu)");
     }
+
+    #endregion
 }
