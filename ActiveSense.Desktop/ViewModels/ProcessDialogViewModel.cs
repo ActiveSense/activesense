@@ -63,7 +63,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
         LoadDefaultInformation();
     }
     
-    public ProcessDialogViewModel() {}
+    // public ProcessDialogViewModel() {}
 
     private void LoadDefaultInformation()
     {
@@ -235,9 +235,9 @@ public partial class ProcessDialogViewModel : DialogViewModel
             ScriptOutput = "Processing was cancelled by user.";
             ShowScriptOutput = true;
         }
-        catch (FileNotFoundException ex)
+        catch (FileNotFoundException)
         {
-            var dialog = new PathDialogViewModel(_pathService)
+            var dialog = new PathDialogViewModel()
             {
                 Title = "Fehler",
                 SubTitle = "R Installation nicht gefunden",

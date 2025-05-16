@@ -27,7 +27,10 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
         {
             pdfFiles = Directory.GetFiles(outputDirectory, "*.pdf");
         }
-        catch (Exception e) { }
+        catch
+        {
+            // ignored
+        }
 
         await Task.Run(() =>
         {

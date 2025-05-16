@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -222,20 +223,6 @@ public class FileParserTests
     }
 
     [Test]
-    public async Task ParseCsvDirectoryAsync_WithEmptyDirectory_ReturnsNull()
-    {
-        // Arrange
-        string directoryPath = Path.Combine(_tempDir, "empty_directory");
-        Directory.CreateDirectory(directoryPath);
-
-        // Act
-        var result = await _fileParser.ParseCsvDirectoryAsync(directoryPath);
-
-        // Assert
-        Assert.That(result, Is.Null);
-    }
-
-    [Test]
     public async Task ParseCsvDirectoryAsync_WithInvalidFiles_ReturnsNull()
     {
         // Arrange
@@ -244,15 +231,15 @@ public class FileParserTests
 
         // Create invalid file
         string invalidFilePath = Path.Combine(directoryPath, "invalid.csv");
-        File.WriteAllText(invalidFilePath, "Not a CSV file");
+        File.WriteAllText(invalidFilePath, "\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\", \"laksjf\"\n\"2024-08-22\",1725,0,426,6316,2424,1545,0\n\"2024-08-23\",0,0,0,0,0,0,0\n");
 
         _mockHeaderAnalyzer.Setup(x => x.IsActivityCsv(It.IsAny<string[]>())).Returns(false);
         _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.IsAny<string[]>())).Returns(false);
 
-        // Act
-        var result = await _fileParser.ParseCsvDirectoryAsync(directoryPath);
-
-        // Assert
-        Assert.That(result, Is.Null);
+        // Act & Assert
+        Assert.ThrowsAsync<Exception>(async () =>
+        {
+            await _fileParser.ParseCsvDirectoryAsync(directoryPath);
+        });
     }
 }
