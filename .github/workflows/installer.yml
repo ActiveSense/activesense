@@ -9,30 +9,12 @@ on:
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
-  build-and-release:
-    # Use ubuntu-latest for better GitHub Action minutes usage
-    runs-on: ${{ startsWith(github.ref, 'refs/tags/v') && 'ubuntu-latest' || matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            installer-type: windows
-            installer-path: ActiveSense.Desktop/Publish/windows/ActiveSense-Setup.exe
-            installer-name: ActiveSense-Setup.exe
-          - os: ubuntu-latest
-            installer-type: linux
-            installer-path: ActiveSense.Desktop/Publish/linux/ActiveSense-Linux-Installer.tar.gz
-            installer-name: ActiveSense-Linux-Installer.tar.gz
-          - os: macos-latest
-            installer-type: macos
-            installer-path: ActiveSense.Desktop/Publish/macos/ActiveSense-Installer.dmg
-            installer-name: ActiveSense-Installer.dmg
-
+  build-windows:
+    runs-on: windows-latest
     # Add write permissions for creating releases
     permissions:
       contents: write
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,40 +24,19 @@ jobs:
         with:
           dotnet-version: '9.0.x'
       
-      # Windows-specific step
-      - name: Install Inno Setup (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Install Inno Setup
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile is.exe
           Start-Process -FilePath .\is.exe -Args "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
           Remove-Item .\is.exe
         shell: pwsh
       
-      # Build Windows installer
       - name: Build Windows Installer
-        if: matrix.os == 'windows-latest'
         run: |
           cd ActiveSense.Desktop
           . .\Publish\windows\package.ps1
         shell: pwsh
       
-      # Build Linux installer
-      - name: Build Linux Installer
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cd ActiveSense.Desktop
-          chmod +x Publish/linux/package-linux.sh
-          ./Publish/linux/package-linux.sh
-      
-      # Build macOS installer
-      - name: Build macOS Installer
-        if: matrix.os == 'macos-latest'
-        run: |
-          cd ActiveSense.Desktop
-          chmod +x Publish/macos/package-dmg.sh
-          ./Publish/macos/package-dmg.sh
-      
-      # Create a GitHub release if this is a tag push
       - name: Create Release and Upload Asset
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -83,6 +44,73 @@ jobs:
           name: ActiveSense ${{ github.ref_name }}
           draft: true
           prerelease: false
-          files: ${{ matrix.installer-path }}
+          files: |
+            ActiveSense.Desktop/Publish/windows/ActiveSense-Setup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ubuntu-latest
+    # Add write permissions for creating releases
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Build Linux Installer
+        run: |
+          cd ActiveSense.Desktop
+          chmod +x Publish/linux/package-linux.sh
+          ./Publish/linux/package-linux.sh
+      
+      - name: Create Release and Upload Asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ActiveSense ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+          files: |
+            ActiveSense.Desktop/Publish/linux/ActiveSense-Linux-Installer.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: macos-latest
+    # Add write permissions for creating releases
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Build macOS Installer
+        run: |
+          cd ActiveSense.Desktop
+          chmod +x Publish/macos/package-dmg.sh
+          ./Publish/macos/package-dmg.sh
+      
+      - name: Create Release and Upload Asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ActiveSense ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+          files: |
+            ActiveSense.Desktop/Publish/macos/ActiveSense-Installer.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
