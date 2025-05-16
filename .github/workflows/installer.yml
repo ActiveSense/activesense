@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
       - name: Install Inno Setup
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile is.exe
@@ -44,7 +44,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
       - name: Build Linux Installer
         run: |
           cd ActiveSense.Desktop
@@ -65,7 +65,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
       - name: Build macOS Installer
         run: |
           cd ActiveSense.Desktop
