@@ -1,12 +1,12 @@
 name: Build Cross-Platform Installers
 on:
   push:
-    branches: [ main, deployment-improvements ]
+    branches: [ main ]
     tags:
       - 'v*'
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch: 
 
 jobs:
   build-windows:
@@ -37,9 +37,10 @@ jobs:
         shell: pwsh
       
       - name: Create Release and Upload Asset
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: ActiveSense test
+          name: ActiveSense ${{ github.ref_name }}
           draft: true
           prerelease: false
           files: |
@@ -68,9 +69,10 @@ jobs:
           ./Publish/linux/package-linux.sh
       
       - name: Create Release and Upload Asset
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: ActiveSense test
+          name: ActiveSense ${{ github.ref_name }}
           draft: true
           prerelease: false
           files: |
@@ -99,9 +101,10 @@ jobs:
           ./Publish/macos/package-dmg.sh
       
       - name: Create Release and Upload Asset
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: ActiveSense test
+          name: ActiveSense ${{ github.ref_name }}
           draft: true
           prerelease: false
           files: |
