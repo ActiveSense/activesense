@@ -79,25 +79,25 @@ activity_create_df_pcp <- function(segment_data,
   #### Setting active rules ####
   # Taken for MSSE GENEA 2011 paper
   # Average cutpoints
-  Sedentary_Threshold <- 0.04
-  Light_Threshold <- (217 + 386) / 9600
-  Moderate_Threshold <- (644 + 439) / 9600
-  Vigorous_Threshold <- (2098 + 1810) / 9600
+  Sedentary_Threshold <- (sedentary_left + sedentary_right) / 2
+  Light_Threshold <- (light_left + light_right) / 9600
+  Moderate_Threshold <- (moderate_left + moderate_right) / 9600
+  Vigorous_Threshold <- (vigorous_left + vigorous_right) / 9600
 
   if (header$Value[[9]] == "left wrist") {
     # Cutpoints for Left
-    Sedentary_Threshold <- 0.04
-    Light_Threshold <- 217 / 4800
-    Moderate_Threshold <- 644 / 4800
-    Vigorous_Threshold <- 1810 / 4800
+    Sedentary_Threshold <- sedentary_left
+    Light_Threshold <- light_left / 4800
+    Moderate_Threshold <- moderate_left / 4800
+    Vigorous_Threshold <- vigorous_left / 4800
   }
 
   if (header$Value[[9]] == "right wrist") {
     # Cutpoints for Right
-    Sedentary_Threshold <- 0.04
-    Light_Threshold <- 386 / 4800
-    Moderate_Threshold <- 439 / 4800
-    Vigorous_Threshold <- 2098 / 4800
+    Sedentary_Threshold <- sedentary_right
+    Light_Threshold <- light_right / 4800
+    Moderate_Threshold <- moderate_right / 4800
+    Vigorous_Threshold <- vigorous_right / 4800
   }
 
   # Sedentary activity
