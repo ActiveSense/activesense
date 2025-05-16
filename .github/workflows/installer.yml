@@ -37,10 +37,9 @@ jobs:
         shell: pwsh
       
       - name: Create Release and Upload Asset
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: ActiveSense ${{ github.ref_name }}
+          name: ActiveSense test
           draft: true
           prerelease: false
           files: |
@@ -69,10 +68,9 @@ jobs:
           ./Publish/linux/package-linux.sh
       
       - name: Create Release and Upload Asset
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: ActiveSense ${{ github.ref_name }}
+          name: ActiveSense test
           draft: true
           prerelease: false
           files: |
