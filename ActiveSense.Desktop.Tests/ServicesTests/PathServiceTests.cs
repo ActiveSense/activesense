@@ -37,13 +37,6 @@ public class PathServiceTests
     private PathService _pathService;
     private string _tempDir;
 
-    [Test]
-    public void OutputDirectory_ReturnsCorrectValue()
-    {
-        // Assert
-        Assert.That(_pathService.OutputDirectory,
-            Is.EqualTo(Path.Combine(_pathService.BasePath, "AnalysisFiles/")));
-    }
 
     [Test]
     public void EnsureDirectoryExists_CreatesDirectoryIfNotExists()

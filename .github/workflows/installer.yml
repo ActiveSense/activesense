@@ -6,7 +6,7 @@ on:
       - 'v*'
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch: 
 
 jobs:
   build-windows:
