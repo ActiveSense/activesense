@@ -4,7 +4,7 @@ public interface IPathService
 {
     // Base paths
     string ApplicationBasePath { get; }
-    string SolutionBasePath { get; }
+    string BasePath { get; }
     
     // Application directories
     string OutputDirectory { get; }

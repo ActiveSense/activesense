@@ -42,7 +42,7 @@ public class PathServiceTests
     {
         // Assert
         Assert.That(_pathService.OutputDirectory,
-            Is.EqualTo(Path.Combine(_pathService.SolutionBasePath, "AnalysisFiles/")));
+            Is.EqualTo(Path.Combine(_pathService.BasePath, "AnalysisFiles/")));
     }
 
     [Test]

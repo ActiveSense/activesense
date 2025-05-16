@@ -30,31 +30,18 @@ public class PathService : IPathService
     {
         get
         {
-            if (_customScriptPath != null)
-                return _customScriptPath;
-
-            // Check relative to application first
-            var relativePath = CombinePaths(SolutionBasePath, "../ActiveSense.RScripts");
+            // Check relative to application first, for development purposes
+            var relativePath = CombinePaths(BasePath, "../ActiveSense.RScripts");
             if (Directory.Exists(relativePath))
                 return relativePath;
-
-            // Fall back to user directory
-            var userPath = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData),
-                "ActiveSense", "RScripts");
-
-            if (!Directory.Exists(userPath))
-            {
-                EnsureDirectoryExists(userPath);
-                CopyResourceScripts(userPath);
-            }
-
+    
+            var userPath = CombinePaths(BasePath, "RScripts");
+    
             return userPath;
         }
     }
 
-    public string SolutionBasePath
+    public string BasePath
     {
         get
         {
@@ -74,7 +61,7 @@ public class PathService : IPathService
         }
     }
 
-    public string OutputDirectory => CombinePaths(SolutionBasePath, "AnalysisFiles/");
+    public string OutputDirectory => CombinePaths(BasePath, "AnalysisFiles/");
 
     // Script paths
     public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
@@ -113,22 +100,6 @@ public class PathService : IPathService
             }
         else
             Directory.CreateDirectory(path);
-    }
-
-    private void CopyResourceScripts(string targetPath)
-    {
-        var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
-
-        // If we have scripts in the app directory, copy them
-        if (Directory.Exists(sourceDir))
-            foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-            {
-                var relativePath = file.Substring(sourceDir.Length + 1);
-                var targetFile = Path.Combine(targetPath, relativePath);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(targetFile));
-                File.Copy(file, targetFile, true);
-            }
     }
 
     public string FindRInstallation()

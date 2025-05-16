@@ -85,5 +85,6 @@
       <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-BlackItalic.ttf" />
       <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop.pdb" />
       <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop" />
+      <None Remove="RScripts\data\27101995_left wrist_105046_2024-08-26 14-36-44.bin" />
     </ItemGroup>
 </Project>

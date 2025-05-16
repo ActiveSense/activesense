@@ -36,13 +36,21 @@ public class ScriptExecutor : IScriptExecutor
         process.OutputDataReceived += (sender, args) =>
         {
             if (args.Data != null)
-                outputBuilder.AppendLine(args.Data);
+                try
+                {
+                    outputBuilder.AppendLine(args.Data);
+                }
+                catch {}
         };
 
         process.ErrorDataReceived += (sender, args) =>
         {
             if (args.Data != null)
-                outputBuilder.AppendLine(args.Data);
+                try
+                {
+                    outputBuilder.AppendLine(args.Data);
+                }
+                catch {}
         };
 
         // Register for cancellation
