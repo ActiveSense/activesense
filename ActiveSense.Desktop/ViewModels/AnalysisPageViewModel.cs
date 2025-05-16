@@ -95,7 +95,6 @@ public partial class AnalysisPageViewModel : PageViewModel
     public async Task Initialize()
     {
         ShowSpinner = true;
-        Console.WriteLine("Loading result files...");
         TabItems.Clear();
         var parser = _resultParserFactory.GetParser(SensorType);
 

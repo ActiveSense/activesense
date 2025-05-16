@@ -24,7 +24,6 @@ public class GeneActiveExporter(
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
         {
-            Console.WriteLine("Analysis does not provide required capabilities for export");
             return false;
         }
 

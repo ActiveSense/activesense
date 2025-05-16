@@ -34,8 +34,7 @@ public class ArchiveCreator : IArchiveCreator
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating archive: {ex.Message}");
-            return false;
+            throw new Exception($"Error creating archive: {ex.Message}");
         }
     }
 

@@ -63,7 +63,6 @@ public static class RPathStorage
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error testing R executable: {ex.Message}");
             return false;
         }
     }

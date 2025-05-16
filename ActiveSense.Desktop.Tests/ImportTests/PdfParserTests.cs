@@ -179,7 +179,7 @@ public class PdfParserTests
     }
 
     [Test]
-    public async Task ParsePdfFilesAsync_WhenExtractionFails_ContinuesProcessing()
+    public async Task ParsePdfFilesAsync_WhenExtractionFails_HaltsProcessing()
     {
         // Arrange
         // Create files
@@ -200,12 +200,8 @@ public class PdfParserTests
         _mockPdfParser.Setup(x => x.ExtractAnalysisFromPdfText(validPdfText))
             .Returns(mockAnalysis);
 
-        // Act
-        var result = await _mockPdfParser.Object.ParsePdfFilesAsync(_tempDir);
+        // Act & Assert
+        Assert.ThrowsAsync<InvalidDataException>(() => _mockPdfParser.Object.ParsePdfFilesAsync(_tempDir));
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count, Is.EqualTo(1));
-        Assert.That(result[0], Is.SameAs(mockAnalysis));
     }
 }

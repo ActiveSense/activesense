@@ -47,7 +47,7 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error parsing PDF file {file}: {e.Message}");
+                    throw new InvalidDataException($"Error parsing PDF file {file}: {e.Message}");
                 }
             }
         });
