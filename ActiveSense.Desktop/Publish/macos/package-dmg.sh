@@ -11,23 +11,14 @@ APP_BUNDLE="${APP_NAME}.app"
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
 
-echo "Building ActiveSense for macOS with size optimizations..."
-# Publish the app with size optimizations
+echo "Building ActiveSense for macOS..."
+# Publish the app
 dotnet publish "$PROJECT_PATH" \
   -c Release \
   -r osx-x64 \
   --self-contained true \
   -p:PublishSingleFile=true \
-  -p:PublishTrimmed=true \
-  -p:TrimMode=link \
-  -p:DebugType=None \
-  -p:DebugSymbols=false \
   -o "$OUTPUT_DIR/temp"
-
-# Remove unnecessary files to reduce size
-echo "Removing unnecessary files..."
-find "$OUTPUT_DIR/temp" -name "*.pdb" -delete
-find "$OUTPUT_DIR/temp" -name "*.xml" -type f -delete
 
 # Create the app bundle structure
 echo "Creating app bundle structure..."
@@ -99,17 +90,9 @@ cp -r "$OUTPUT_DIR/$APP_BUNDLE" "$OUTPUT_DIR/dmg_temp/"
 # This allows users to drag and drop the app to their Applications folder
 ln -s /Applications "$OUTPUT_DIR/dmg_temp/Applications"
 
-# Create the DMG with maximum compression
-echo "Creating compressed DMG file..."
-hdiutil create -volname "$APP_NAME" \
-  -srcfolder "$OUTPUT_DIR/dmg_temp" \
-  -ov \
-  -format UDBZ \
-  "$OUTPUT_DIR/$DMG_NAME"
-
-# Show final DMG size
-DMG_SIZE=$(du -h "$OUTPUT_DIR/$DMG_NAME" | cut -f1)
-echo "DMG file size: $DMG_SIZE"
+# Create the DMG
+echo "Creating DMG file..."
+hdiutil create -volname "$APP_NAME" -srcfolder "$OUTPUT_DIR/dmg_temp" -ov -format UDZO "$OUTPUT_DIR/$DMG_NAME"
 
 # Clean up
 echo "Cleaning up..."
