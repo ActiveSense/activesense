@@ -2,7 +2,7 @@ name: Build Cross-Platform Installers
 
 on:
   push:
-    branches: [ main, master, refactoring ]
+    branches: [ main, master, refacroting ]
     tags:
       - 'v*'
   pull_request:
@@ -14,10 +14,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -35,20 +35,21 @@ jobs:
         shell: pwsh
 
       - name: Upload Windows Installer
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-installer
           path: Publish/windows/ActiveSense-Setup.exe
           if-no-files-found: error
+          retention-days: 7
 
   build-linux:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -58,20 +59,21 @@ jobs:
           ./Publish/linux/package.sh
 
       - name: Upload Linux Installer
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-installer
           path: Publish/linux/ActiveSense-Linux-Installer.tar.gz
           if-no-files-found: error
+          retention-days: 7
 
   build-macos:
     runs-on: macos-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -81,11 +83,12 @@ jobs:
           ./Publish/macos/package-macos.sh
 
       - name: Upload macOS Installer
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-installer
           path: Publish/macos/ActiveSense-Installer.dmg
           if-no-files-found: error
+          retention-days: 7
 
   create-release:
     needs: [build-windows, build-linux, build-macos]
@@ -93,9 +96,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./installers
+          merge-multiple: true
 
       - name: Display structure of downloaded files
         run: ls -R ./installers
