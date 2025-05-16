@@ -53,6 +53,22 @@ Write-Host "Build successful. Executable found at: $ExePath" -ForegroundColor Gr
 Write-Host "Contents of app directory:" -ForegroundColor Cyan
 Get-ChildItem -Path $AppDir -Force | Format-Table Name, Length
 
+# Make sure we have the icon files
+$IconFile = Join-Path -Path $ProjectDir -ChildPath "Assets\active-sense-logo.ico"
+$LargeIconFile = Join-Path -Path $ProjectDir -ChildPath "Assets\active-sense-logo.png"
+
+# If icon files don't exist, use default ones
+if (!(Test-Path $IconFile)) {
+    Write-Host "Custom icon file not found at: $IconFile" -ForegroundColor Yellow
+    # Use default icon from the app directory
+    $IconFile = Join-Path -Path $AppDir -ChildPath "ActiveSense.Desktop.exe"
+}
+else {
+    Write-Host "Using custom icon file: $IconFile" -ForegroundColor Green
+    # Copy icon to app directory to ensure it's included in the installer
+    Copy-Item -Path $IconFile -Destination $AppDir -Force
+}
+
 # Create Inno Setup script directly in script
 $InnoScriptPath = Join-Path -Path $ScriptDir -ChildPath "installer.iss"
 Write-Host "Creating Inno Setup script at: $InnoScriptPath" -ForegroundColor Cyan
@@ -88,6 +104,9 @@ SolidCompression=yes
 OutputDir=$($ScriptDir.Replace('\', '\\'))
 OutputBaseFilename=ActiveSense-Setup
 
+; Set up custom icons
+SetupIconFile=$($IconFile.Replace('\', '\\'))
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -101,10 +120,10 @@ Source: "$($AppDir.Replace('\', '\\'))\\*"; DestDir: "{app}"; Flags: ignoreversi
 
 [Icons]
 ; Create Start Menu shortcuts
-Name: "{group}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"
+Name: "{group}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; IconFilename: "{app}\\active-sense-logo.ico"
 Name: "{group}\\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 ; Create Desktop shortcut if selected
-Name: "{autodesktop}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; IconFilename: "{app}\\active-sense-logo.ico"; Tasks: desktopicon
 
 [Run]
 ; Option to launch the application after installation
@@ -134,13 +153,13 @@ function Find-InnoSetup {
             "${env:ProgramFiles(x86)}\Inno Setup 5\ISCC.exe",
             "${env:ProgramFiles}\Inno Setup 5\ISCC.exe"
         )
-        
+
         foreach ($path in $defaultPaths) {
             if (Test-Path $path) {
                 return $path
             }
         }
-        
+
         return $null
     }
 }
@@ -148,7 +167,7 @@ function Find-InnoSetup {
 $InnoCompiler = Find-InnoSetup
 if ($null -eq $InnoCompiler) {
     Write-Host "Inno Setup not found. Please install Inno Setup from: https://jrsoftware.org/isdl.php" -ForegroundColor Yellow
-    
+
     # Create a simple ZIP as fallback
     Write-Host "Creating a ZIP package as fallback..." -ForegroundColor Cyan
     $ZipPath = Join-Path -Path $ScriptDir -ChildPath "ActiveSense-Windows.zip"
@@ -178,7 +197,7 @@ if ($ExitCode -eq 0 -and (Test-Path $InstallerPath)) {
     Write-Host "Installer successfully created at: $InstallerPath" -ForegroundColor Green
 } else {
     Write-Host "Installer compilation failed with exit code: $ExitCode" -ForegroundColor Red
-    
+
     # Create a ZIP file as fallback
     Write-Host "Creating a ZIP package as fallback..." -ForegroundColor Cyan
     $ZipPath = Join-Path -Path $ScriptDir -ChildPath "ActiveSense-Windows.zip"
