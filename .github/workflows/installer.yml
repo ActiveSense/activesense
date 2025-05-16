@@ -1,17 +1,16 @@
 name: Build Cross-Platform Installers
 on:
   push:
-    branches: [ main, master, refactoring ]
+    branches: [ main ]
     tags:
       - 'v*'
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
   build-windows:
     runs-on: windows-latest
-    # Add write permissions for creating releases
     permissions:
       contents: write
     
@@ -51,7 +50,6 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    # Add write permissions for creating releases
     permissions:
       contents: write
     
@@ -84,7 +82,6 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
-    # Add write permissions for creating releases
     permissions:
       contents: write
     
