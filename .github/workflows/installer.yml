@@ -1,0 +1,115 @@
+name: Build Cross-Platform Installers
+
+on:
+  push:
+    branches: [ main, master, refactoring ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile is.exe
+          Start-Process -FilePath .\is.exe -Args "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
+          Remove-Item .\is.exe
+
+      - name: Build Windows Installer
+        run: |
+          mkdir -p Publish/windows
+          # Create the installer script from the repository
+          . .\Publish\windows\package.ps1
+        shell: pwsh
+
+      - name: Upload Windows Installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-installer
+          path: Publish/windows/ActiveSense-Setup.exe
+          if-no-files-found: error
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build Linux Installer
+        run: |
+          chmod +x Publish/linux/package.sh
+          ./Publish/linux/package.sh
+
+      - name: Upload Linux Installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-installer
+          path: Publish/linux/ActiveSense-Linux-Installer.tar.gz
+          if-no-files-found: error
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build macOS Installer
+        run: |
+          chmod +x Publish/macos/package-macos.sh
+          ./Publish/macos/package-macos.sh
+
+      - name: Upload macOS Installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-installer
+          path: Publish/macos/ActiveSense-Installer.dmg
+          if-no-files-found: error
+
+  create-release:
+    needs: [build-windows, build-linux, build-macos]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./installers
+
+      - name: Display structure of downloaded files
+        run: ls -R ./installers
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ActiveSense ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            ./installers/windows-installer/ActiveSense-Setup.exe
+            ./installers/linux-installer/ActiveSense-Linux-Installer.tar.gz
+            ./installers/macos-installer/ActiveSense-Installer.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
