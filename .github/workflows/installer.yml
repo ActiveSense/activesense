@@ -10,6 +10,8 @@ on:
 
 jobs:
   build-and-release:
+    permissions:
+      contents: write  
     # Use ubuntu-latest for better GitHub Action minutes usage
     runs-on: ${{ startsWith(github.ref, 'refs/tags/v') && 'ubuntu-latest' || matrix.os }}
     strategy:
@@ -70,11 +72,10 @@ jobs:
           chmod +x Publish/macos/package-dmg.sh
           ./Publish/macos/package-dmg.sh
       # Create a GitHub release if this is a tag push
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload to Release 
         with:
-          name: ActiveSense ${{ github.ref_name }}
-          draft: false
+          name: ActiveSense 23
+          draft: true
           prerelease: false
           files: ${{ matrix.installer-path }}
         env:
