@@ -3,7 +3,7 @@ set -e
 
 # Configuration
 PROJECT_PATH="ActiveSense.Desktop.csproj"
-OUTPUT_DIR="publish/macos"
+OUTPUT_DIR="Publish/macos"
 APP_NAME="ActiveSense"
 DMG_NAME="${APP_NAME}-Installer.dmg"
 APP_BUNDLE="${APP_NAME}.app"
@@ -28,61 +28,21 @@ mkdir -p "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources"
 # Copy the published app into the bundle
 cp -r "$OUTPUT_DIR/temp/"* "$OUTPUT_DIR/$APP_BUNDLE/Contents/MacOS/"
 
-# Handle icons - check for various possible icon files
+# Look for logo files - prioritize the new active-sense-logo files
 if [ -f "Assets/active-sense-logo.icns" ]; then
   # Use the .icns file directly if it exists
-  cp "Assets/active-sense-logo.icns" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/AppIcon.icns"
-  ICON_NAME="AppIcon"
-  echo "Using existing .icns file for the app icon"
+  cp "Assets/active-sense-logo.icns" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/app-icon.icns"
+  echo "Using active-sense-logo.icns for app icon"
 elif [ -f "Assets/active-sense-logo.png" ]; then
-  # Convert PNG to ICNS format if the PNG exists
-  echo "Converting PNG logo to ICNS format..."
-  
-  # Create temporary iconset directory
-  ICON_SET_DIR="$OUTPUT_DIR/AppIcon.iconset"
-  mkdir -p "$ICON_SET_DIR"
-  
-  # Generate different icon sizes
-  if command -v sips &> /dev/null; then
-    sips -z 16 16 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_16x16.png"
-    sips -z 32 32 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_16x16@2x.png"
-    sips -z 32 32 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_32x32.png"
-    sips -z 64 64 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_32x32@2x.png"
-    sips -z 128 128 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_128x128.png"
-    sips -z 256 256 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_128x128@2x.png"
-    sips -z 256 256 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_256x256.png"
-    sips -z 512 512 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_256x256@2x.png"
-    sips -z 512 512 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_512x512.png"
-    sips -z 1024 1024 "Assets/active-sense-logo.png" --out "$ICON_SET_DIR/icon_512x512@2x.png"
-    
-    # Convert the iconset to icns
-    if command -v iconutil &> /dev/null; then
-      iconutil -c icns "$ICON_SET_DIR" -o "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/AppIcon.icns"
-      ICON_NAME="AppIcon"
-      echo "Successfully converted PNG to ICNS format"
-    else
-      echo "Warning: iconutil not found, cannot convert iconset to icns"
-      # Copy the PNG as a fallback
-      cp "Assets/active-sense-logo.png" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/AppIcon.png"
-      ICON_NAME="AppIcon"
-    fi
-    
-    # Clean up the temporary iconset directory
-    rm -rf "$ICON_SET_DIR"
-  else
-    echo "Warning: sips not found, cannot resize PNG for icon conversion"
-    # Copy the PNG as a fallback
-    cp "Assets/active-sense-logo.png" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/AppIcon.png"
-    ICON_NAME="AppIcon"
-  fi
+  # Use PNG directly (no conversion to different sizes)
+  cp "Assets/active-sense-logo.png" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/app-icon.png"
+  echo "Using active-sense-logo.png for app icon"
 elif [ -f "Assets/app-icon.icns" ]; then
-  # Fallback to the original icon name mentioned in your script
+  # Fall back to the original icon name mentioned in your script
   cp "Assets/app-icon.icns" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/app-icon.icns"
-  ICON_NAME="app-icon"
-  echo "Using app-icon.icns for the app icon"
+  echo "Using app-icon.icns for app icon"
 else
   echo "Warning: No app icon found. The app will use the default icon."
-  ICON_NAME=""
 fi
 
 # Create Info.plist
@@ -91,18 +51,8 @@ cat > "$OUTPUT_DIR/$APP_BUNDLE/Contents/Info.plist" << EOF
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-EOF
-
-# Add icon information if an icon was found
-if [ ! -z "$ICON_NAME" ]; then
-cat >> "$OUTPUT_DIR/$APP_BUNDLE/Contents/Info.plist" << EOF
 	<key>CFBundleIconFile</key>
-	<string>${ICON_NAME}</string>
-EOF
-fi
-
-# Continue with the rest of Info.plist
-cat >> "$OUTPUT_DIR/$APP_BUNDLE/Contents/Info.plist" << EOF
+	<string>app-icon</string>
 	<key>CFBundleIdentifier</key>
 	<string>ch.ost.activesense</string>
 	<key>CFBundleName</key>
@@ -139,17 +89,6 @@ cp -r "$OUTPUT_DIR/$APP_BUNDLE" "$OUTPUT_DIR/dmg_temp/"
 # Create a Applications symlink in the temporary directory
 # This allows users to drag and drop the app to their Applications folder
 ln -s /Applications "$OUTPUT_DIR/dmg_temp/Applications"
-
-# Create a README file with installation instructions
-cat > "$OUTPUT_DIR/dmg_temp/README.txt" << EOF
-ActiveSense Installation
-
-To install ActiveSense:
-1. Drag the ActiveSense app to the Applications folder
-2. Double-click the app in your Applications folder to run it
-
-For help, contact support@ost.ch
-EOF
 
 # Create the DMG
 echo "Creating DMG file..."
