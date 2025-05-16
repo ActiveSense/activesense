@@ -2,7 +2,7 @@ name: Build Cross-Platform Installers
 
 on:
   push:
-    branches: [ main, master, refacroting ]
+    branches: [ main, master, refactoring ]
     tags:
       - 'v*'
   pull_request:
