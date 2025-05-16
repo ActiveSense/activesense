@@ -172,7 +172,7 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success output", ""));
+            .ReturnsAsync((true, "Success output"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);
@@ -180,7 +180,6 @@ public class GeneActiveProcessorTests
         // Assert
         Assert.That(result.Success, Is.True);
         Assert.That(result.Output, Is.EqualTo("Success output"));
-        Assert.That(result.Error, Is.Empty);
 
         // Verify the script executor was called with the right executable
         _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
@@ -206,14 +205,14 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((false, "", "Script execution failed"));
+            .ReturnsAsync((false, "Script execution failed"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);
 
         // Assert
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Error, Is.EqualTo("Script execution failed"));
+        Assert.That(result.Output, Is.EqualTo("Script execution failed"));
     }
 
     [Test]
@@ -240,8 +239,7 @@ public class GeneActiveProcessorTests
 
         // Assert
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Output, Is.EqualTo("Operation was cancelled"));
-        Assert.That(result.Error, Is.EqualTo("Processing cancelled by user"));
+        Assert.That(result.Output, Is.EqualTo("Failed to execute R script: The operation was canceled."));
     }
 
     [Test]
@@ -265,9 +263,8 @@ public class GeneActiveProcessorTests
 
         // Assert
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Output, Is.Empty);
-        Assert.That(result.Error, Does.Contain("Failed to execute R script"));
-        Assert.That(result.Error, Does.Contain("Test exception"));
+        Assert.That(result.Output, Does.Contain("Failed to execute R script"));
+        Assert.That(result.Output, Does.Contain("Test exception"));
     }
 
     [Test]
@@ -281,7 +278,7 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success", ""));
+            .ReturnsAsync((true, "Success"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);
@@ -309,7 +306,7 @@ public class GeneActiveProcessorTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success", ""));
+            .ReturnsAsync((true, "Success"));
 
         // Act
         var result = await _processor.ProcessAsync(arguments);

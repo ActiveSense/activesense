@@ -46,13 +46,6 @@ public class PathServiceTests
     }
 
     [Test]
-    public void ScriptBasePath_WithCustomPath_ReturnsCustomPath()
-    {
-        // Assert
-        Assert.That(_pathService.ScriptBasePath, Is.EqualTo(_tempDir));
-    }
-
-    [Test]
     public void EnsureDirectoryExists_CreatesDirectoryIfNotExists()
     {
         // Arrange

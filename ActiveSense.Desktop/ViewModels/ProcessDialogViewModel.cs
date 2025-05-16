@@ -205,7 +205,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
             if (Directory.EnumerateFiles(processingDirectory).Any())
             {
-                var (scriptSuccess, output, error) =
+                var (scriptSuccess, output) =
                     await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
                 ScriptOutput = output;
                 ShowScriptOutput = true;
@@ -215,10 +215,8 @@ public partial class ProcessDialogViewModel : DialogViewModel
                     var dialog = new InfoDialogViewModel()
                     {
                         Title = "Fehler",
-                        Message =
-                            "Script Execution failed",
-                        ExtendedMessage = 
-                            $"Error: {error} Output: {output}",
+                        Message = "Script Execution failed",
+                        ExtendedMessage = output,
                         OkButtonText = "Schliessen",
                     };
                     await _dialogService.ShowDialog<MainViewModel, InfoDialogViewModel>(_mainViewModel, dialog);

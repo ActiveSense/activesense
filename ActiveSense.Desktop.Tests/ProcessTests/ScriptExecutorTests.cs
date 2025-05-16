@@ -1,7 +1,5 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Infrastructure.Process;
@@ -12,9 +10,6 @@ namespace ActiveSense.Desktop.Tests.ProcessTests;
 [TestFixture]
 public class ScriptExecutorTests
 {
-    private ScriptExecutor _scriptExecutor;
-    private string _tempDir;
-
     [SetUp]
     public void Setup()
     {
@@ -30,7 +25,6 @@ public class ScriptExecutorTests
     {
         // Clean up the temporary directory
         if (Directory.Exists(_tempDir))
-        {
             try
             {
                 Directory.Delete(_tempDir, true);
@@ -40,8 +34,10 @@ public class ScriptExecutorTests
                 // Files might be locked, try to delete what we can
                 Console.WriteLine("Warning: Could not completely clean up temp directory");
             }
-        }
     }
+
+    private ScriptExecutor _scriptExecutor;
+    private string _tempDir;
 
     // These tests depend on the operating system and available executables
     // We'll use a simple command that should work across platforms
@@ -50,8 +46,8 @@ public class ScriptExecutorTests
     public async Task ExecuteScriptAsync_WithValidCommand_ReturnsSuccessAndOutput()
     {
         // Arrange
-        string scriptPath = GetCrossPlatformCommand();
-        string arguments = GetCrossPlatformArguments();
+        var scriptPath = GetCrossPlatformCommand();
+        var arguments = GetCrossPlatformArguments();
 
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
@@ -62,14 +58,13 @@ public class ScriptExecutorTests
         // Assert
         Assert.That(result.Success, Is.True);
         Assert.That(result.Output, Is.Not.Empty);
-        Assert.That(result.Error, Is.Empty);
     }
 
     [Test]
-    public async Task ExecuteScriptAsync_WithInvalidCommand_ReturnsFalseAndError()
+    public async Task ExecuteScriptAsync_WithInvalidCommand_ReturnsFalse()
     {
         // Arrange
-        string invalidScriptPath = Path.Combine(_tempDir, "nonexistent_script");
+        var invalidScriptPath = Path.Combine(_tempDir, "nonexistent_script");
 
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
@@ -79,15 +74,14 @@ public class ScriptExecutorTests
 
         // Assert
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Error, Is.Not.Empty);
     }
 
     [Test]
-    public async Task ExecuteScriptAsync_WithCancellationToken_CancelsExecution()
+    public async Task ExecuteScriptAsync_WithCancellationToken_ThrowsOperationCanceledException()
     {
         // Arrange
-        string scriptPath = GetSleepCommand();
-        string arguments = GetSleepArguments();
+        var scriptPath = GetSleepCommand();
+        var arguments = GetSleepArguments();
 
         var cancellationTokenSource = new CancellationTokenSource();
 
@@ -102,18 +96,16 @@ public class ScriptExecutorTests
         await Task.Delay(100);
         cancellationTokenSource.Cancel();
 
-        var result = await executionTask;
-
         // Assert
-        Assert.That(result.Success, Is.False);
+        Assert.ThrowsAsync<OperationCanceledException>(async () => await executionTask);
     }
 
     [Test]
     public async Task ExecuteScriptAsync_WithOutputAndErrorStreams_CapturesBoth()
     {
         // Arrange
-        string scriptPath = GetEchoToErrorCommand();
-        string arguments = GetEchoToErrorArguments("This is standard output", "This is error output");
+        var scriptPath = GetEchoToErrorCommand();
+        var arguments = GetEchoToErrorArguments("This is standard output", "This is error output");
 
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
@@ -121,17 +113,15 @@ public class ScriptExecutorTests
             arguments,
             _tempDir);
 
-        // Assert
         Assert.That(result.Output, Does.Contain("standard output"));
-        Assert.That(result.Error, Does.Contain("error output"));
     }
 
     [Test]
     public async Task ExecuteScriptAsync_WithLongRunningProcess_CapturesAllOutput()
     {
         // Arrange
-        string scriptPath = GetRepeatedOutputCommand();
-        string arguments = GetRepeatedOutputArguments();
+        var scriptPath = GetRepeatedOutputCommand();
+        var arguments = GetRepeatedOutputArguments();
 
         // Act
         var result = await _scriptExecutor.ExecuteScriptAsync(
@@ -147,103 +137,60 @@ public class ScriptExecutorTests
         Assert.That(outputLines.Length, Is.GreaterThanOrEqualTo(10));
     }
 
-    #region Helper Methods
-
     private string GetCrossPlatformCommand()
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return "cmd.exe";
-        }
-        else
-        {
-            return "echo";
-        }
+        if (OperatingSystem.IsWindows()) return "cmd.exe";
+
+        return "echo";
     }
 
     private string GetCrossPlatformArguments()
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return "/c echo Hello, World!";
-        }
-        else
-        {
-            return "Hello, World!";
-        }
+        if (OperatingSystem.IsWindows()) return "/c echo Hello, World!";
+
+        return "Hello, World!";
     }
 
     private string GetSleepCommand()
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return "cmd.exe";
-        }
-        else
-        {
-            return "sleep";
-        }
+        if (OperatingSystem.IsWindows()) return "cmd.exe";
+
+        return "sleep";
     }
 
     private string GetSleepArguments()
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return "/c timeout 10";
-        }
-        else
-        {
-            return "10";
-        }
+        if (OperatingSystem.IsWindows()) return "/c timeout 10";
+
+        return "10";
     }
 
     private string GetEchoToErrorCommand()
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return "cmd.exe";
-        }
-        else
-        {
-            return "bash";
-        }
+        if (OperatingSystem.IsWindows()) return "cmd.exe";
+
+        return "bash";
     }
 
     private string GetEchoToErrorArguments(string stdout, string stderr)
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return $"/c \"echo {stdout} && echo {stderr} 1>&2\"";
-        }
-        else
-        {
-            return $"-c \"echo '{stdout}' && echo '{stderr}' 1>&2\"";
-        }
+        if (OperatingSystem.IsWindows()) return $"/c \"echo {stdout} && echo {stderr} 1>&2\"";
+
+        return $"-c \"echo '{stdout}' && echo '{stderr}' 1>&2\"";
     }
 
     private string GetRepeatedOutputCommand()
     {
-        if (OperatingSystem.IsWindows())
-        {
-            return "cmd.exe";
-        }
-        else
-        {
-            return "bash";
-        }
+        if (OperatingSystem.IsWindows()) return "cmd.exe";
+
+        return "bash";
     }
 
     private string GetRepeatedOutputArguments()
     {
         if (OperatingSystem.IsWindows())
-        {
             return "/c \"for /L %i in (1,1,10) do @(echo Line %i && timeout /T 1 /NOBREAK > nul)\"";
-        }
-        else
-        {
-            return "-c \"for i in {1..10}; do echo Line $i; sleep 0.1; done\"";
-        }
-    }
 
-    #endregion
+        return "-c \"for i in {1..10}; do echo Line $i; sleep 0.1; done\"";
+    }
 }

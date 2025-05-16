@@ -8,11 +8,10 @@ APP_NAME="ActiveSense"
 DMG_NAME="${APP_NAME}-Installer.dmg"
 APP_BUNDLE="${APP_NAME}.app"
 
-# Create output directory
 mkdir -p "$OUTPUT_DIR"
 
 echo "Building ActiveSense for macOS..."
-# Publish the app
+
 dotnet publish "$PROJECT_PATH" \
   -c Release \
   -r osx-x64 \
@@ -20,7 +19,6 @@ dotnet publish "$PROJECT_PATH" \
   -p:PublishSingleFile=true \
   -o "$OUTPUT_DIR/temp"
 
-# Create the app bundle structure
 echo "Creating app bundle structure..."
 mkdir -p "$OUTPUT_DIR/$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources"
@@ -28,19 +26,9 @@ mkdir -p "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources"
 # Copy the published app into the bundle
 cp -r "$OUTPUT_DIR/temp/"* "$OUTPUT_DIR/$APP_BUNDLE/Contents/MacOS/"
 
-# Look for logo files - prioritize the new active-sense-logo files
-if [ -f "Assets/active-sense-logo.icns" ]; then
-  # Use the .icns file directly if it exists
-  cp "Assets/active-sense-logo.icns" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/app-icon.icns"
-  echo "Using active-sense-logo.icns for app icon"
-elif [ -f "Assets/active-sense-logo.png" ]; then
-  # Use PNG directly (no conversion to different sizes)
+if [ -f "Assets/active-sense-logo.png" ]; then
   cp "Assets/active-sense-logo.png" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/app-icon.png"
   echo "Using active-sense-logo.png for app icon"
-elif [ -f "Assets/app-icon.icns" ]; then
-  # Fall back to the original icon name mentioned in your script
-  cp "Assets/app-icon.icns" "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources/app-icon.icns"
-  echo "Using app-icon.icns for app icon"
 else
   echo "Warning: No app icon found. The app will use the default icon."
 fi
@@ -79,22 +67,18 @@ cat > "$OUTPUT_DIR/$APP_BUNDLE/Contents/Info.plist" << EOF
 </plist>
 EOF
 
-# Set executable permissions
 chmod +x "$OUTPUT_DIR/$APP_BUNDLE/Contents/MacOS/ActiveSense.Desktop"
 
 # Create a temporary directory for DMG contents
 mkdir -p "$OUTPUT_DIR/dmg_temp"
 cp -r "$OUTPUT_DIR/$APP_BUNDLE" "$OUTPUT_DIR/dmg_temp/"
 
-# Create a Applications symlink in the temporary directory
-# This allows users to drag and drop the app to their Applications folder
+# allows users to drag and drop the app to their Applications folder
 ln -s /Applications "$OUTPUT_DIR/dmg_temp/Applications"
 
-# Create the DMG
 echo "Creating DMG file..."
 hdiutil create -volname "$APP_NAME" -srcfolder "$OUTPUT_DIR/dmg_temp" -ov -format UDZO "$OUTPUT_DIR/$DMG_NAME"
 
-# Clean up
 echo "Cleaning up..."
 rm -rf "$OUTPUT_DIR/temp"
 rm -rf "$OUTPUT_DIR/dmg_temp"

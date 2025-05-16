@@ -38,7 +38,7 @@ public class GeneActiveProcessor : ISensorProcessor
 
     public IReadOnlyList<ScriptArgument> DefaultArguments => _defaultArguments;
 
-    public async Task<(bool Success, string Output, string Error)> ProcessAsync(
+    public async Task<(bool Success, string Output)> ProcessAsync(
         IEnumerable<ScriptArgument> arguments, CancellationToken cancellationToken = default)
     {
         try
@@ -62,17 +62,9 @@ public class GeneActiveProcessor : ISensorProcessor
                 cancellationToken);
             return result;
         }
-        catch (OperationCanceledException)
-        {
-            return (false, "Operation was cancelled", "Processing cancelled by user");
-        }
-        catch (FileNotFoundException)
-        {
-            throw;
-        }
         catch (Exception ex)
         {
-            return (false, string.Empty, $"Failed to execute R script: {ex.Message}");
+            return (false, $"Failed to execute R script: {ex.Message}");
         }
     }
 

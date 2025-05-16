@@ -10,7 +10,6 @@ OUTPUT_DIR="Publish/linux"
 PACKAGE_DIR="$OUTPUT_DIR/package"
 INSTALLER_DIR="$OUTPUT_DIR/installer"
 
-# Create output directories
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$PACKAGE_DIR"
 mkdir -p "$INSTALLER_DIR"
@@ -24,10 +23,9 @@ dotnet publish "$PROJECT_PATH" \
   -o "$PACKAGE_DIR"
 
 echo "Copying installer files..."
-# Copy the icon to the package directory
 if [ -f "Assets/active-sense-logo.png" ]; then
   cp "Assets/active-sense-logo.png" "$PACKAGE_DIR/"
-  echo "Custom icon copied to package"
+  echo "icon copied to package"
 fi
 
 # Copy the installer script
