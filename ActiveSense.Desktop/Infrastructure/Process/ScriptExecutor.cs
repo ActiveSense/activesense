@@ -32,7 +32,6 @@ public class ScriptExecutor : IScriptExecutor
         };
 
         var outputBuilder = new StringBuilder();
-        var errorBuilder = new StringBuilder();
 
         process.OutputDataReceived += (sender, args) =>
         {
@@ -43,7 +42,7 @@ public class ScriptExecutor : IScriptExecutor
         process.ErrorDataReceived += (sender, args) =>
         {
             if (args.Data != null)
-                errorBuilder.AppendLine(args.Data);
+                outputBuilder.AppendLine(args.Data);
         };
 
         // Register for cancellation
@@ -65,8 +64,9 @@ public class ScriptExecutor : IScriptExecutor
         }
         catch (Exception e)
         {
-            return (false, outputBuilder.ToString(), $"Failed to start process: {e.Message}");
+            return (false, $"Failed to start process: {e.Message}", string.Empty);
         }
+        
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
@@ -76,9 +76,10 @@ public class ScriptExecutor : IScriptExecutor
         }
         catch (OperationCanceledException)
         {
-            return (false, outputBuilder.ToString(), "Operation was cancelled");
+            // Return what we have if cancelled
+            return (false, outputBuilder.ToString(), string.Empty);
         }
 
-        return (process.ExitCode == 0, outputBuilder.ToString(), errorBuilder.ToString());
+        return (process.ExitCode == 0, outputBuilder.ToString(), string.Empty);
     }
 }
