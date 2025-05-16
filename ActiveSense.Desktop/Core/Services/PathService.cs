@@ -23,26 +23,8 @@ public class PathService : IPathService
         EnsureDirectoryExists(ScriptInputPath);
     }
 
-    public string OutputDirectory => CombinePaths(BasePath, "AnalysisFiles/");
-    public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
-    public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
-    public string ScriptExecutablePath => FindRInstallation();
     public string ApplicationBasePath => AppDomain.CurrentDomain.BaseDirectory;
 
-    public string ScriptBasePath
-    {
-        get
-        {
-            // Check relative to application first, for dev environment
-            var relativePath = CombinePaths(BasePath, "../ActiveSense.RScripts");
-            if (Directory.Exists(relativePath))
-                return relativePath;
-
-            var userPath = CombinePaths(BasePath, "RScripts");
-
-            return userPath;
-        }
-    }
 
     public string BasePath
     {
@@ -50,18 +32,82 @@ public class PathService : IPathService
         {
             var directory = ApplicationBasePath;
 
-            if (!directory.Contains("bin")) return directory;
-            while (!Directory.Exists(Path.Combine(directory, "ActiveSense.Desktop")) &&
-                   !File.Exists(Path.Combine(directory, "ActiveSense.Desktop.sln")))
-            {
-                var parentDir = Directory.GetParent(directory);
-                if (parentDir == null) return ApplicationBasePath;
+            if (directory.Contains("bin"))
+                while (!Directory.Exists(Path.Combine(directory, "ActiveSense.Desktop")) &&
+                       !File.Exists(Path.Combine(directory, "ActiveSense.Desktop.sln")))
+                {
+                    var parentDir = Directory.GetParent(directory);
+                    if (parentDir == null) return ApplicationBasePath;
 
-                directory = parentDir.FullName;
-            }
+                    directory = parentDir.FullName;
+                }
 
             return directory;
         }
+    }
+
+    public string ScriptInputPath => CombinePaths(ScriptBasePath, "data");
+    public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
+    public string ScriptExecutablePath => FindRInstallation();
+
+    public string OutputDirectory
+    {
+        get
+        {
+            // If custom output path is provided, use it
+            if (!string.IsNullOrEmpty(_customOutputPath))
+                return _customOutputPath;
+
+            // Check if we're in development mode or production
+            if (IsInDevelopmentMode())
+                // In development, use the solution directory
+                return CombinePaths(BasePath, "AnalysisFiles/");
+
+            // In production, use the user's local app data folder
+            var userOutputPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ActiveSense", "AnalysisFiles/");
+
+            // Ensure the directory exists
+            EnsureDirectoryExists(userOutputPath);
+            return userOutputPath;
+        }
+    }
+
+    public string ScriptBasePath
+    {
+        get
+        {
+            // Check relative to application first
+            var relativePath = CombinePaths(BasePath, "../ActiveSense.RScripts");
+            if (Directory.Exists(relativePath))
+                return relativePath;
+
+            // Fall back to user directory
+            var userPath = Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                "ActiveSense", "RScripts");
+
+            if (!Directory.Exists(userPath))
+            {
+                EnsureDirectoryExists(userPath);
+                CopyResourceScripts(userPath);
+            }
+
+            return userPath;
+        }
+    }
+
+// Helper function to determine if we're in development mode
+    private bool IsInDevelopmentMode()
+    {
+        // If we're in the solution directory structure (containing .git, .idea, etc.)
+        // or if BasePath contains "bin/Debug", we're likely in development mode
+        return Directory.Exists(Path.Combine(BasePath, ".git")) ||
+               Directory.Exists(Path.Combine(BasePath, ".idea")) ||
+               BasePath.Contains("bin\\Debug") ||
+               File.Exists(Path.Combine(BasePath, "ActiveSense.Desktop.sln"));
     }
 
     #region helpers
@@ -96,6 +142,33 @@ public class PathService : IPathService
             }
         else
             Directory.CreateDirectory(path);
+    }
+
+    private void CopyResourceScripts(string targetPath)
+    {
+        var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
+
+        // If we have scripts in the app directory, copy them
+        if (Directory.Exists(sourceDir))
+        {
+            // First ensure the target directory exists
+            if (!Directory.Exists(targetPath)) Directory.CreateDirectory(targetPath);
+
+            // Copy all files and subdirectories
+            foreach (var dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                // Create the corresponding subdirectory in the target location
+                var newDirPath = dirPath.Replace(sourceDir, targetPath);
+                if (!Directory.Exists(newDirPath)) Directory.CreateDirectory(newDirPath);
+            }
+
+            // Copy all files
+            foreach (var filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            {
+                var newFilePath = filePath.Replace(sourceDir, targetPath);
+                File.Copy(filePath, newFilePath, true);
+            }
+        }
     }
 
     public string FindRInstallation()
