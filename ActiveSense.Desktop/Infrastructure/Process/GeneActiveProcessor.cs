@@ -62,6 +62,10 @@ public class GeneActiveProcessor : ISensorProcessor
                 cancellationToken);
             return result;
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             return (false, $"Failed to execute R script: {ex.Message}");

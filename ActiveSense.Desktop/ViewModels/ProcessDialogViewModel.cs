@@ -161,12 +161,9 @@ public partial class ProcessDialogViewModel : DialogViewModel
         Close();
     }
 
-    public event Action<string[]?>? FilesSelected;
-
     public void SetSelectedFiles(string[]? files)
     {
         SelectedFiles = files;
-        FilesSelected?.Invoke(files);
 
         if (files == null || files.Length == 0)
             StatusMessage = "No files selected";
@@ -229,12 +226,12 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StopCountdown();
             await ParseResults();
         }
+        
         catch (OperationCanceledException)
         {
-            StatusMessage = "Operation was cancelled";
-            ScriptOutput = "Processing was cancelled by user.";
-            ShowScriptOutput = true;
+            Close();
         }
+        
         catch (FileNotFoundException)
         {
             var dialog = new PathDialogViewModel()
@@ -248,6 +245,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             };
             await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
         }
+        
         catch (Exception ex)
         {
             var dialog = new InfoDialogViewModel
@@ -260,6 +258,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             };
             await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
         }
+        
         finally
         {
             StopCountdown();

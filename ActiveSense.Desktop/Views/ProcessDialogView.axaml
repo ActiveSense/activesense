@@ -217,7 +217,8 @@
                     Background="#F6F6F6"
                     CornerRadius="4"
                     Padding="12"
-                    Margin="24,16,24,0">
+                    Margin="24,16,24,0"
+                    IsVisible="{Binding !IsProcessing}">
                 <Grid ColumnDefinitions="Auto,*">
                     <PathIcon Grid.Column="0"
                            Data="{StaticResource info_regular}" 
