@@ -130,6 +130,10 @@ public class App : Application
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit
             DisableAvaloniaDataAnnotationValidation();
+            
+            var pathService = services.GetRequiredService<IPathService>();
+            var path = pathService.ScriptBasePath;
+            pathService.CopyResources(path);
 
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView

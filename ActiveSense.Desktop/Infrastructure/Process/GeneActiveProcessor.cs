@@ -66,6 +66,10 @@ public class GeneActiveProcessor : ISensorProcessor
         {
             throw;
         }
+        // catch (FileNotFoundException)
+        // {
+        //     throw;
+        // }
         catch (Exception ex)
         {
             return (false, $"Failed to execute R script: {ex.Message}");

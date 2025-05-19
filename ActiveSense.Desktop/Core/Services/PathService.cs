@@ -43,7 +43,7 @@ public class PathService : IPathService
             if (!Directory.Exists(userPath))
             {
                 EnsureDirectoryExists(userPath);
-                CopyResourceScripts(userPath);
+                CopyResources(userPath);
             }
             else
             {
@@ -117,7 +117,7 @@ public class PathService : IPathService
         return path;
     }
 
-    private void CopyResourceScripts(string targetPath)
+    public void CopyResources(string targetPath)
     {
         
         var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
