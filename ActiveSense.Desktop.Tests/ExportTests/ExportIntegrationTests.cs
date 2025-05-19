@@ -8,6 +8,7 @@ using ActiveSense.Desktop.Infrastructure.Export;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.ExportTests;
 
@@ -33,9 +34,13 @@ public class ExportIntegrationTests
         var pdfGenerator = new PdfReportGenerator(serializer);
         var csvExporter = new CsvExporter();
         var archiveCreator = new ArchiveCreator();
+        var logger = new Serilog.LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+        
 
         // Create exporter with real components
-        _exporter = new GeneActiveExporter(pdfGenerator, csvExporter, archiveCreator);
+        _exporter = new GeneActiveExporter(pdfGenerator, csvExporter, archiveCreator, logger);
 
         // Create and populate test analysis
         _analysis = new GeneActiveAnalysis(dateConverter)

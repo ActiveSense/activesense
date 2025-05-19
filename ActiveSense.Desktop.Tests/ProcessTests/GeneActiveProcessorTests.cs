@@ -11,6 +11,7 @@ using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.ProcessTests;
 
@@ -24,12 +25,14 @@ public class GeneActiveProcessorTests
         _mockScriptExecutor = new Mock<IScriptExecutor>();
         _mockFileManager = new Mock<IFileManager>();
         _mockTimeEstimator = new Mock<IProcessingTimeEstimator>();
+        _mockLogger = new Mock<ILogger>();
 
         _processor = new GeneActiveProcessor(
             _mockPathService.Object,
             _mockScriptExecutor.Object,
             _mockFileManager.Object,
-            _mockTimeEstimator.Object);
+            _mockTimeEstimator.Object,
+            _mockLogger.Object);
 
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -55,6 +58,7 @@ public class GeneActiveProcessorTests
     private Mock<IProcessingTimeEstimator> _mockTimeEstimator;
     private GeneActiveProcessor _processor;
     private string _tempDir;
+    private Mock<ILogger> _mockLogger;
 
     [Test]
     public void SupportedType_ReturnsGeneActiv()

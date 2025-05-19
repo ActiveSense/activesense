@@ -11,6 +11,8 @@ using ActiveSense.Desktop.Infrastructure.Parse;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using Moq;
 using NUnit.Framework;
+using Serilog;
+using Serilog.Core;
 
 namespace ActiveSense.Desktop.Tests.ImportTests;
 
@@ -22,13 +24,15 @@ public class GeneActiveResultParserTests
     private GeneActiveResultParser _resultParser;
     private string _tempDir;
     private DateToWeekdayConverter _dateConverter;
+    private Mock<ILogger> _mockLogger;
 
     [SetUp]
     public void Setup()
     {
         _mockPdfParser = new Mock<IPdfParser>();
         _mockFileParser = new Mock<IFileParser>();
-        _resultParser = new GeneActiveResultParser(_mockPdfParser.Object, _mockFileParser.Object);
+        _mockLogger = new Mock<ILogger>();
+        _resultParser = new GeneActiveResultParser(_mockPdfParser.Object, _mockFileParser.Object, _mockLogger.Object);
         _dateConverter = new DateToWeekdayConverter();
 
         // Create temp directory for test files

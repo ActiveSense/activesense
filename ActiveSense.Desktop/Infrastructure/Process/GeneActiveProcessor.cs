@@ -8,6 +8,7 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
@@ -18,17 +19,20 @@ public class GeneActiveProcessor : ISensorProcessor
     private readonly IPathService _pathService;
     private readonly IScriptExecutor _scriptExecutor;
     private readonly IProcessingTimeEstimator _timeEstimator;
+    Serilog.ILogger _logger; 
 
     public GeneActiveProcessor(
         IPathService pathService,
         IScriptExecutor scriptExecutor,
         IFileManager fileManager,
-        IProcessingTimeEstimator timeEstimator)
+        IProcessingTimeEstimator timeEstimator,
+        Serilog.ILogger logger)
     {
-        _pathService = pathService ?? throw new ArgumentNullException(nameof(pathService));
-        _scriptExecutor = scriptExecutor ?? throw new ArgumentNullException(nameof(scriptExecutor));
-        _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
-        _timeEstimator = timeEstimator ?? throw new ArgumentNullException(nameof(timeEstimator));
+        _logger = logger;
+        _pathService = pathService;
+        _scriptExecutor = scriptExecutor;
+        _fileManager = fileManager;
+        _timeEstimator = timeEstimator;
         _defaultArguments = CreateDefaultArguments();
     }
 
@@ -46,6 +50,11 @@ public class GeneActiveProcessor : ISensorProcessor
             var scriptPath = _pathService.MainScriptPath;
             var executablePath = _pathService.ScriptExecutablePath;
             var workingDirectory = _pathService.ScriptBasePath;
+            
+            _logger.Information("Starting GeneActive processing");
+            _logger.Information($"Script path: {scriptPath}");
+            _logger.Information($"Executable path: {executablePath}");
+            _logger.Information($"Working directory: {workingDirectory}");
 
             var argsToUse = arguments?.ToList() ?? _defaultArguments;
 
@@ -60,14 +69,23 @@ public class GeneActiveProcessor : ISensorProcessor
 
             var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
                 cancellationToken);
+            
+            _logger.Information("Processing completed");
+            
             return result;
         }
         catch (OperationCanceledException)
         {
             throw;
         }
+        catch (FileNotFoundException)
+        {
+            _logger.Error("R executable not found.");
+            throw;
+        }
         catch (Exception ex)
         {
+            _logger.Error(ex.Message, "Error executing R script");
             return (false, $"Failed to execute R script: {ex.Message}");
         }
     }

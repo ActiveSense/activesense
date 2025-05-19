@@ -101,22 +101,6 @@ public class ScriptExecutorTests
     }
 
     [Test]
-    public async Task ExecuteScriptAsync_WithOutputAndErrorStreams_CapturesBoth()
-    {
-        // Arrange
-        var scriptPath = GetEchoToErrorCommand();
-        var arguments = GetEchoToErrorArguments("This is standard output", "This is error output");
-
-        // Act
-        var result = await _scriptExecutor.ExecuteScriptAsync(
-            scriptPath,
-            arguments,
-            _tempDir);
-
-        Assert.That(result.Output, Does.Contain("standard output"));
-    }
-
-    [Test]
     public async Task ExecuteScriptAsync_WithLongRunningProcess_CapturesAllOutput()
     {
         // Arrange

@@ -8,7 +8,7 @@ using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
 namespace ActiveSense.Desktop.Infrastructure.Parse;
 
-public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser) : IResultParser
+public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser, Serilog.ILogger logger) : IResultParser
 {
     private readonly ApplicationPageNames[] _analysisPages =
     [
@@ -24,6 +24,8 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
 
     public async Task<IEnumerable<IAnalysis>> ParseResultsAsync(string outputDirectory)
     {
+        logger.Information("Parsing GeneActive results");
+        
         var analyses = new List<IAnalysis>();
 
         if (!Directory.Exists(outputDirectory))
@@ -41,7 +43,9 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
 
         // Assign tags
         foreach (var analysis in analyses) AssignTags(analysis);
-
+        
+        logger.Information("Parsing completed");
+        
         return analyses;
     }
 

@@ -13,7 +13,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 
 namespace ActiveSense.Desktop.Infrastructure.Parse;
 
-public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter)
+public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter, Serilog.ILogger logger)
     : IPdfParser
 {
     private readonly DateToWeekdayConverter _dateConverter = dateConverter;
@@ -38,6 +38,7 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
             {
                 try
                 {
+                    logger.Information("Parsing PDF file: {File}", file);
                     var pdfText = ExtractTextFromPdf(file);
                     var analysis = ExtractAnalysisFromPdfText(pdfText);
 
@@ -47,6 +48,7 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
                 }
                 catch (Exception e)
                 {
+                    logger.Error(e, "Error parsing PDF file: {File}", file);
                     throw new InvalidDataException($"Error parsing PDF file {file}: {e.Message}");
                 }
             }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Serilog.Core;
 
 namespace ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
@@ -11,18 +12,7 @@ public static class RPathStorage
     
     public static string GetRPath()
     {
-        try
-        {
-            if (File.Exists(FilePath))
-            {
-                return File.ReadAllText(FilePath).Trim();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error reading R path: {ex.Message}");
-        }
-        return string.Empty;
+        return File.Exists(FilePath) ? File.ReadAllText(FilePath).Trim() : string.Empty;
     }
     
     public static void SaveRPath(string path)

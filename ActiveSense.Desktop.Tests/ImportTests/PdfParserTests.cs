@@ -8,6 +8,7 @@ using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Parse;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.ImportTests;
 
@@ -19,22 +20,19 @@ public class PdfParserTests
     private Mock<PdfParser> _mockPdfParser;
     private PdfParser _realPdfParser;
     private string _tempDir;
-
+    private Mock<Serilog.ILogger> _mockLogger;
+    
     [SetUp]
     public void Setup()
     {
         _dateConverter = new DateToWeekdayConverter();
         _mockSerializer = new Mock<IAnalysisSerializer>();
+        _mockLogger = new Mock<Serilog.ILogger>();
 
-        // Create a real PdfParser for testing the actual implementations
-        _realPdfParser = new PdfParser(_mockSerializer.Object, _dateConverter);
-
-        // Create a mock PdfParser for testing with controlled behavior
-        _mockPdfParser = new Mock<PdfParser>(_mockSerializer.Object, _dateConverter);
-        // Make the mock call the real implementation by default
+        _realPdfParser = new PdfParser(_mockSerializer.Object, _dateConverter, _mockLogger.Object);
+        _mockPdfParser = new Mock<PdfParser>(_mockSerializer.Object, _dateConverter, _mockLogger.Object);
         _mockPdfParser.CallBase = true;
 
-        // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
     }
@@ -189,6 +187,8 @@ public class PdfParserTests
         File.WriteAllText(validPdfPath, "%PDF-1.4\nMock PDF content");
         File.WriteAllText(invalidPdfPath, "%PDF-1.4\nInvalid PDF content");
 
+        var mockLogger = new Mock<ILogger>().Object;
+    
         var mockAnalysis = new GeneActiveAnalysis(_dateConverter) { FileName = "valid" };
 
         // Set up the mock to succeed for valid file but throw for invalid file
@@ -201,7 +201,7 @@ public class PdfParserTests
             .Returns(mockAnalysis);
 
         // Act & Assert
+        // Since _mockPdfParser is already a mock, just use it directly
         Assert.ThrowsAsync<InvalidDataException>(() => _mockPdfParser.Object.ParsePdfFilesAsync(_tempDir));
-
     }
 }

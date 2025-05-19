@@ -12,6 +12,7 @@ using ActiveSense.Desktop.Infrastructure.Parse;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.ImportTests;
 
@@ -23,6 +24,7 @@ public class ImportIntegrationTests
     private IResultParser _resultParser;
     private DateToWeekdayConverter _dateConverter;
     private IAnalysisSerializer _serializer;
+    private Mock<ILogger> _mockLogger;
     private string _tempDir;
 
     [SetUp]
@@ -35,16 +37,17 @@ public class ImportIntegrationTests
         // Create test components
         _dateConverter = new DateToWeekdayConverter();
         _serializer = new AnalysisSerializer(_dateConverter);
+        _mockLogger = new Mock<ILogger>();
         
         // Mock the PDF parser since we're having issues with PDF creation
         _mockPdfParser = new Mock<IPdfParser>();
         
         // Use real file parser
         var headerAnalyzer = new HeaderAnalyzer();
-        _fileParser = new FileParser(headerAnalyzer, _dateConverter);
+        _fileParser = new FileParser(headerAnalyzer, _dateConverter, _mockLogger.Object);
         
         // Use our result parser with the mocked PDF parser
-        _resultParser = new GeneActiveResultParser(_mockPdfParser.Object, _fileParser);
+        _resultParser = new GeneActiveResultParser(_mockPdfParser.Object, _fileParser, _mockLogger.Object);
     }
 
     [TearDown]

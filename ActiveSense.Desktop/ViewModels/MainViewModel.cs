@@ -16,13 +16,15 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
     [ObservableProperty] private Dialogs.DialogViewModel _dialog;
     private readonly PageFactory _pageFactory;
     private readonly DialogService _dialogService;
+    private readonly IPathService _pathService;
 
     /// <inheritdoc/>
-    public MainViewModel(Dialogs.DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService)
+    public MainViewModel(Dialogs.DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService, IPathService pathService)
     {
         _pageFactory = pageFactory;
         _dialog = dialog;
         _dialogService = dialogService;
+        _pathService = pathService;
     }
 
 
@@ -32,7 +34,12 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
         {
             ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
         });
+        await CopyResourcesOnStartup();
+    }
 
+    private async Task CopyResourcesOnStartup()
+    {
+        await Task.Run(() => _pathService.CopyResources());
     }
 
     public async Task<bool> ConfirmOnClose()
@@ -46,7 +53,13 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
         };
 
         await _dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(this, dialog);
-
+        
+        // Clear the output directory on exit
+        if (dialog.Confirmed)
+        {
+            _pathService.ClearDirectory(_pathService.OutputDirectory);
+        }
+        
         return dialog.Confirmed;
     }
 }
