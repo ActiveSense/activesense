@@ -9,11 +9,13 @@ namespace ActiveSense.Desktop.Infrastructure.Export;
 public class GeneActiveExporter(
     IPdfReportGenerator pdfReportGenerator,
     ICsvExporter csvExporter,
-    IArchiveCreator archiveCreator)
+    IArchiveCreator archiveCreator,
+    Serilog.ILogger logger)
     : IExporter
 {
     public async Task<bool> ExportAsync(IAnalysis analysis, string outputPath, bool exportRawData = false)
     {
+        logger.Information("Exporting analysis to {outputPath}", outputPath);
         if (exportRawData)
             return await ExportPdfAndCsvZipAsync(analysis, outputPath);
 

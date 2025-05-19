@@ -37,7 +37,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
         await CopyResourcesOnStartup();
     }
 
-    public async Task CopyResourcesOnStartup()
+    private async Task CopyResourcesOnStartup()
     {
         await Task.Run(() => _pathService.CopyResources());
     }
@@ -53,7 +53,13 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
         };
 
         await _dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(this, dialog);
-
+        
+        // Clear the output directory on exit
+        if (dialog.Confirmed)
+        {
+            _pathService.ClearDirectory(_pathService.OutputDirectory);
+        }
+        
         return dialog.Confirmed;
     }
 }

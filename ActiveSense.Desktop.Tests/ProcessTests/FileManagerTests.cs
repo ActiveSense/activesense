@@ -16,12 +16,15 @@ public class FileManagerTests
     private string _tempDir;
     private string _processingDir;
     private string _outputDir;
+    private Mock<Serilog.ILogger> _loggerMock;
 
     [SetUp]
     public void Setup()
     {
         _mockPathService = new Mock<IPathService>();
-        _fileManager = new FileManager(_mockPathService.Object);
+        _loggerMock = new Mock<Serilog.ILogger>();
+        
+        _fileManager = new FileManager(_mockPathService.Object, _loggerMock.Object);
 
         // Create temp directory structure for tests
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());

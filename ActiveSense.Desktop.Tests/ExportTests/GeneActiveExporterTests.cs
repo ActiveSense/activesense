@@ -18,6 +18,7 @@ public class GeneActiveExporterTests
     private GeneActiveExporter _exporter;
     private GeneActiveAnalysis _mockAnalysis;
     private DateToWeekdayConverter _dateConverter;
+    private Mock<Serilog.ILogger> _mockLogger;
 
     [SetUp]
     public void Setup()
@@ -25,11 +26,13 @@ public class GeneActiveExporterTests
         _mockPdfReportGenerator = new Mock<IPdfReportGenerator>();
         _mockCsvExporter = new Mock<ICsvExporter>();
         _mockArchiveCreator = new Mock<IArchiveCreator>();
+        _mockLogger = new Mock<Serilog.ILogger>();
 
         _exporter = new GeneActiveExporter(
             _mockPdfReportGenerator.Object,
             _mockCsvExporter.Object,
-            _mockArchiveCreator.Object);
+            _mockArchiveCreator.Object,
+            _mockLogger.Object);
 
         _dateConverter = new DateToWeekdayConverter();
         _mockAnalysis = new GeneActiveAnalysis(_dateConverter)

@@ -19,13 +19,15 @@ public class FileParserTests
     private DateToWeekdayConverter _dateConverter;
     private FileParser _fileParser;
     private string _tempDir;
+    private Mock<Serilog.ILogger> _mockLogger;
 
     [SetUp]
     public void Setup()
     {
         _mockHeaderAnalyzer = new Mock<IHeaderAnalyzer>();
         _dateConverter = new DateToWeekdayConverter();
-        _fileParser = new FileParser(_mockHeaderAnalyzer.Object, _dateConverter);
+        _mockLogger = new Mock<Serilog.ILogger>();
+        _fileParser = new FileParser(_mockHeaderAnalyzer.Object, _dateConverter, _mockLogger.Object);
 
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());

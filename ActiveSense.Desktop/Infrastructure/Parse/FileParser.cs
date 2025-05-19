@@ -12,7 +12,7 @@ using CsvHelper;
 
 namespace ActiveSense.Desktop.Infrastructure.Parse;
 
-public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter)
+public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter, Serilog.ILogger logger)
     : IFileParser
 {
     public AnalysisType DetermineAnalysisType(string[] headers)
@@ -38,10 +38,12 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
             {
                 try
                 {
+                    logger.Information("Parsing CSV file: {File}", file);
                     ParseCsvFile(file, analysis);
                 }
                 catch (Exception e)
                 {
+                    logger.Error(e, "Error parsing CSV file: {File}", file);
                     throw new Exception($"Error parsing file {file}: {e.Message}", e);
                 }
             }
