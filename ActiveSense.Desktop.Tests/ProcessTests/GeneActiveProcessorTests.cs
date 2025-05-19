@@ -142,24 +142,6 @@ public class GeneActiveProcessorTests
     }
 
     [Test]
-    public void GetEstimatedProcessingTime_DelegatesCallToTimeEstimator()
-    {
-        // Arrange
-        string[] files = { "file1.bin", "file2.bin" };
-        var expectedTimeSpan = TimeSpan.FromMinutes(5);
-
-        _mockTimeEstimator.Setup(x => x.EstimateProcessingTime(files))
-            .Returns(expectedTimeSpan);
-
-        // Act
-        var result = _processor.GetEstimatedProcessingTime(files);
-
-        // Assert
-        Assert.That(result, Is.EqualTo(expectedTimeSpan));
-        _mockTimeEstimator.Verify(x => x.EstimateProcessingTime(files), Times.Once);
-    }
-
-    [Test]
     public async Task ProcessAsync_ExecutesScriptWithCorrectArguments()
     {
         // Arrange

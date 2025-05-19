@@ -90,14 +90,31 @@ public class GeneActiveProcessor : ISensorProcessor
         }
     }
 
+    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files)
+    {
+        long totalSizeBytes = 0;
+        foreach (string filePath in files)
+        {
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            {
+                try
+                {
+                    totalSizeBytes += new FileInfo(filePath).Length;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
+                }
+            }
+        }
+        double totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
+        
+        return await Task.Run(() => _timeEstimator.EstimateProcessingTime(totalSizeMB));
+    }
+
     public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
     {
         _fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes);
-    }
-
-    public TimeSpan GetEstimatedProcessingTime(IEnumerable<string> files)
-    {
-        return _timeEstimator.EstimateProcessingTime(files);
     }
 
     public string ProcessingInfo =>
