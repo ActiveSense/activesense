@@ -133,7 +133,9 @@ public class App : Application
             
             var pathService = services.GetRequiredService<IPathService>();
             var path = pathService.ScriptBasePath;
+            Console.WriteLine("Copying resources to: " + path);
             pathService.CopyResources(path);
+            Console.WriteLine("Done.");
 
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView

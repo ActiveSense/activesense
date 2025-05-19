@@ -120,19 +120,27 @@ public class PathService : IPathService
     public void CopyResources(string targetPath)
     {
         
+        Console.WriteLine("Copying resources to: " + targetPath);
+        
         var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
         
         Console.WriteLine("ApplicationBasePath: " + ApplicationBasePath);
         Console.WriteLine("SolutionBasePath: " + SolutionBasePath);
         Console.WriteLine("SourceDir: " + sourceDir);
         
-        if (!Directory.Exists(sourceDir)) return;
+        // if (!Directory.Exists(sourceDir)) return;
 
         foreach (var dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+        {
+            Console.WriteLine(dirPath);
             EnsureDirectoryExists(dirPath.Replace(sourceDir, targetPath));
+        }
 
         foreach (var filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+        {
+            Console.WriteLine(filePath);
             File.Copy(filePath, filePath.Replace(sourceDir, targetPath), true);
+        }
     }
 
     private string FindRInstallation()
