@@ -44,7 +44,7 @@
         <Setter Property="Margin" Value="16,4,16,16" />
     </Style>
 
-    <!--  -->
+    <!-- Settings Card -->
     <Style Selector="Border.setting-card">
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Background" Value="White" />

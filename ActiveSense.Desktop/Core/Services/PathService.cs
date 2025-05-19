@@ -115,7 +115,13 @@ public class PathService : IPathService
 
     private void CopyResourceScripts(string targetPath)
     {
+        
         var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
+        
+        Console.WriteLine("ApplicationBasePath: " + ApplicationBasePath);
+        Console.WriteLine("SolutionBasePath: " + SolutionBasePath);
+        Console.WriteLine("SourceDir: " + sourceDir);
+        
         if (!Directory.Exists(sourceDir)) return;
 
         foreach (var dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
