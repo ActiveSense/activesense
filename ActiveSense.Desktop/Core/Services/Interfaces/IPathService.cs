@@ -14,5 +14,5 @@ public interface IPathService
     // Utility functions
     bool EnsureDirectoryExists(string path);
     void ClearDirectory(string path);
-    void CopyResources(string path);
+    void CopyResources();
 }

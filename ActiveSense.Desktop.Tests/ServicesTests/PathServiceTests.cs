@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using ActiveSense.Desktop.Core.Services;
+using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.ServicesTests;
 
@@ -14,8 +16,12 @@ public class PathServiceTests
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
-
-        _pathService = new PathService(_tempDir, _tempDir);
+        
+        // Create a mock logger
+        _mockLogger = new Mock<ILogger>();
+        
+        // Pass the mock logger to the PathService
+        _pathService = new PathService(_mockLogger.Object);
     }
 
     [TearDown]
@@ -36,7 +42,7 @@ public class PathServiceTests
 
     private PathService _pathService;
     private string _tempDir;
-
+    private Mock<ILogger> _mockLogger;
 
     [Test]
     public void EnsureDirectoryExists_CreatesDirectoryIfNotExists()

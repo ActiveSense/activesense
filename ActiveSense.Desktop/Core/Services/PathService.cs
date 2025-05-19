@@ -10,22 +10,17 @@ namespace ActiveSense.Desktop.Core.Services;
 
 public class PathService : IPathService
 {
-    private readonly string _customOutputPath;
-    private readonly string _customScriptPath;
 
-    public PathService(string customOutputPath = null, string customScriptPath = null)
+    Serilog.ILogger _logger;
+    
+    public PathService(Serilog.ILogger logger)
     {
-        _customOutputPath = customOutputPath;
-        _customScriptPath = customScriptPath;
-
+        _logger = logger;
         EnsureDirectoryExists(OutputDirectory);
         EnsureDirectoryExists(ScriptInputPath);
     }
 
-    public string OutputDirectory =>
-        !string.IsNullOrEmpty(_customOutputPath)
-            ? _customOutputPath
-            : IsDevelopment
+    public string OutputDirectory => IsDevelopment
                 ? CombinePaths(SolutionBasePath, "AnalysisFiles/")
                 : GetOrCreateLocalAppPath("AnalysisFiles/");
 
@@ -33,22 +28,10 @@ public class PathService : IPathService
     {
         get
         {
-            if (!string.IsNullOrEmpty(_customScriptPath) && Directory.Exists(_customScriptPath))
-                return _customScriptPath;
-
             var devPath = CombinePaths(SolutionBasePath, "../ActiveSense.RScripts");
             if (Directory.Exists(devPath)) return devPath;
 
             var userPath = GetOrCreateLocalAppPath("RScripts");
-            if (!Directory.Exists(userPath))
-            {
-                EnsureDirectoryExists(userPath);
-                CopyResources(userPath);
-            }
-            else
-            {
-                Console.WriteLine("Directory already exists");
-            }
 
             return userPath;
         }
@@ -104,7 +87,7 @@ public class PathService : IPathService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error clearing directory: {ex.Message}");
+           _logger.Error(ex, "Could not clear directory"); 
         }
     }
 
@@ -117,28 +100,20 @@ public class PathService : IPathService
         return path;
     }
 
-    public void CopyResources(string targetPath)
+    public void CopyResources()
     {
-        
-        Console.WriteLine("Copying resources to: " + targetPath);
-        
         var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
+        var targetPath = GetOrCreateLocalAppPath("RScripts");
         
-        Console.WriteLine("ApplicationBasePath: " + ApplicationBasePath);
-        Console.WriteLine("SolutionBasePath: " + SolutionBasePath);
-        Console.WriteLine("SourceDir: " + sourceDir);
+        _logger.Information("Copying resources from {source} to {target}", sourceDir, targetPath);
         
-        // if (!Directory.Exists(sourceDir)) return;
-
         foreach (var dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
         {
-            Console.WriteLine(dirPath);
             EnsureDirectoryExists(dirPath.Replace(sourceDir, targetPath));
         }
 
         foreach (var filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
         {
-            Console.WriteLine(filePath);
             File.Copy(filePath, filePath.Replace(sourceDir, targetPath), true);
         }
     }

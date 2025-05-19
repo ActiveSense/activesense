@@ -23,6 +23,7 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
 using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
 using DialogViewModel = ActiveSense.Desktop.ViewModels.Dialogs.DialogViewModel;
@@ -35,6 +36,11 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .CreateLogger();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -88,6 +94,12 @@ public class App : Application
 
         // Register converters
         collection.AddTransient<DateToWeekdayConverter>();
+        
+        // Logging
+        collection.AddSingleton(Log.Logger);
+        collection.AddLogging(loggingBuilder => 
+            loggingBuilder.AddSerilog(dispose: true));
+        
 
         // Register charts
         collection.AddTransient<BarChartViewModel>();
@@ -131,12 +143,6 @@ public class App : Application
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit
             DisableAvaloniaDataAnnotationValidation();
             
-            var pathService = services.GetRequiredService<IPathService>();
-            var path = pathService.ScriptBasePath;
-            Console.WriteLine("Copying resources to: " + path);
-            pathService.CopyResources(path);
-            Console.WriteLine("Done.");
-
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView
             {
