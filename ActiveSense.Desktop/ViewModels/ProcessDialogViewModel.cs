@@ -181,16 +181,19 @@ public partial class ProcessDialogViewModel : DialogViewModel
         }
 
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
-        var estimatedTime = processor.GetEstimatedProcessingTime(SelectedFiles);
-        StartCountdown(estimatedTime);
 
         try
         {
             IsProcessing = true;
+
+            StatusMessage = "Laufzeit wird berechnet...";
+            var estimatedTime = await processor.GetEstimatedProcessingTimeAsync(SelectedFiles);
+            StartCountdown(estimatedTime);
+                
             _sharedDataService.IsProcessingInBackground = true;
             _cancellationTokenSource = new CancellationTokenSource();
 
-            StatusMessage = "Copying files...";
+            StatusMessage = "Dateien werden kopiert...";
 
             var processingDirectory = _pathService.ScriptInputPath;
             var outputDirectory = _pathService.OutputDirectory;
@@ -198,7 +201,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
 
 
-            StatusMessage = "Processing files...";
+            StatusMessage = "Dateien werden verarbeitet...";
 
             if (Directory.EnumerateFiles(processingDirectory).Any())
             {
@@ -222,7 +225,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             }
 
 
-            StatusMessage = "Parsing results...";
+            StatusMessage = "Resultate werden analysiert...";
             StopCountdown();
             await ParseResults();
         }

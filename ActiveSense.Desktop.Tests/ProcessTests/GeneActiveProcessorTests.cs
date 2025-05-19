@@ -152,7 +152,7 @@ public class GeneActiveProcessorTests
             .Returns(expectedTimeSpan);
 
         // Act
-        var result = _processor.GetEstimatedProcessingTime(files);
+        var result = _processor.GetEstimatedProcessingTimeAsync(files);
 
         // Assert
         Assert.That(result, Is.EqualTo(expectedTimeSpan));

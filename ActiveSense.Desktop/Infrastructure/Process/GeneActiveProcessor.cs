@@ -90,14 +90,14 @@ public class GeneActiveProcessor : ISensorProcessor
         }
     }
 
+    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files)
+    {
+        return await Task.Run(() => _timeEstimator.EstimateProcessingTime(files));
+    }
+
     public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
     {
         _fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes);
-    }
-
-    public TimeSpan GetEstimatedProcessingTime(IEnumerable<string> files)
-    {
-        return _timeEstimator.EstimateProcessingTime(files);
     }
 
     public string ProcessingInfo =>
