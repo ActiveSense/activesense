@@ -45,6 +45,10 @@ public class PathService : IPathService
                 EnsureDirectoryExists(userPath);
                 CopyResourceScripts(userPath);
             }
+            else
+            {
+                Console.WriteLine("Directory already exists");
+            }
 
             return userPath;
         }
