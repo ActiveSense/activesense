@@ -10,11 +10,11 @@
     <Design.DataContext>
         <analysisPages:SleepPageViewModel />
     </Design.DataContext>
+    
     <ScrollViewer x:Name="MainScrollViewer"
                   VerticalScrollBarVisibility="Visible"
                   HorizontalScrollBarVisibility="Disabled">
         <Grid>
-            <!-- Empty state message when no charts are visible -->
             <Border IsVisible="{Binding !ChartsVisible}"
                     CornerRadius="8"
                     Padding="20"
@@ -37,9 +37,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- Chart content when available -->
             <StackPanel IsVisible="{Binding ChartsVisible}" Spacing="10">
-
 
                 <!-- Sleep Duration Charts Section -->
                 <Expander Header="{Binding TotalSleepTitle}"

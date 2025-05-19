@@ -15,7 +15,6 @@
                   HorizontalScrollBarVisibility="Disabled">
 
         <Grid>
-            <!-- Empty state message when no charts are visible -->
             <Border IsVisible="{Binding !ChartsVisible}"
                     CornerRadius="8"
                     Padding="20"
@@ -24,7 +23,6 @@
                     VerticalAlignment="Center"
                     MaxWidth="400">
                 <StackPanel Spacing="15" HorizontalAlignment="Center">
-                    <!-- Message -->
                     <TextBlock Text="Keine Daten ausgewählt"
                                FontSize="20"
                                FontWeight="SemiBold"
@@ -148,7 +146,6 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
-
             </StackPanel>
         </Grid>
     </ScrollViewer>

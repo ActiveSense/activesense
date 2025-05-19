@@ -8,7 +8,6 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
-using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
@@ -19,7 +18,7 @@ public class GeneActiveProcessor : ISensorProcessor
     private readonly IPathService _pathService;
     private readonly IScriptExecutor _scriptExecutor;
     private readonly IProcessingTimeEstimator _timeEstimator;
-    Serilog.ILogger _logger; 
+    private readonly Serilog.ILogger _logger; 
 
     public GeneActiveProcessor(
         IPathService pathService,
@@ -51,7 +50,7 @@ public class GeneActiveProcessor : ISensorProcessor
             var executablePath = _pathService.ScriptExecutablePath;
             var workingDirectory = _pathService.ScriptBasePath;
             
-            _logger.Information("Starting GeneActive processing");
+            _logger.Information("Processing started");
             _logger.Information($"Script path: {scriptPath}");
             _logger.Information($"Executable path: {executablePath}");
             _logger.Information($"Working directory: {workingDirectory}");
@@ -74,15 +73,18 @@ public class GeneActiveProcessor : ISensorProcessor
             
             return result;
         }
+        
         catch (OperationCanceledException)
         {
             throw;
         }
+        
         catch (FileNotFoundException)
         {
             _logger.Error("R executable not found.");
             throw;
         }
+        
         catch (Exception ex)
         {
             _logger.Error(ex.Message, "Error executing R script");
@@ -95,19 +97,17 @@ public class GeneActiveProcessor : ISensorProcessor
         long totalSizeBytes = 0;
         foreach (string filePath in files)
         {
-            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) continue;
+            try
             {
-                try
-                {
-                    totalSizeBytes += new FileInfo(filePath).Length;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
-                }
+                totalSizeBytes += new FileInfo(filePath).Length;
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
             }
         }
-        double totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
+        var totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
         
         return await Task.Run(() => _timeEstimator.EstimateProcessingTime(totalSizeMB));
     }
@@ -120,7 +120,7 @@ public class GeneActiveProcessor : ISensorProcessor
     public string ProcessingInfo =>
         "Einstellungen werden nur auf die Verarbeitung von .bin-Dateien angewendet. Beim Import als PDF werden die Einstellungen ignoriert.";
 
-    private List<ScriptArgument> CreateDefaultArguments()
+    private static List<ScriptArgument> CreateDefaultArguments()
     {
         return
         [

@@ -11,8 +11,7 @@
     <Border Classes="dialog-container" Width="450">
         <Grid RowDefinitions="Auto, *, Auto">
             <Grid Grid.Row="0"
-                  Margin="24,24,24,0"
-                 >
+                  Margin="24,24,24,0">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock Text="Analyse Exportieren"

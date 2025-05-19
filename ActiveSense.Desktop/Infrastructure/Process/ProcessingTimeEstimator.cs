@@ -12,22 +12,31 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     private const double BenchmarkTimeSeconds = 388;
     private const double BaselineMbPerSecond = BenchmarkFileSizeMb / BenchmarkTimeSeconds;
 
-    private const int CalibrationIterations = 1_000_000;
+    private const int CalibrationIterations = 4_000_000;
     private const int CalibrationDataSizeBytes = 1024;
 
     // The reference calibration time is the time taken for the calibration task on the machine that has the above benchmark speed.
-    private const double ReferenceCalibrationTimeSeconds = 1.178;
+    private const double ReferenceCalibrationTimeSeconds = 4.130;
 
     private static readonly Lazy<double> MachineSpeedFactor = new Lazy<double>(CalculateMachineSpeedFactor, LazyThreadSafetyMode.ExecutionAndPublication);
 
     public TimeSpan EstimateProcessingTime(double totalFileSizesMB)
     {
+        if (totalFileSizesMB <= 10)
+        {
+            return TimeSpan.Zero;
+        }
+        
+        var estimatedSecondsOnBenchmarkMachine = totalFileSizesMB / BaselineMbPerSecond;
 
-        double estimatedSecondsOnBenchmarkMachine = totalFileSizesMB / BaselineMbPerSecond;
-
-        double actualEstimatedSeconds = estimatedSecondsOnBenchmarkMachine * MachineSpeedFactor.Value;
+        var actualEstimatedSeconds = estimatedSecondsOnBenchmarkMachine * MachineSpeedFactor.Value;
 
         if (actualEstimatedSeconds < 0) actualEstimatedSeconds = 0;
+        
+        if (totalFileSizesMB < 20)
+        {
+            return TimeSpan.FromSeconds(actualEstimatedSeconds + 15);
+        }
 
         return TimeSpan.FromSeconds(actualEstimatedSeconds);
     }
@@ -35,7 +44,7 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     private static double CalculateMachineSpeedFactor()
     {
         Stopwatch sw = Stopwatch.StartNew();
-        double currentMachineCalibrationTime = RunCalibrationTaskInternal();
+        var currentMachineCalibrationTime = RunCalibrationTaskInternal();
         sw.Stop();
 
         if (currentMachineCalibrationTime <=0)
@@ -43,7 +52,7 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
             return 1.0;
         }
 
-        double factor = currentMachineCalibrationTime / ReferenceCalibrationTimeSeconds;
+        var factor = currentMachineCalibrationTime / ReferenceCalibrationTimeSeconds;
 
         factor = Math.Max(0.2, Math.Min(5.0, factor));
 
@@ -72,8 +81,11 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     public static void TestCalibration()
     {
         Console.WriteLine($"Running calibration task with {CalibrationIterations} iterations on {CalibrationDataSizeBytes} byte blocks...");
-        double timeTaken = RunCalibrationTaskInternal();
-        Console.WriteLine($"Calibration task took: {timeTaken:F3} seconds on this machine.");
-        Console.WriteLine($"If this is your 'good' benchmark machine, set REFERENCE_CALIBRATION_TIME_SECONDS to ~{timeTaken:F3}.");
+        for(int i = 0; i < 5; i++)
+        {
+            Console.WriteLine($"Iteration {i + 1}...");
+            var timeTaken = RunCalibrationTaskInternal();
+            Console.WriteLine($"Calibration task took: {timeTaken:F3}");
+        }
     }
 }

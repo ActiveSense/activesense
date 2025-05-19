@@ -51,7 +51,7 @@ public static class RPathStorage
 
             return output.Contains("Rscript");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return false;
         }

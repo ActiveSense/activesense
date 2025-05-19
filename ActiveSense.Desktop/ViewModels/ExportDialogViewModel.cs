@@ -19,10 +19,9 @@ public partial class ExportDialogViewModel(
     : Dialogs.DialogViewModel
 {
     [ObservableProperty] private bool _confirmed;
-    [ObservableProperty] private string _statusMessage = "Choose export options";
     [ObservableProperty] private SensorTypes _selectedSensorType = SensorTypes.GENEActiv;
-    [ObservableProperty] private bool _includeRawData = false;
-    [ObservableProperty] private bool _exportStarted = false;
+    [ObservableProperty] private bool _includeRawData;
+    [ObservableProperty] private bool _exportStarted;
 
     public event Func<bool, Task<string?>>? FilePickerRequested;
 
@@ -43,12 +42,6 @@ public partial class ExportDialogViewModel(
     [RelayCommand]
     private async Task ExportAnalysis()
     {
-        if (sharedDataService.SelectedAnalyses.Count != 1)
-        {
-            StatusMessage = "Please select exactly one analysis to export";
-            return;
-        }
-
         var filePath = await FilePickerRequested?.Invoke(IncludeRawData)!;
 
         if (string.IsNullOrEmpty(filePath))
@@ -60,7 +53,6 @@ public partial class ExportDialogViewModel(
         {
             var exporter = exporterFactory.GetExporter(SelectedSensorType);
             var analysis = sharedDataService.SelectedAnalyses.First();
-
 
             ExportStarted = true;
             var success = await exporter.ExportAsync(analysis, filePath, IncludeRawData);
@@ -88,7 +80,7 @@ public partial class ExportDialogViewModel(
             {
                 Title = "Export fehlgeschlagen",
                 Message = "Fehler beim Exportieren",
-                ExtendedMessage = "" + ex.Message,
+                ExtendedMessage = ex.Message,
                 OkButtonText = "Schliessen",
             };
             await dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(mainViewModel, dialog);

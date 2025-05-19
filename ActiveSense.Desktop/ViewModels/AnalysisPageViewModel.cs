@@ -26,7 +26,7 @@ public partial class AnalysisPageViewModel : PageViewModel
 
     [ObservableProperty] private ObservableCollection<IAnalysis> _resultFiles = new();
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = new();
-    [ObservableProperty] private TabItemTemplate? _selectedTabItem = null;
+    [ObservableProperty] private TabItemTemplate? _selectedTabItem;
     [ObservableProperty] private SensorTypes _sensorType = SensorTypes.GENEActiv;
     [ObservableProperty] private bool _showExportOption = true;
     [ObservableProperty] private bool _showSpinner = true;
@@ -58,7 +58,6 @@ public partial class AnalysisPageViewModel : PageViewModel
         _sharedDataService.AllAnalysesChanged += OnAnalysesChanged;
     }
 
-    // public AnalysisPageViewModel(){}
     public ObservableCollection<TabItemTemplate> TabItems { get; } = [];
 
     async partial void OnSelectedAnalysesChanged(ObservableCollection<IAnalysis> value)

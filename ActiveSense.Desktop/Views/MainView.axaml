@@ -6,6 +6,7 @@
         ExtendClientAreaToDecorationsHint="False"
         ExtendClientAreaChromeHints="Default"
         SystemDecorations="Full"
+        RequestedThemeVariant="Light"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ActiveSense.Desktop.Views.MainView"
         x:DataType="vm:MainViewModel"
@@ -15,15 +16,13 @@
         Title="ActiveSense.Desktop">
 
     <Grid>
-        <!-- Main layout with sidebar and content -->
         <Grid ColumnDefinitions="Auto,*">
-            <!-- Content area -->
             <ContentControl Grid.Column="1"
                             Content="{Binding ActivePage}"
                             Margin="5" />
         </Grid>
 
-        <!-- Dialog overlay -->
+        <!-- Dialogs get displayed with this -->
         <Grid IsVisible="{Binding Dialog.IsDialogOpen, FallbackValue=False}">
             <Border Background="#80000000" Opacity="0.7" />
             <ContentControl Content="{Binding Dialog}"

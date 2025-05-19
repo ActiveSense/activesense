@@ -23,37 +23,37 @@ public partial class SleepPageViewModel : PageViewModel
     private readonly ISharedDataService _sharedDataService;
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
 
-    [ObservableProperty] private bool _chartsVisible = false;
+    [ObservableProperty] private bool _chartsVisible;
 
     [ObservableProperty] private string _sleepDistributionTitle = "Schlafverteilung";
     [ObservableProperty] private string _sleepDistributionDescription = "Durchschnittliche Verteilung der Schlaf- und Wachzeiten in Stunden pro Nacht";
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _pieCharts = [];
-    [ObservableProperty] private bool _isDistributionExpanded = false;
+    [ObservableProperty] private bool _isDistributionExpanded;
 
     [ObservableProperty] private string _sleepTimeWithEfficiencyTitle = "Schlafzeit mit Effizienz";
     [ObservableProperty] private string _sleepTimeWithEfficiencyDescription = "Schlafzeit pro Nacht in Stunden mit Schlafeffizienz in %";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepTimeWithEfficiencyCharts = [];
-    [ObservableProperty] private bool _isSleepTimeWithEfficiencyExpanded = false;
+    [ObservableProperty] private bool _isSleepTimeWithEfficiencyExpanded;
 
     [ObservableProperty] private string _sleepTimeTitle = "Schlafzeit";
     [ObservableProperty] private string _sleepTimeDescription = "Zeitpunkt des Schlafbeginns und -endes";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepTimeCharts = [];
-    [ObservableProperty] private bool _isSleepTimeExpanded = false;
+    [ObservableProperty] private bool _isSleepTimeExpanded;
 
     [ObservableProperty] private string _totalSleepTitle = "Schlafzeit";
     [ObservableProperty] private string _totalSleepDescription = "Durchschnittliche Schlafzeit pro Nacht in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _totalSleepCharts = [];
-    [ObservableProperty] private bool _isTotalSleepExpanded = false;
+    [ObservableProperty] private bool _isTotalSleepExpanded;
 
     [ObservableProperty] private string _sleepEfficiencyTitle = "Schlaf-Effizienz";
     [ObservableProperty] private string _sleepEfficiencyDescription = "Schlaf-Effizienz pro Nacht in %";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sleepEfficiencyCharts = [];
-    [ObservableProperty] private bool _isSleepEfficiencyExpanded = false;
+    [ObservableProperty] private bool _isSleepEfficiencyExpanded;
 
     [ObservableProperty] private string _activePeriodsTitle = "Aktive Perioden";
     [ObservableProperty] private string _activePeriodsDescription = "Aktive Perioden pro Nacht";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _activePeriodsCharts = [];
-    [ObservableProperty] private bool _isActivePeriodsExpanded = false;
+    [ObservableProperty] private bool _isActivePeriodsExpanded;
 
 
     public SleepPageViewModel(ISharedDataService sharedDataService,

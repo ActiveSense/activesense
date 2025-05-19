@@ -116,7 +116,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
         if (remaining.TotalSeconds <= 0)
         {
-            TimeRemaining = "Finalizing...";
+            TimeRemaining = "Fertigstellen...";
             ProgressValue = 100;
         }
         else

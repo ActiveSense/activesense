@@ -25,17 +25,17 @@ public partial class GeneralPageViewModel : PageViewModel
     [ObservableProperty] private string _movementTitle = "Aktivitätsverteilung";
     [ObservableProperty] private string _movementDescription = "Die durchschnittliche Verteilung der Aktivität über 24h in Stunden.";
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = [];
-    [ObservableProperty] private bool _isMovementExpanded = false;
+    [ObservableProperty] private bool _isMovementExpanded;
     
     [ObservableProperty] private string _averageSleepTitle = "Durchschnittlicher Schlaf";
     [ObservableProperty] private string _averageSleepDescription = "Durchschnittlicher Schlaf pro Nacht in Stunden.";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _averageSleepCharts = [];
-    [ObservableProperty] private bool _isAverageSleepExpanded = false;
+    [ObservableProperty] private bool _isAverageSleepExpanded;
     
     [ObservableProperty] private string _averageActivityTitle = "Durchschnittliche Aktivität";
     [ObservableProperty] private string _averageActivityDescription = "Durchschnittliche Aktivität pro Tag in Stunden. Light, moderate und vigorous activity addiert.";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _averageActivityCharts = [];
-    [ObservableProperty] private bool _isAverageActivityExpanded = false;
+    [ObservableProperty] private bool _isAverageActivityExpanded;
     
 
     public GeneralPageViewModel(ISharedDataService sharedDataService, ChartColors chartColors)

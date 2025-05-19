@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels.Dialogs;
 
-public partial class PathDialogViewModel() : Dialogs.DialogViewModel
+public partial class PathDialogViewModel() : DialogViewModel
 {
     [ObservableProperty] private string _closeButtonText = "Close";
 
@@ -22,7 +22,7 @@ public partial class PathDialogViewModel() : Dialogs.DialogViewModel
 
     [ObservableProperty] private string _title = "Warning";
     
-    [ObservableProperty] private bool _errorOccurred = false;
+    [ObservableProperty] private bool _errorOccurred;
 
     [RelayCommand]
     private void Ok()

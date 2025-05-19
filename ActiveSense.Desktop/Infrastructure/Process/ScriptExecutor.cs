@@ -55,7 +55,6 @@ public class ScriptExecutor : IScriptExecutor
             }
         };
 
-        // Register for cancellation
         cancellationToken.Register(() =>
         {
             try
@@ -72,6 +71,7 @@ public class ScriptExecutor : IScriptExecutor
         {
             process.Start();
         }
+        
         catch (Exception e)
         {
             return (false, $"Failed to start process: {e.Message}");
@@ -84,6 +84,7 @@ public class ScriptExecutor : IScriptExecutor
         {
             await process.WaitForExitAsync(cancellationToken);
         }
+        
         catch (OperationCanceledException)
         {
             throw new OperationCanceledException();

@@ -24,7 +24,7 @@
                         Classes="card"
                         Padding="4"
                         HorizontalAlignment="Left">
-                    <ListBox Name="tabSelector"
+                    <ListBox Name="TabSelector"
                              Background="Transparent"
                              BorderThickness="0"
                              ItemsSource="{Binding TabItems}"
@@ -93,7 +93,7 @@
                         <PathIcon Data="{StaticResource arrow_download_regular}" Height="15" Foreground="White" />
                     </Button>
 
-                    <!-- Add/Plus button - dark style -->
+                    <!-- Add button -->
                     <Button Padding="0"
                             Classes="Primary"
                             Theme="{DynamicResource SolidButton}"
@@ -208,9 +208,7 @@
                                                         </ItemsControl.ItemsPanel>
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
-                                                                <!-- Use a Grid with two children - one for background, one for content -->
                                                                 <Grid Margin="0,0,4,4">
-                                                                    <!-- Background element - this one gets opacity -->
                                                                     <Border Background="{Binding Color}"
                                                                             Opacity="0.2"
                                                                             CornerRadius="12"
@@ -234,7 +232,6 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
 
-                                    <!-- Custom item container style -->
                                     <ListBox.Styles>
                                         <Style Selector="ListBoxItem">
                                             <Setter Property="Padding" Value="0" />

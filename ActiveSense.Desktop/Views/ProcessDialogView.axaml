@@ -22,7 +22,6 @@
             Height="530"
             Width="650">
         <Grid RowDefinitions="Auto, *, Auto, Auto">
-            <!-- Header -->
             <Grid Grid.Row="0" IsVisible="{Binding !IsProcessing}"
                   Margin="24,24,24,0">
                 <StackPanel>
@@ -46,7 +45,6 @@
                 <PathIcon Data="{StaticResource arrow_minimize_regular}"></PathIcon>
             </Button>
 
-            <!-- Content -->
             <ScrollViewer Grid.Row="1"
                           Padding="24,0,24,0"
                           VerticalScrollBarVisibility="Auto">
@@ -114,7 +112,6 @@
 
                     </StackPanel>
 
-                    <!-- Separator -->
                     <Rectangle Grid.Column="1" Fill="Transparent" />
 
                     <!-- Right column - File selection -->
@@ -128,7 +125,6 @@
                                     CornerRadius="6"
                                     Padding="6">
                                 <Grid>
-                                    <!-- "No files" message -->
                                     <TextBlock Text="Keine Dateien ausgewählt"
                                                IsVisible="{Binding SelectedFiles, Converter={x:Static ObjectConverters.IsNull}}"
                                                HorizontalAlignment="Center"
@@ -136,7 +132,6 @@
                                                Foreground="#888888"
                                                Margin="0,40,0,40" />
                  
-                                    <!-- Files list -->
                                     <ListBox ItemsSource="{Binding SelectedFiles}"
                                              Background="Transparent"
                                              Padding="0"
@@ -210,7 +205,6 @@
                 </Border>
             </Grid>
             
-            <!-- Message section between content and footer -->
             <Border Grid.Row="2"
                     BorderThickness="1"
                     BorderBrush="#DDDDDD"
@@ -233,7 +227,6 @@
                 </Grid>
             </Border>
 
-            <!-- Footer -->
             <Grid Grid.Row="3"
                   Margin="24,20"
                   ColumnDefinitions="Auto, *, Auto">

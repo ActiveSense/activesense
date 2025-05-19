@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ActiveSense.Desktop.ViewModels.Dialogs
 {
-    public partial class WarningDialogViewModel : Dialogs.DialogViewModel
+    public partial class WarningDialogViewModel : DialogViewModel
     {
         [ObservableProperty] private string _title = "Warning";
         [ObservableProperty] private string _subTitle = "An error occurred during operation";
