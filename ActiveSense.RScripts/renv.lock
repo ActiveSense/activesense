@@ -5,6 +5,10 @@
       {
         "Name": "CRAN",
         "URL": "http://cran.r-project.org"
+      },
+      {
+        "Name": "ACTIVESENSE_UNIVERSE",
+        "URL": "https://activesense.r-universe.dev"
       }
     ]
   },
@@ -12,7 +16,7 @@
     "GENEAclassify": {
       "Package": "GENEAclassify",
       "Version": "1.5.5",
-      "Source": "Local",
+      "Source": "Repository",
       "Type": "Package",
       "Title": "Segmentation and Classification of Accelerometer Data",
       "Date": "2024-02-07",
@@ -41,20 +45,21 @@
       "VignetteBuilder": "knitr",
       "NeedsCompilation": "yes",
       "Maintainer": "Jia Ying Chua <jiayingc@activinsights.com>",
-      "Repository": "CRAN",
-      "RemoteType": "local",
-      "RemoteUrl": "renv/GENEApackages/GENEAclassify.zip"
+      "Repository": "https://activesense.r-universe.dev",
+      "RemoteUrl": "https://github.com/ActiveSense/GENEAclassify",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "56dfe059b856018a12514405c88fd29fe0a7a561"
     },
     "GENEAread": {
       "Package": "GENEAread",
       "Version": "2.0.10",
-      "Source": "Local",
+      "Source": "Repository",
       "Type": "Package",
       "Title": "Package for Reading Binary Files",
       "Date": "2024-03-05",
       "Authors@R": "c( person(\"Zhou\", \"Fang\", role = \"aut\"), person(\"Joss\", \"Langford\", role = \"aut\", email = \"joss@activinsights.co.uk\"), person(\"Charles\", \"Sweetland\", role = \"aut\", email = \"charles@sweetland-solutions.co.uk\"), person(\"Jia Ying\", \"Chua\", role = c(\"aut\",\"cre\"), email = \"jiayingc@activinsights.com\"))",
       "Maintainer": "Jia Ying Chua <jiayingc@activinsights.com>",
-      "Description": "Functions and analytics for GENEA-compatible accelerometer data into R objects.  See topic 'GENEAread' for an introduction to the package.  See <https://activinsights.com/technology/geneactiv/> for more details on the GENEActiv device.",
+      "Description": "Functions and analytics for GENEA-compatible accelerometer data into R objects. See topic 'GENEAread' for an introduction to the package. See <https://activinsights.com/technology/geneactiv/> for more details on the GENEActiv device.",
       "License": "GPL-2 | GPL-3",
       "Encoding": "UTF-8",
       "Depends": [
@@ -68,9 +73,10 @@
       "RoxygenNote": "7.3.1",
       "NeedsCompilation": "yes",
       "Author": "Zhou Fang [aut], Joss Langford [aut], Charles Sweetland [aut], Jia Ying Chua [aut, cre]",
-      "Repository": "CRAN",
-      "RemoteType": "local",
-      "RemoteUrl": "renv/GENEApackages/GENEAread.zip"
+      "Repository": "https://activesense.r-universe.dev",
+      "RemoteUrl": "https://github.com/ActiveSense/GENEAread",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "4e4d1aed76a688776e5b67585532e768c0bf81eb"
     },
     "MASS": {
       "Package": "MASS",
