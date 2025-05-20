@@ -15,7 +15,7 @@
   "Packages": {
     "GENEAclassify": {
       "Package": "GENEAclassify",
-      "Version": "1.5.5",
+      "Version": "1.5.6",
       "Source": "Repository",
       "Type": "Package",
       "Title": "Segmentation and Classification of Accelerometer Data",
@@ -48,7 +48,7 @@
       "Repository": "https://activesense.r-universe.dev",
       "RemoteUrl": "https://github.com/ActiveSense/GENEAclassify",
       "RemoteRef": "HEAD",
-      "RemoteSha": "56dfe059b856018a12514405c88fd29fe0a7a561"
+      "RemoteSha": "095701e5acd2f37aeb4e1fd502289c90481a5d7f"
     },
     "GENEAread": {
       "Package": "GENEAread",
