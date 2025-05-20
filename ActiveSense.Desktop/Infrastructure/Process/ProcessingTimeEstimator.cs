@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
+using iText.Layout.Element;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
@@ -12,11 +15,11 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     private const double BenchmarkTimeSeconds = 388;
     private const double BaselineMbPerSecond = BenchmarkFileSizeMb / BenchmarkTimeSeconds;
 
-    private const int CalibrationIterations = 4_000_000;
+    private const int CalibrationIterations = 1_000_000;
     private const int CalibrationDataSizeBytes = 1024;
 
     // The reference calibration time is the time taken for the calibration task on the machine that has the above benchmark speed.
-    private const double ReferenceCalibrationTimeSeconds = 4.130;
+    private const double ReferenceCalibrationTimeSeconds = 1.239;
 
     private static readonly Lazy<double> MachineSpeedFactor = new Lazy<double>(CalculateMachineSpeedFactor, LazyThreadSafetyMode.ExecutionAndPublication);
 
@@ -43,16 +46,20 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
 
     private static double CalculateMachineSpeedFactor()
     {
-        Stopwatch sw = Stopwatch.StartNew();
-        var currentMachineCalibrationTime = RunCalibrationTaskInternal();
-        sw.Stop();
+        var values = new List<double>();
 
-        if (currentMachineCalibrationTime <=0)
+        for (int i = 0; i < 4; i++)
+        {
+            values.Add(RunCalibrationTaskInternal());
+        }
+
+        var average = values.Average();
+        if (average <=0)
         {
             return 1.0;
         }
 
-        var factor = currentMachineCalibrationTime / ReferenceCalibrationTimeSeconds;
+        var factor = average / ReferenceCalibrationTimeSeconds;
 
         factor = Math.Max(0.2, Math.Min(5.0, factor));
 
@@ -81,11 +88,12 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     public static void TestCalibration()
     {
         Console.WriteLine($"Running calibration task with {CalibrationIterations} iterations on {CalibrationDataSizeBytes} byte blocks...");
+        var values = new List<double>();
         for(int i = 0; i < 5; i++)
         {
             Console.WriteLine($"Iteration {i + 1}...");
-            var timeTaken = RunCalibrationTaskInternal();
-            Console.WriteLine($"Calibration task took: {timeTaken:F3}");
+            values.Add(RunCalibrationTaskInternal());
         }
+        Console.WriteLine($"Average time: {values.Average():F3}");
     }
 }

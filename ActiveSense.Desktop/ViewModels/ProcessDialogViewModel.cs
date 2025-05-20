@@ -198,8 +198,8 @@ public partial class ProcessDialogViewModel : DialogViewModel
             var processingDirectory = _pathService.ScriptInputPath;
             var outputDirectory = _pathService.OutputDirectory;
 
-            processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
-
+            
+            await processor.CopyFilesAsync(SelectedFiles, processingDirectory, outputDirectory);
 
             StatusMessage = "Dateien werden verarbeitet...";
 

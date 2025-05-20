@@ -122,7 +122,7 @@ public class GeneActiveProcessorTests
     }
 
     [Test]
-    public void CopyFiles_DelegatesCallToFileManager()
+    public async Task CopyFiles_DelegatesCallToFileManager()
     {
         // Arrange
         string[] files = { "file1.bin", "file2.bin" };
@@ -130,7 +130,7 @@ public class GeneActiveProcessorTests
         var outputDir = "/path/to/output";
 
         // Act
-        _processor.CopyFiles(files, processingDir, outputDir);
+        await _processor.CopyFilesAsync(files, processingDir, outputDir);
 
         // Assert
         _mockFileManager.Verify(x => x.CopyFiles(

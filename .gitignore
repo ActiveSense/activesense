@@ -9,7 +9,7 @@ ActiveSense.RScripts/testing/references/
 ActiveSense.RScripts/outputs/*
 ActiveSense.Desktop/bin
 ActiveSense.Desktop/obj
-ActiveSense.Desktop/.idea/
+ActiveSense.Desktop/.idea
 ActiveSense.Desktop.Tests/obj
 ActiveSense.Desktop.Tests/bin
 ActiveSense.Desktop/AnalysisFiles/

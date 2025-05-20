@@ -54,6 +54,7 @@ public class GeneActiveProcessor : ISensorProcessor
             _logger.Information($"Script path: {scriptPath}");
             _logger.Information($"Executable path: {executablePath}");
             _logger.Information($"Working directory: {workingDirectory}");
+           _logger.Information("Processing Arguments: {Arguments}", string.Join(", ", arguments?.Select(a => a.ToString()) ?? _defaultArguments.Select(a => a.ToString())));
 
             var argsToUse = arguments?.ToList() ?? _defaultArguments;
 
@@ -112,9 +113,9 @@ public class GeneActiveProcessor : ISensorProcessor
         return await Task.Run(() => _timeEstimator.EstimateProcessingTime(totalSizeMB));
     }
 
-    public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
+    public async Task CopyFilesAsync(string[] files, string processingDirectory, string outputDirectory)
     {
-        _fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes);
+        await Task.Run(() => _fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes));
     }
 
     public string ProcessingInfo =>
