@@ -11,6 +11,7 @@ rm(list=ls())
 # Sets repository
 local({
   r <- getOption("repos")
+  r["ACTIVESENSE_UNIVERSE"] <- "https://activesense.r-universe.dev"
   r["CRAN"] <- "http://cran.r-project.org"
   options(repos = r)
 })
