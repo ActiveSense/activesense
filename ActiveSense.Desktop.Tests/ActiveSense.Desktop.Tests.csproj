@@ -20,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModelTests\" />
+    <Folder Include="CoreTests\" />
+    <Folder Include="InfrastructureTests\" />
   </ItemGroup>
   
 </Project>
