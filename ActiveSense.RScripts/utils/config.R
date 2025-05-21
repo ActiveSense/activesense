@@ -10,10 +10,10 @@ rm(list=ls())
 
 # Sets repository
 local({
-  r <- getOption("repos")
-  r["ACTIVESENSE_UNIVERSE"] <- "https://activesense.r-universe.dev"
-  r["CRAN"] <- "http://cran.r-project.org"
-  options(repos = r)
+  options(repos = c(
+    ACTIVESENSE_UNIVERSE = "https://activesense.r-universe.dev",
+    CRAN = "http://cran.r-project.org"
+  ))
 })
 
 # time zone
@@ -34,6 +34,23 @@ if (!is.null(mmap_setting_from_test)) {
 # LIBRARIES
 # ==================================
 
+source("functions/01_library_installer.R")
+
+librarys <- c(
+  "GENEAread",
+  "GENEAclassify",
+  "profvis",
+  "scales",
+  "reshape2",
+  "future",
+  "promises",
+  "versions",
+  "optparse",
+  "testthat"
+)
+
+library_installer(librarys)
+
 library(GENEAread)
 library(GENEAclassify)
 library(profvis)
@@ -43,13 +60,6 @@ library(future)
 library(promises)
 library(optparse)
 library(testthat)
-library(bitops)
-library(mmap)
-library(MASS)
-library(changepoint)
-library(zoo)
-library(signal)
-library(rpart)
 
 # ==================================
 # SOURCE
