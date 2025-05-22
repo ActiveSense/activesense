@@ -2,9 +2,6 @@
 # BASIC
 # ==================================
 
-# Sets up renv // automatic dependency management
-source("utils/renv_setup.R")
-
 # clears persistent data objects
 rm(list=ls())
 

@@ -13,7 +13,8 @@ Write-Host "App directory: $AppDir" -ForegroundColor Cyan
 if (!(Test-Path $AppDir)) {
     Write-Host "Creating app directory..." -ForegroundColor Cyan
     New-Item -ItemType Directory -Path $AppDir -Force | Out-Null
-} else {
+}
+else {
     Write-Host "Cleaning app directory..." -ForegroundColor Cyan
     Remove-Item -Path "$AppDir\*" -Force -Recurse -ErrorAction SilentlyContinue
 }
@@ -32,6 +33,38 @@ Write-Host "Project path: $ProjectPath" -ForegroundColor Cyan
 # Check if project file exists
 if (!(Test-Path $ProjectPath)) {
     Write-Host "Project file not found at: $ProjectPath" -ForegroundColor Red
+    exit 1
+}
+
+# Intializing RScript
+$RProjectSourceDir = Join-Path -Path $ProjectDir -ChildPath "ActiveSense.RScripts" 
+$RSetupScriptPath = Join-Path -Path $RProjectSourceDir -ChildPath "utils\renv_setup.R"
+
+if (Test-Path $RProjectSourceDir) {
+    Write-Host "R project source directory found at: $RProjectSourceDir" -ForegroundColor Cyan
+    if (Test-Path $RSetupScriptPath) {
+        Write-Host "Setting up R environment using: $RSetupScriptPath" -ForegroundColor Cyan
+        # Temporarily change location to the R project directory to run renv_setup.R
+        Push-Location $RProjectSourceDir
+        try {
+            Rscript.exe -e "source('$($RSetupScriptPath -replace '\\', '/'))" # Pass the script to Rscript
+            Write-Host "R environment setup in source complete." -ForegroundColor Green
+        }
+        catch {
+            Write-Host "ERROR during R environment setup: $($_.Exception.Message)" -ForegroundColor Red
+            exit 1
+        }
+        finally {
+            Pop-Location
+        }
+    }
+    else {
+        Write-Host "R setup script not found at: $RSetupScriptPath. Skipping R environment setup." -ForegroundColor Yellow
+        exit 1
+    }
+}
+else {
+    Write-Host "R project source directory not found at: $RProjectSourceDir." -ForegroundColor Yellow
     exit 1
 }
 
@@ -145,7 +178,8 @@ function Find-InnoSetup {
     try {
         $innoCompiler = (Get-Command "iscc.exe" -ErrorAction Stop).Source
         return $innoCompiler
-    } catch {
+    }
+    catch {
         # Try to find Inno Setup in the default installation directory
         $defaultPaths = @(
             "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
@@ -195,7 +229,8 @@ $CompileOutput | ForEach-Object { Write-Host $_ }
 $InstallerPath = Join-Path -Path $ScriptDir -ChildPath "ActiveSense-Setup.exe"
 if ($ExitCode -eq 0 -and (Test-Path $InstallerPath)) {
     Write-Host "Installer successfully created at: $InstallerPath" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "Installer compilation failed with exit code: $ExitCode" -ForegroundColor Red
 
     # Create a ZIP file as fallback

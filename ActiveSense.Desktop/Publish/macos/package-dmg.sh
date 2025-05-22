@@ -7,9 +7,20 @@ OUTPUT_DIR="Publish/macos"
 APP_NAME="ActiveSense"
 DMG_NAME="${APP_NAME}-Installer.dmg"
 APP_BUNDLE="${APP_NAME}.app"
+R_PROJECT_DIR_SOURCE="../ActiveSense.RScripts"
 
 mkdir -p "$OUTPUT_DIR"
 
+# Installing dependencies for R
+if [ -d "$R_PROJECT_DIR_SOURCE" ]; then
+  echo "Setting up R environment in source directory: $R_PROJECT_DIR_SOURCE..."
+  (cd "$R_PROJECT_DIR_SOURCE" && Rscript ./utils/renv_setup.R)
+  echo "R environment setup in source complete."
+else
+  echo "Warning: R project source directory '$R_PROJECT_DIR_SOURCE' not found. dotnet publish will copy it as-is."
+fi
+
+# dotnet installation
 echo "Building ActiveSense for macOS..."
 
 dotnet publish "$PROJECT_PATH" \

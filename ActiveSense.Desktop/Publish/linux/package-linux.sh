@@ -9,10 +9,20 @@ PROJECT_PATH="ActiveSense.Desktop.csproj"
 OUTPUT_DIR="Publish/linux"
 PACKAGE_DIR="$OUTPUT_DIR/package"
 INSTALLER_DIR="$OUTPUT_DIR/installer"
+R_PROJECT_DIR_SOURCE="../ActiveSense.RScripts"
 
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$PACKAGE_DIR"
 mkdir -p "$INSTALLER_DIR"
+
+# Installing dependencies for R
+if [ -d "$R_PROJECT_DIR_SOURCE" ]; then
+  echo "Setting up R environment in source directory: $R_PROJECT_DIR_SOURCE..."
+  (cd "$R_PROJECT_DIR_SOURCE" && Rscript ./utils/renv_setup.R)
+  echo "R environment setup in source complete."
+else
+  echo "Warning: R project source directory '$R_PROJECT_DIR_SOURCE' not found. dotnet publish will copy it as-is."
+fi
 
 echo "Building ActiveSense for Linux..."
 dotnet publish "$PROJECT_PATH" \
