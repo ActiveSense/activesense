@@ -37,7 +37,8 @@ if (!(Test-Path $ProjectPath)) {
 }
 
 # Intializing RScript
-$RProjectSourceDir = Join-Path -Path $ProjectDir -ChildPath "ActiveSense.RScripts" 
+$TempRdirectory = Split-Path -Parent $ProjectDir
+$RProjectSourceDir = Join-Path -Path $TempRdirectory -ChildPath "ActiveSense.RScripts" 
 $RSetupScriptPath = Join-Path -Path $RProjectSourceDir -ChildPath "utils\renv_setup.R"
 
 if (Test-Path $RProjectSourceDir) {
