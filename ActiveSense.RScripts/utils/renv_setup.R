@@ -2,24 +2,15 @@
 # DEACTIVATE SYMLINK
 # ==================================
 
-message("Setting renv.config.cache.symlinks to FALSE...")
-options(renv.config.cache.symlinks = FALSE)
-message("renv.config.cache.symlinks is now: ", getOption("renv.config.cache.symlinks"))
-
-
-# ==================================
-# INSTALL RENV
-# ==================================
-
-# Does this happen implicitly?
-# tryCatch({
-#   install.packages("renv", repos = "https://cloud.r-project.org/", quiet = TRUE)
-#   if (!requireNamespace("renv", quietly = TRUE)) {
-#     stop("Failed to install renv. Please ensure R has permissions or install renv manually.")
-#   }
-# }, error = function(e) {
-#   stop(paste("Failed to install renv:", conditionMessage(e)))
-# })
+tryCatch({
+  message("Setting renv.config.cache.symlinks to FALSE...")
+  options(renv.config.cache.symlinks = FALSE)
+  message("renv.config.cache.symlinks is now: ", getOption("renv.config.cache.symlinks"))
+}, error = function(e) {
+  message("!!! ERROR during switching config: !!!")
+  message(conditionMessage(e))
+  stop("Failed to change symlinks. Error: ", conditionMessage(e))
+})
 
 # ==================================
 # RUN RENV::RESTORE

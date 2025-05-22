@@ -1,7 +1,7 @@
 name: Build Cross-Platform Installers
 on:
   push:
-    branches: [ main, rscript/precompiled-dependencies-workflow ]
+    branches: [ main ]
     tags:
       - 'v*'
   pull_request:
