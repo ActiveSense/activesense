@@ -239,12 +239,6 @@ public partial class ProcessDialogViewModel : DialogViewModel
         {
             var dialog = new PathDialogViewModel()
             {
-                Title = "Fehler",
-                SubTitle = "R Installation nicht gefunden",
-                Message =
-                    "Es wurde kein R-Installationsverzeichnis gefunden. Bitte geben Sie den Pfad zu Ihrer R-Installation an.",
-                OkButtonText = "Speichern",
-                CloseButtonText = "Abbrechen"
             };
             await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
         }

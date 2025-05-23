@@ -8,6 +8,7 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
@@ -15,17 +16,17 @@ public class GeneActiveProcessor : ISensorProcessor
 {
     private readonly List<ScriptArgument> _defaultArguments;
     private readonly IFileManager _fileManager;
+    private readonly ILogger _logger;
     private readonly IPathService _pathService;
     private readonly IScriptExecutor _scriptExecutor;
     private readonly IProcessingTimeEstimator _timeEstimator;
-    private readonly Serilog.ILogger _logger; 
 
     public GeneActiveProcessor(
         IPathService pathService,
         IScriptExecutor scriptExecutor,
         IFileManager fileManager,
         IProcessingTimeEstimator timeEstimator,
-        Serilog.ILogger logger)
+        ILogger logger)
     {
         _logger = logger;
         _pathService = pathService;
@@ -49,14 +50,15 @@ public class GeneActiveProcessor : ISensorProcessor
             var scriptPath = _pathService.MainScriptPath;
             var executablePath = _pathService.ScriptExecutablePath;
             var workingDirectory = _pathService.ScriptBasePath;
-            
+
             _logger.Information("Processing started");
             _logger.Information($"Script path: {scriptPath}");
             _logger.Information($"Executable path: {executablePath}");
             _logger.Information($"Working directory: {workingDirectory}");
-           _logger.Information("Processing Arguments: {Arguments}", string.Join(", ", arguments?.Select(a => a.ToString()) ?? _defaultArguments.Select(a => a.ToString())));
+            _logger.Information("Processing Arguments: {Arguments}",
+                string.Join(", ", _defaultArguments.Select(a => a.ToCommandLineArgument())));
 
-            var argsToUse = arguments?.ToList() ?? _defaultArguments;
+            var argsToUse = _defaultArguments;
 
             var outputDir = $"-d \"{_pathService.OutputDirectory}\"";
 
@@ -69,23 +71,23 @@ public class GeneActiveProcessor : ISensorProcessor
 
             var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
                 cancellationToken);
-            
+
             _logger.Information("Processing completed");
-            
+
             return result;
         }
-        
+
         catch (OperationCanceledException)
         {
             throw;
         }
-        
+
         catch (FileNotFoundException)
         {
             _logger.Error("R executable not found.");
             throw;
         }
-        
+
         catch (Exception ex)
         {
             _logger.Error(ex.Message, "Error executing R script");
@@ -96,7 +98,7 @@ public class GeneActiveProcessor : ISensorProcessor
     public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files)
     {
         long totalSizeBytes = 0;
-        foreach (string filePath in files)
+        foreach (var filePath in files)
         {
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) continue;
             try
@@ -108,8 +110,9 @@ public class GeneActiveProcessor : ISensorProcessor
                 _logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
             }
         }
+
         var totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
-        
+
         return await Task.Run(() => _timeEstimator.EstimateProcessingTime(totalSizeMB));
     }
 
@@ -140,7 +143,7 @@ public class GeneActiveProcessor : ISensorProcessor
                 Description = "Run sleep analysis",
                 Value = true
             },
-            
+
             // Left wrist thresholds
             new NumericArgument
             {

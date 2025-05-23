@@ -128,9 +128,9 @@ public class PathService : IPathService
                           : OperatingSystem.IsLinux() ? FindLinuxRInstallation()
                           : null;
 
-        if (IsValidRPath(platformPath)) return platformPath;
-
         throw new FileNotFoundException("Could not locate R installation.");
+        
+        if (IsValidRPath(platformPath)) return platformPath;
     }
 
     private bool IsValidRPath(string path) =>

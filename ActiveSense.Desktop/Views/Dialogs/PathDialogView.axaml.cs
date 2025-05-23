@@ -33,7 +33,7 @@ public partial class PathDialogView : UserControl
             
             if (DataContext is PathDialogViewModel viewModel)
             {
-                viewModel.SelectedRInstallationPath = selectedPath;
+                viewModel.RPath = selectedPath;
             }
         }
     }
