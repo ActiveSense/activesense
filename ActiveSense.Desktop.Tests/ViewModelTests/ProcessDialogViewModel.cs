@@ -10,7 +10,6 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
-using ActiveSense.Desktop.Infrastructure.Process;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using ActiveSense.Desktop.ViewModels;
@@ -20,206 +19,185 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Serilog;
-using Serilog.Core;
 
-namespace ActiveSense.Desktop.Tests.ViewModelTests
+namespace ActiveSense.Desktop.Tests.ViewModelTests;
+
+[TestFixture]
+public class ProcessDialogViewModelTests
 {
-    [TestFixture]
-    public class ProcessDialogViewModelTests
+    [SetUp]
+    public void Setup()
     {
-        private ProcessDialogViewModel _viewModel;
-        private Mock<ISharedDataService> _mockSharedDataService;
-        private Mock<IPathService> _mockPathService;
-        private Mock<ISensorProcessor> _mockSensorProcessor;
-        private string _tempDir;
-        private ServiceProvider _serviceProvider;
+        _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(_tempDir);
 
-        [SetUp]
-        public void Setup()
+        _mockSharedDataService = new Mock<ISharedDataService>();
+        _mockPathService = new Mock<IPathService>();
+        _mockSensorProcessor = new Mock<ISensorProcessor>();
+
+        _mockSensorProcessor.Setup(p => p.SupportedType).Returns(SensorTypes.GENEActiv);
+        _mockSensorProcessor.Setup(p => p.ProcessingInfo).Returns("Test processing info");
+        _mockSensorProcessor.Setup(p => p.DefaultArguments).Returns(new List<ScriptArgument>
         {
-            // Create a temp directory for any file operations
-            _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(_tempDir);
+            new BoolArgument { Flag = "test", Name = "Test Argument", Description = "Test Description", Value = true }
+        });
 
-            // Setup mocks for interfaces we need to control
-            _mockSharedDataService = new Mock<ISharedDataService>();
-            _mockPathService = new Mock<IPathService>();
-            _mockSensorProcessor = new Mock<ISensorProcessor>();
+        var services = new ServiceCollection();
 
-            // Configure the mock sensor processor
-            _mockSensorProcessor.Setup(p => p.SupportedType).Returns(SensorTypes.GENEActiv);
-            _mockSensorProcessor.Setup(p => p.ProcessingInfo).Returns("Test processing info");
-            _mockSensorProcessor.Setup(p => p.DefaultArguments).Returns(new List<ScriptArgument> {
-                new BoolArgument { Flag = "test", Name = "Test Argument", Description = "Test Description", Value = true }
-            });
+        var logger = new LoggerConfiguration().CreateLogger();
+        services.AddSingleton<ILogger>(logger);
 
-            // Build service provider with real implementations where needed
-            var services = new ServiceCollection();
+        services.AddSingleton(_mockSharedDataService.Object);
+        services.AddSingleton(_mockPathService.Object);
 
-            // Add a logger
-            var logger = new LoggerConfiguration().CreateLogger();
-            services.AddSingleton<ILogger>(logger);
+        services.AddSingleton<Func<SensorTypes, ISensorProcessor>>(_ => _ => _mockSensorProcessor.Object);
 
-            // Add services with mocks
-            services.AddSingleton(_mockSharedDataService.Object);
-            services.AddSingleton(_mockPathService.Object);
+        var mockResultParser = new Mock<IResultParser>();
+        services.AddSingleton<Func<SensorTypes, IResultParser>>(_ => _ => mockResultParser.Object);
 
-            // Add a real function that returns our mock processor
-            services.AddSingleton<Func<SensorTypes, ISensorProcessor>>(_ => _ => _mockSensorProcessor.Object);
-            
-            // Add a real function that returns a mock result parser
-            var mockResultParser = new Mock<IResultParser>();
-            services.AddSingleton<Func<SensorTypes, IResultParser>>(_ => _ => mockResultParser.Object);
+        services.AddSingleton<SensorProcessorFactory>();
+        services.AddSingleton<ResultParserFactory>();
 
-            // Add factories with real implementations
-            services.AddSingleton<SensorProcessorFactory>();
-            services.AddSingleton<ResultParserFactory>();
+        services.AddSingleton<DialogService>();
+        services.AddSingleton<DialogViewModel>();
+        services.AddSingleton<DateToWeekdayConverter>();
+        services.AddSingleton<ChartColors>();
 
-            // Add other required services
-            services.AddSingleton<DialogService>();
-            services.AddSingleton<DialogViewModel>();
-            services.AddSingleton<DateToWeekdayConverter>();
-            services.AddSingleton<ChartColors>();
+        services.AddSingleton<AnalysisPageViewModel>();
+        services.AddSingleton<SleepPageViewModel>();
+        services.AddSingleton<ActivityPageViewModel>();
+        services.AddSingleton<GeneralPageViewModel>();
 
-            // Add page factory dependencies
-            services.AddSingleton<AnalysisPageViewModel>();
-            services.AddSingleton<SleepPageViewModel>();
-            services.AddSingleton<ActivityPageViewModel>();
-            services.AddSingleton<GeneralPageViewModel>();
-
-            // Add the page factory
-            services.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(sp => name => name switch
-            {
-                ApplicationPageNames.Analyse => sp.GetRequiredService<AnalysisPageViewModel>(),
-                ApplicationPageNames.Schlaf => sp.GetRequiredService<SleepPageViewModel>(),
-                ApplicationPageNames.Aktivität => sp.GetRequiredService<ActivityPageViewModel>(),
-                ApplicationPageNames.Allgemein => sp.GetRequiredService<GeneralPageViewModel>(),
-                _ => throw new InvalidOperationException($"No ViewModel registered for {name}"),
-            });
-            services.AddSingleton<PageFactory>();
-
-            // Add main view model
-            services.AddSingleton<MainViewModel>();
-
-            // Add the ProcessDialogViewModel
-            services.AddSingleton<ProcessDialogViewModel>();
-
-            // Build the service provider
-            _serviceProvider = services.BuildServiceProvider();
-
-            // Get the view model from the service provider
-            _viewModel = _serviceProvider.GetRequiredService<ProcessDialogViewModel>();
-        }
-
-        [TearDown]
-        public void TearDown()
+        services.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(sp => name => name switch
         {
-            // Clean up temp directory
-            if (Directory.Exists(_tempDir))
-            {
-                Directory.Delete(_tempDir, true);
-            }
+            ApplicationPageNames.Analyse => sp.GetRequiredService<AnalysisPageViewModel>(),
+            ApplicationPageNames.Schlaf => sp.GetRequiredService<SleepPageViewModel>(),
+            ApplicationPageNames.Aktivität => sp.GetRequiredService<ActivityPageViewModel>(),
+            ApplicationPageNames.Allgemein => sp.GetRequiredService<GeneralPageViewModel>(),
+            _ => throw new InvalidOperationException($"No ViewModel registered for {name}")
+        });
+        services.AddSingleton<PageFactory>();
 
-            // Dispose service provider
-            _serviceProvider.Dispose();
-        }
+        services.AddSingleton<MainViewModel>();
 
-        [Test]
-        public void Constructor_InitializesProperties()
-        {
-            // Assert
-            Assert.That(_viewModel, Is.Not.Null);
-            Assert.That(_viewModel.Title, Is.EqualTo("Sensordaten analysieren"));
-            Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
-            Assert.That(_viewModel.SelectedSensorTypes, Is.EqualTo(SensorTypes.GENEActiv));
-            Assert.That(_viewModel.ProcessingInfo, Is.EqualTo("Test processing info"));
-            Assert.That(_viewModel.Arguments, Is.Not.Empty);
-        }
+        services.AddSingleton<ProcessDialogViewModel>();
 
-        [Test]
-        public void SetSelectedFiles_WithNullFiles_UpdatesStatusMessage()
-        {
-            // Act
-            _viewModel.SetSelectedFiles(null);
+        _serviceProvider = services.BuildServiceProvider();
 
-            // Assert
-            Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
-            Assert.That(_viewModel.SelectedFiles, Is.Null);
-        }
+        _viewModel = _serviceProvider.GetRequiredService<ProcessDialogViewModel>();
+    }
 
-        [Test]
-        public void SetSelectedFiles_WithEmptyFiles_UpdatesStatusMessage()
-        {
-            // Act
-            _viewModel.SetSelectedFiles(Array.Empty<string>());
+    [TearDown]
+    public void TearDown()
+    {
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
 
-            // Assert
-            Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
-            Assert.That(_viewModel.SelectedFiles, Is.Empty);
-        }
+        _serviceProvider.Dispose();
+    }
 
-        [Test]
-        public void SetSelectedFiles_WithFiles_UpdatesStatusMessageWithCount()
-        {
-            // Arrange
-            var files = new[] { "file1.bin", "file2.bin" };
+    private ProcessDialogViewModel _viewModel;
+    private Mock<ISharedDataService> _mockSharedDataService;
+    private Mock<IPathService> _mockPathService;
+    private Mock<ISensorProcessor> _mockSensorProcessor;
+    private string _tempDir;
+    private ServiceProvider _serviceProvider;
 
-            // Act
-            _viewModel.SetSelectedFiles(files);
+    [Test]
+    public void Constructor_InitializesProperties()
+    {
+        // Assert
+        Assert.That(_viewModel, Is.Not.Null);
+        Assert.That(_viewModel.Title, Is.EqualTo("Sensordaten analysieren"));
+        Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
+        Assert.That(_viewModel.SelectedSensorTypes, Is.EqualTo(SensorTypes.GENEActiv));
+        Assert.That(_viewModel.ProcessingInfo, Is.EqualTo("Test processing info"));
+        Assert.That(_viewModel.Arguments, Is.Not.Empty);
+    }
 
-            // Assert
-            Assert.That(_viewModel.StatusMessage, Is.EqualTo("2 file(s) selected"));
-            Assert.That(_viewModel.SelectedFiles, Is.SameAs(files));
-        }
+    [Test]
+    public void SetSelectedFiles_WithNullFiles_UpdatesStatusMessage()
+    {
+        // Act
+        _viewModel.SetSelectedFiles(null);
 
-        [Test]
-        public void CancelCommand_WhenNotProcessing_CanExecute()
-        {
-            // Arrange
-            _viewModel.IsProcessing = false;
+        // Assert
+        Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
+        Assert.That(_viewModel.SelectedFiles, Is.Null);
+    }
 
-            // Act
-            var canExecute = _viewModel.CancelCommand.CanExecute(null);
+    [Test]
+    public void SetSelectedFiles_WithEmptyFiles_UpdatesStatusMessage()
+    {
+        // Act
+        _viewModel.SetSelectedFiles(Array.Empty<string>());
 
-            // Assert
-            Assert.That(canExecute, Is.True);
-        }
+        // Assert
+        Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
+        Assert.That(_viewModel.SelectedFiles, Is.Empty);
+    }
 
-        [Test]
-        public void HideCommand_CanExecute()
-        {
-            // Act
-            var canExecute = _viewModel.HideCommand.CanExecute(null);
+    [Test]
+    public void SetSelectedFiles_WithFiles_UpdatesStatusMessageWithCount()
+    {
+        // Arrange
+        var files = new[] { "file1.bin", "file2.bin" };
 
-            // Assert
-            Assert.That(canExecute, Is.True);
-        }
+        // Act
+        _viewModel.SetSelectedFiles(files);
 
-        [Test]
-        public async Task ProcessFilesCommand_WithNoFiles_UpdatesStatusMessageOnly()
-        {
-            // Arrange
-            _viewModel.SetSelectedFiles(null);
+        // Assert
+        Assert.That(_viewModel.StatusMessage, Is.EqualTo("2 file(s) selected"));
+        Assert.That(_viewModel.SelectedFiles, Is.SameAs(files));
+    }
 
-            // Act
-            await _viewModel.ProcessFilesCommand.ExecuteAsync(null);
+    [Test]
+    public void CancelCommand_WhenNotProcessing_CanExecute()
+    {
+        // Arrange
+        _viewModel.IsProcessing = false;
 
-            // Assert
-            Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
-            _mockSensorProcessor.Verify(p => p.ProcessAsync(It.IsAny<IEnumerable<ScriptArgument>>(), It.IsAny<CancellationToken>()), Times.Never);
-        }
+        // Act
+        var canExecute = _viewModel.CancelCommand.CanExecute(null);
 
-        [Test]
-        public void Arguments_AreLoadedFromSensorProcessor()
-        {
-            // Assert
-            Assert.That(_viewModel.Arguments.Count, Is.EqualTo(1));
-            var arg = _viewModel.Arguments[0] as BoolArgument;
-            Assert.That(arg, Is.Not.Null);
-            Assert.That(arg.Flag, Is.EqualTo("test"));
-            Assert.That(arg.Name, Is.EqualTo("Test Argument"));
-            Assert.That(arg.Description, Is.EqualTo("Test Description"));
-            Assert.That(arg.Value, Is.True);
-        }
+        // Assert
+        Assert.That(canExecute, Is.True);
+    }
+
+    [Test]
+    public void HideCommand_CanExecute()
+    {
+        // Act
+        var canExecute = _viewModel.HideCommand.CanExecute(null);
+
+        // Assert
+        Assert.That(canExecute, Is.True);
+    }
+
+    [Test]
+    public async Task ProcessFilesCommand_WithNoFiles_UpdatesStatusMessageOnly()
+    {
+        // Arrange
+        _viewModel.SetSelectedFiles(null);
+
+        // Act
+        await _viewModel.ProcessFilesCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(_viewModel.StatusMessage, Is.EqualTo("No files selected"));
+        _mockSensorProcessor.Verify(
+            p => p.ProcessAsync(It.IsAny<IList<ScriptArgument>>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public void Arguments_AreLoadedFromSensorProcessor()
+    {
+        // Assert
+        Assert.That(_viewModel.Arguments.Count, Is.EqualTo(1));
+        var arg = _viewModel.Arguments[0] as BoolArgument;
+        Assert.That(arg, Is.Not.Null);
+        Assert.That(arg.Flag, Is.EqualTo("test"));
+        Assert.That(arg.Name, Is.EqualTo("Test Argument"));
+        Assert.That(arg.Description, Is.EqualTo("Test Description"));
+        Assert.That(arg.Value, Is.True);
     }
 }

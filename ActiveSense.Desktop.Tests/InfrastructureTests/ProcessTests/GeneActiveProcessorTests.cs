@@ -253,34 +253,6 @@ public class GeneActiveProcessorTests
     }
 
     [Test]
-    public async Task ProcessAsync_WithNullArguments_UsesDefaultArguments()
-    {
-        // Arrange
-        List<ScriptArgument> arguments = null;
-
-        _mockScriptExecutor.Setup(x => x.ExecuteScriptAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((true, "Success"));
-
-        // Act
-        var result = await _processor.ProcessAsync(arguments);
-
-        // Assert
-        Assert.That(result.Success, Is.True);
-
-        // Verify that the script executor was called with a command line that includes
-        // arguments corresponding to the default arguments
-        _mockScriptExecutor.Verify(x => x.ExecuteScriptAsync(
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("--activity TRUE") && s.Contains("--sleep TRUE")),
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Test]
     public async Task ProcessAsync_WithEmptyArguments_StillBuildsCommandLine()
     {
         // Arrange

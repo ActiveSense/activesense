@@ -12,29 +12,15 @@ using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
-public class GeneActiveProcessor : ISensorProcessor
+public class GeneActiveProcessor(
+    IPathService pathService,
+    IScriptExecutor scriptExecutor,
+    IFileManager fileManager,
+    IProcessingTimeEstimator timeEstimator,
+    ILogger logger)
+    : ISensorProcessor
 {
-    private readonly List<ScriptArgument> _defaultArguments;
-    private readonly IFileManager _fileManager;
-    private readonly ILogger _logger;
-    private readonly IPathService _pathService;
-    private readonly IScriptExecutor _scriptExecutor;
-    private readonly IProcessingTimeEstimator _timeEstimator;
-
-    public GeneActiveProcessor(
-        IPathService pathService,
-        IScriptExecutor scriptExecutor,
-        IFileManager fileManager,
-        IProcessingTimeEstimator timeEstimator,
-        ILogger logger)
-    {
-        _logger = logger;
-        _pathService = pathService;
-        _scriptExecutor = scriptExecutor;
-        _fileManager = fileManager;
-        _timeEstimator = timeEstimator;
-        _defaultArguments = CreateDefaultArguments();
-    }
+    private readonly List<ScriptArgument> _defaultArguments = CreateDefaultArguments();
 
     private static string[] SupportedFileTypes => [".bin"];
 
@@ -43,24 +29,24 @@ public class GeneActiveProcessor : ISensorProcessor
     public IReadOnlyList<ScriptArgument> DefaultArguments => _defaultArguments;
 
     public async Task<(bool Success, string Output)> ProcessAsync(
-        IEnumerable<ScriptArgument> arguments, CancellationToken cancellationToken = default)
+        IList<ScriptArgument> arguments, CancellationToken cancellationToken = default)
     {
         try
         {
-            var scriptPath = _pathService.MainScriptPath;
-            var executablePath = _pathService.ScriptExecutablePath;
-            var workingDirectory = _pathService.ScriptBasePath;
+            var scriptPath = pathService.MainScriptPath;
+            var executablePath = pathService.ScriptExecutablePath;
+            var workingDirectory = pathService.ScriptBasePath;
 
-            _logger.Information("Processing started");
-            _logger.Information($"Script path: {scriptPath}");
-            _logger.Information($"Executable path: {executablePath}");
-            _logger.Information($"Working directory: {workingDirectory}");
-            _logger.Information("Processing Arguments: {Arguments}",
-                string.Join(", ", _defaultArguments.Select(a => a.ToCommandLineArgument())));
+            logger.Information("Processing started");
+            logger.Information($"Script path: {scriptPath}");
+            logger.Information($"Executable path: {executablePath}");
+            logger.Information($"Working directory: {workingDirectory}");
+            logger.Information("Processing Arguments: {Arguments}",
+                string.Join(", ", arguments.Select(a => a.ToCommandLineArgument())));
 
-            var argsToUse = _defaultArguments;
+            var argsToUse = arguments;
 
-            var outputDir = $"-d \"{_pathService.OutputDirectory}\"";
+            var outputDir = $"-d \"{pathService.OutputDirectory}\"";
 
             var scriptArguments = string.Join(" ",
                 argsToUse
@@ -69,10 +55,10 @@ public class GeneActiveProcessor : ISensorProcessor
 
             var processArguments = $"\"{scriptPath}\" {outputDir} {scriptArguments}";
 
-            var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
+            var result = await scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
                 cancellationToken);
 
-            _logger.Information("Processing completed");
+            logger.Information("Processing completed");
 
             return result;
         }
@@ -84,13 +70,13 @@ public class GeneActiveProcessor : ISensorProcessor
 
         catch (FileNotFoundException)
         {
-            _logger.Error("R executable not found.");
+            logger.Error("R executable not found.");
             throw;
         }
 
         catch (Exception ex)
         {
-            _logger.Error(ex.Message, "Error executing R script");
+            logger.Error(ex.Message, "Error executing R script");
             return (false, $"Failed to execute R script: {ex.Message}");
         }
     }
@@ -107,18 +93,18 @@ public class GeneActiveProcessor : ISensorProcessor
             }
             catch (Exception ex)
             {
-                _logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
+                logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
             }
         }
 
         var totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
 
-        return await Task.Run(() => _timeEstimator.EstimateProcessingTime(totalSizeMB));
+        return await Task.Run(() => timeEstimator.EstimateProcessingTime(totalSizeMB));
     }
 
     public async Task CopyFilesAsync(string[] files, string processingDirectory, string outputDirectory)
     {
-        await Task.Run(() => _fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes));
+        await Task.Run(() => fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes));
     }
 
     public string ProcessingInfo =>

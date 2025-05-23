@@ -24,4 +24,24 @@ public class ProcessingTimeEstimatorTests
         
         Assert.That(result, Is.Not.EqualTo(TimeSpan.Zero));
     }
+    
+    [Test]
+    public void EstimateProcessingTime_Is_Zero()
+    {
+        double totalSizeMB = 0;
+
+        var result = _estimator.EstimateProcessingTime(totalSizeMB);
+        
+        Assert.That(result, Is.EqualTo(TimeSpan.Zero));
+    }
+    
+    [Test]
+    public void EstimateProcessingTime_Negative_Is_Zero()
+    {
+        double totalSizeMB = -2400;
+
+        var result = _estimator.EstimateProcessingTime(totalSizeMB);
+        
+        Assert.That(result, Is.EqualTo(TimeSpan.Zero));
+    }
 }

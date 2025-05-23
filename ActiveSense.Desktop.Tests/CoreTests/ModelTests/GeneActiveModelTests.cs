@@ -230,6 +230,21 @@ public class AnalysisModelTests
     }
 
     [Test]
+    public void Days_ShouldReturnCorrectValues()
+    {
+        // Test the "Days" property - this accesses the raw Day values from ActivityRecords
+        string[] expected = { "2024-11-29", "2024-11-30", "2024-12-01" };
+
+        var actual = _analysis.Days;
+
+        Assert.That(actual.Length, Is.EqualTo(expected.Length), "Days array length is incorrect");
+        for (int i = 0; i < expected.Length; i++)
+        {
+            Assert.That(actual[i], Is.EqualTo(expected[i]), $"Days value at index {i} is incorrect");
+        }
+    }
+
+    [Test]
     public void ModerateActivity_ShouldReturnCorrectValues()
     {
         // Cast to IActivityAnalysis to test the interface method
@@ -324,6 +339,221 @@ public class AnalysisModelTests
             Assert.That(validWeekdays.Contains(baseDayName, StringComparer.OrdinalIgnoreCase), Is.True,
                 $"{baseDayName} is not a valid weekday");
         }
+    }
+
+    [Test]
+    public void ActivityDates_ShouldReturnFormattedDates()
+    {
+        // Cast to IActivityAnalysis to test the interface method
+        IActivityAnalysis activityAnalysis = _analysis;
+
+        var dates = activityAnalysis.ActivityDates();
+
+        Assert.That(dates.Length, Is.EqualTo(3), "ActivityDates should return 3 dates");
+
+        // Expected dates in dd.MM.yyyy format (default format used in GeneActiveAnalysis)
+        string[] expected = { "29.11.2024", "30.11.2024", "01.12.2024" };
+
+        for (int i = 0; i < expected.Length; i++)
+        {
+            Assert.That(dates[i], Is.EqualTo(expected[i]), $"ActivityDates value at index {i} is incorrect");
+        }
+    }
+
+    [Test]
+    public void SleepDates_ShouldReturnFormattedDates()
+    {
+        // Cast to ISleepAnalysis to test the interface method
+        ISleepAnalysis sleepAnalysis = _analysis;
+
+        var dates = sleepAnalysis.SleepDates();
+
+        Assert.That(dates.Length, Is.EqualTo(3), "SleepDates should return 3 dates");
+
+        // Expected dates in dd.MM.yyyy format (default format used in GeneActiveAnalysis)
+        string[] expected = { "29.11.2024", "30.11.2024", "01.12.2024" };
+
+        for (int i = 0; i < expected.Length; i++)
+        {
+            Assert.That(dates[i], Is.EqualTo(expected[i]), $"SleepDates value at index {i} is incorrect");
+        }
+    }
+
+    [Test]
+    public void ActivityDates_WithInvalidDates_ShouldReturnOriginalStrings()
+    {
+        // Arrange - Create analysis with invalid date strings
+        var invalidActivityRecords = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "invalid-date-1",
+                Steps = "1000",
+                NonWear = "0",
+                Sleep = "12000",
+                Sedentary = "20000",
+                Light = "10000",
+                Moderate = "3000",
+                Vigorous = "500"
+            },
+            new ActivityRecord
+            {
+                Day = "not-a-date",
+                Steps = "2000",
+                NonWear = "0",
+                Sleep = "13000",
+                Sedentary = "21000",
+                Light = "11000",
+                Moderate = "3500",
+                Vigorous = "600"
+            }
+        };
+
+        var analysisWithInvalidDates = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        analysisWithInvalidDates.SetActivityRecords(invalidActivityRecords);
+
+        // Act
+        IActivityAnalysis activityAnalysis = analysisWithInvalidDates;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert - Should return original strings when parsing fails
+        Assert.That(dates.Length, Is.EqualTo(2), "ActivityDates should return 2 dates");
+        Assert.That(dates[0], Is.EqualTo("invalid-date-1"), "Should return original string when date parsing fails");
+        Assert.That(dates[1], Is.EqualTo("not-a-date"), "Should return original string when date parsing fails");
+    }
+
+    [Test]
+    public void SleepDates_WithInvalidDates_ShouldReturnOriginalStrings()
+    {
+        // Arrange - Create analysis with invalid date strings
+        var invalidSleepRecords = new List<SleepRecord>
+        {
+            new SleepRecord
+            {
+                NightStarting = "invalid-date-1",
+                SleepOnsetTime = "21:00",
+                RiseTime = "07:00",
+                TotalElapsedBedTime = "36000",
+                TotalSleepTime = "28800",
+                TotalWakeTime = "7200",
+                SleepEfficiency = "80.0",
+                NumActivePeriods = "30",
+                MedianActivityLength = "120"
+            },
+            new SleepRecord
+            {
+                NightStarting = "not-a-date",
+                SleepOnsetTime = "22:00",
+                RiseTime = "08:00",
+                TotalElapsedBedTime = "36000",
+                TotalSleepTime = "28800",
+                TotalWakeTime = "7200",
+                SleepEfficiency = "80.0",
+                NumActivePeriods = "25",
+                MedianActivityLength = "140"
+            }
+        };
+
+        var analysisWithInvalidDates = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        analysisWithInvalidDates.SetSleepRecords(invalidSleepRecords);
+
+        // Act
+        ISleepAnalysis sleepAnalysis = analysisWithInvalidDates;
+        var dates = sleepAnalysis.SleepDates();
+
+        // Assert - Should return original strings when parsing fails
+        Assert.That(dates.Length, Is.EqualTo(2), "SleepDates should return 2 dates");
+        Assert.That(dates[0], Is.EqualTo("invalid-date-1"), "Should return original string when date parsing fails");
+        Assert.That(dates[1], Is.EqualTo("not-a-date"), "Should return original string when date parsing fails");
+    }
+
+    [Test]
+    public void ActivityDates_WithEmptyRecords_ShouldReturnEmptyArray()
+    {
+        // Arrange - Create analysis with no activity records
+        var emptyAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        emptyAnalysis.SetActivityRecords(new List<ActivityRecord>());
+
+        // Act
+        IActivityAnalysis activityAnalysis = emptyAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert
+        Assert.That(dates, Is.Not.Null, "ActivityDates should not return null");
+        Assert.That(dates.Length, Is.EqualTo(0), "ActivityDates should return empty array when no records");
+    }
+
+    [Test]
+    public void SleepDates_WithEmptyRecords_ShouldReturnEmptyArray()
+    {
+        // Arrange - Create analysis with no sleep records
+        var emptyAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        emptyAnalysis.SetSleepRecords(new List<SleepRecord>());
+
+        // Act
+        ISleepAnalysis sleepAnalysis = emptyAnalysis;
+        var dates = sleepAnalysis.SleepDates();
+
+        // Assert
+        Assert.That(dates, Is.Not.Null, "SleepDates should not return null");
+        Assert.That(dates.Length, Is.EqualTo(0), "SleepDates should return empty array when no records");
+    }
+
+    [Test]
+    public void ActivityDates_WithDifferentDateFormats_ShouldHandleCorrectly()
+    {
+        // Arrange - Create records with different valid date formats
+        var mixedFormatRecords = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "2024-11-29", // ISO format
+                Steps = "1000",
+                NonWear = "0",
+                Sleep = "12000",
+                Sedentary = "20000",
+                Light = "10000",
+                Moderate = "3000",
+                Vigorous = "500"
+            },
+            new ActivityRecord
+            {
+                Day = "11/30/2024", // US format
+                Steps = "2000",
+                NonWear = "0",
+                Sleep = "13000",
+                Sedentary = "21000",
+                Light = "11000",
+                Moderate = "3500",
+                Vigorous = "600"
+            },
+            new ActivityRecord
+            {
+                Day = "01.12.2024", // German format (already in target format)
+                Steps = "3000",
+                NonWear = "0",
+                Sleep = "14000",
+                Sedentary = "22000",
+                Light = "12000",
+                Moderate = "4000",
+                Vigorous = "700"
+            }
+        };
+
+        var mixedFormatAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        mixedFormatAnalysis.SetActivityRecords(mixedFormatRecords);
+
+        // Act
+        IActivityAnalysis activityAnalysis = mixedFormatAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(3), "ActivityDates should return 3 dates");
+        
+        // All should be converted to dd.MM.yyyy format
+        Assert.That(dates[0], Is.EqualTo("29.11.2024"), "First date should be formatted correctly");
+        Assert.That(dates[1], Is.EqualTo("30.11.2024"), "Second date should be formatted correctly");
+        Assert.That(dates[2], Is.EqualTo("12.01.2024"), "Third date should be formatted correctly");
     }
 
     #endregion
@@ -445,5 +675,396 @@ public class AnalysisModelTests
         Assert.That(updatedSteps.Length, Is.EqualTo(4), "Updated StepsPerDay should have 4 items");
         Assert.That(updatedSteps[3], Is.EqualTo(5000).Within(0.01), "The new step value was not added correctly");
     }
+
+    #endregion
+
+    #region Additional Tests for Previously Untested Functions
+
+    [Test]
+    public void Days_WithEmptyActivityRecords_ShouldReturnEmptyArray()
+    {
+        // Arrange - Create analysis with no activity records
+        var emptyAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        emptyAnalysis.SetActivityRecords(new List<ActivityRecord>());
+
+        // Act
+        var days = emptyAnalysis.Days;
+
+        // Assert
+        Assert.That(days, Is.Not.Null, "Days should not return null");
+        Assert.That(days.Length, Is.EqualTo(0), "Days should return empty array when no activity records");
+    }
+
+    [Test]
+    public void ParseAndFormatDate_WithValidISODate_ShouldFormatCorrectly()
+    {
+        // Note: ParseAndFormatDate is a private method, so we test it indirectly through ActivityDates()
+        // Arrange - Create record with ISO date format
+        var recordWithISODate = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "2024-01-15", // ISO format
+                Steps = "5000",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetActivityRecords(recordWithISODate);
+
+        // Act
+        IActivityAnalysis activityAnalysis = testAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(1), "Should have one date");
+        Assert.That(dates[0], Is.EqualTo("15.01.2024"), "ISO date should be formatted to dd.MM.yyyy");
+    }
+
+    [Test]
+    public void ParseAndFormatDate_WithLeapYearDate_ShouldHandleCorrectly()
+    {
+        // Arrange - Test with leap year date (2024 is a leap year)
+        var recordWithLeapDate = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "2024-02-29", // Leap year date
+                Steps = "6000",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetActivityRecords(recordWithLeapDate);
+
+        // Act
+        IActivityAnalysis activityAnalysis = testAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(1), "Should have one date");
+        Assert.That(dates[0], Is.EqualTo("29.02.2024"), "Leap year date should be formatted correctly");
+    }
+
+    [Test]
+    public void ParseAndFormatDate_WithDifferentFormats_ShouldParseAndFormatConsistently()
+    {
+        // Arrange - Test various date formats that DateTime.Parse should handle
+        var recordsWithVariousFormats = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "2024/03/15", // Slash format
+                Steps = "7000",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            },
+            new ActivityRecord
+            {
+                Day = "March 16, 2024", // Long format
+                Steps = "7500",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetActivityRecords(recordsWithVariousFormats);
+
+        // Act
+        IActivityAnalysis activityAnalysis = testAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(2), "Should have two dates");
+        Assert.That(dates[0], Is.EqualTo("15.03.2024"), "Slash format should be formatted to dd.MM.yyyy");
+        Assert.That(dates[1], Is.EqualTo("16.03.2024"), "Long format should be formatted to dd.MM.yyyy");
+    }
+
+    [Test]
+    public void SleepDates_WithVariousValidFormats_ShouldFormatConsistently()
+    {
+        // Arrange - Test sleep records with various date formats
+        var recordsWithVariousFormats = new List<SleepRecord>
+        {
+            new SleepRecord
+            {
+                NightStarting = "2024/04/20", // Slash format
+                SleepOnsetTime = "22:30",
+                RiseTime = "07:30",
+                TotalElapsedBedTime = "32400",
+                TotalSleepTime = "27000",
+                TotalWakeTime = "5400",
+                SleepEfficiency = "83.3",
+                NumActivePeriods = "20",
+                MedianActivityLength = "180"
+            },
+            new SleepRecord
+            {
+                NightStarting = "April 21, 2024", // Long format
+                SleepOnsetTime = "23:00",
+                RiseTime = "08:00",
+                TotalElapsedBedTime = "32400",
+                TotalSleepTime = "28800",
+                TotalWakeTime = "3600",
+                SleepEfficiency = "88.9",
+                NumActivePeriods = "15",
+                MedianActivityLength = "200"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetSleepRecords(recordsWithVariousFormats);
+
+        // Act
+        ISleepAnalysis sleepAnalysis = testAnalysis;
+        var dates = sleepAnalysis.SleepDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(2), "Should have two dates");
+        Assert.That(dates[0], Is.EqualTo("20.04.2024"), "Slash format should be formatted to dd.MM.yyyy");
+        Assert.That(dates[1], Is.EqualTo("21.04.2024"), "Long format should be formatted to dd.MM.yyyy");
+    }
+
+    [Test]
+    public void ActivityDates_WithCustomFormat_ShouldUseCustomFormat()
+    {
+        // Note: This tests the private ParseAndFormatDate method indirectly
+        // The method uses a constant DateFormat of "dd.MM.yyyy", so we verify this behavior
+        
+        // Arrange - Use an analysis with known date
+        var record = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "2024-12-25", // Christmas date for easy verification
+                Steps = "1000",
+                NonWear = "0",
+                Sleep = "28800",
+                Sedentary = "30000",
+                Light = "10000",
+                Moderate = "2000",
+                Vigorous = "500"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetActivityRecords(record);
+
+        // Act
+        IActivityAnalysis activityAnalysis = testAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(1), "Should have one date");
+        Assert.That(dates[0], Is.EqualTo("25.12.2024"), "Should use dd.MM.yyyy format");
+        Assert.That(dates[0], Does.Match(@"^\d{2}\.\d{2}\.\d{4}$"), "Should match dd.MM.yyyy pattern");
+    }
+
+    [Test]
+    public void SleepDates_ShouldUseConsistentFormat()
+    {
+        // Arrange - Use sleep analysis with known date
+        var record = new List<SleepRecord>
+        {
+            new SleepRecord
+            {
+                NightStarting = "2024-12-31", // New Year's Eve for easy verification
+                SleepOnsetTime = "23:30",
+                RiseTime = "08:30",
+                TotalElapsedBedTime = "32400",
+                TotalSleepTime = "28800",
+                TotalWakeTime = "3600",
+                SleepEfficiency = "88.9",
+                NumActivePeriods = "12",
+                MedianActivityLength = "250"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetSleepRecords(record);
+
+        // Act
+        ISleepAnalysis sleepAnalysis = testAnalysis;
+        var dates = sleepAnalysis.SleepDates();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(1), "Should have one date");
+        Assert.That(dates[0], Is.EqualTo("31.12.2024"), "Should use dd.MM.yyyy format");
+        Assert.That(dates[0], Does.Match(@"^\d{2}\.\d{2}\.\d{4}$"), "Should match dd.MM.yyyy pattern");
+    }
+
+    [Test]
+    public void Days_ShouldReturnRawDayValues()
+    {
+        // Arrange - Create records with mixed date formats to verify Days returns raw values
+        var mixedRecords = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "raw-value-1", // Not a date - should be returned as-is
+                Steps = "1000",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            },
+            new ActivityRecord
+            {
+                Day = "2024-01-01", // Valid date - should still be returned as-is in Days
+                Steps = "2000",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetActivityRecords(mixedRecords);
+
+        // Act
+        var days = testAnalysis.Days;
+
+        // Assert
+        Assert.That(days.Length, Is.EqualTo(2), "Should have two day values");
+        Assert.That(days[0], Is.EqualTo("raw-value-1"), "Should return raw value without formatting");
+        Assert.That(days[1], Is.EqualTo("2024-01-01"), "Should return raw value without formatting");
+    }
+
+    [Test]
+    public void ActivityDates_AndActivityWeekdays_ShouldUseConsistentDateParsing()
+    {
+        // This test verifies that both ActivityDates() and ActivityWeekdays() 
+        // use the same date parsing logic (through ParseAndFormatDate method)
+        
+        // Arrange - Use records with specific dates where we know the weekdays
+        var recordsWithKnownWeekdays = new List<ActivityRecord>
+        {
+            new ActivityRecord
+            {
+                Day = "2024-11-29", // This is a Friday (Freitag in German)
+                Steps = "8000",
+                NonWear = "0",
+                Sleep = "25200",
+                Sedentary = "28800",
+                Light = "12600",
+                Moderate = "3600",
+                Vigorous = "900"
+            },
+            new ActivityRecord
+            {
+                Day = "2024-11-30", // This is a Saturday (Samstag in German)
+                Steps = "5000",
+                NonWear = "0",
+                Sleep = "32400",
+                Sedentary = "25200",
+                Light = "10800",
+                Moderate = "1800",
+                Vigorous = "0"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetActivityRecords(recordsWithKnownWeekdays);
+
+        // Act
+        IActivityAnalysis activityAnalysis = testAnalysis;
+        var dates = activityAnalysis.ActivityDates();
+        var weekdays = activityAnalysis.ActivityWeekdays();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(2), "Should have two dates");
+        Assert.That(weekdays.Length, Is.EqualTo(2), "Should have two weekdays");
+        
+        // Verify formatted dates
+        Assert.That(dates[0], Is.EqualTo("29.11.2024"), "First date should be formatted correctly");
+        Assert.That(dates[1], Is.EqualTo("30.11.2024"), "Second date should be formatted correctly");
+        
+        // Verify weekdays (should be German weekday names)
+        Assert.That(weekdays[0], Does.StartWith("Freitag").Or.StartWith("1. Freitag"), "First weekday should be Friday");
+        Assert.That(weekdays[1], Does.StartWith("Samstag").Or.StartWith("1. Samstag"), "Second weekday should be Saturday");
+    }
+
+    [Test]
+    public void SleepDates_AndSleepWeekdays_ShouldUseConsistentDateParsing()
+    {
+        // This test verifies that both SleepDates() and SleepWeekdays() 
+        // use the same date parsing logic
+        
+        // Arrange - Use records with specific dates where we know the weekdays
+        var recordsWithKnownWeekdays = new List<SleepRecord>
+        {
+            new SleepRecord
+            {
+                NightStarting = "2024-12-01", // This is a Sunday (Sonntag in German)
+                SleepOnsetTime = "22:00",
+                RiseTime = "07:00",
+                TotalElapsedBedTime = "32400",
+                TotalSleepTime = "28800",
+                TotalWakeTime = "3600",
+                SleepEfficiency = "88.9",
+                NumActivePeriods = "15",
+                MedianActivityLength = "200"
+            },
+            new SleepRecord
+            {
+                NightStarting = "2024-12-02", // This is a Monday (Montag in German)
+                SleepOnsetTime = "23:00",
+                RiseTime = "08:00",
+                TotalElapsedBedTime = "32400",
+                TotalSleepTime = "27000",
+                TotalWakeTime = "5400",
+                SleepEfficiency = "83.3",
+                NumActivePeriods = "20",
+                MedianActivityLength = "180"
+            }
+        };
+
+        var testAnalysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
+        testAnalysis.SetSleepRecords(recordsWithKnownWeekdays);
+
+        // Act
+        ISleepAnalysis sleepAnalysis = testAnalysis;
+        var dates = sleepAnalysis.SleepDates();
+        var weekdays = sleepAnalysis.SleepWeekdays();
+
+        // Assert
+        Assert.That(dates.Length, Is.EqualTo(2), "Should have two dates");
+        Assert.That(weekdays.Length, Is.EqualTo(2), "Should have two weekdays");
+        
+        // Verify formatted dates
+        Assert.That(dates[0], Is.EqualTo("01.12.2024"), "First date should be formatted correctly");
+        Assert.That(dates[1], Is.EqualTo("02.12.2024"), "Second date should be formatted correctly");
+        
+        // Verify weekdays (should be German weekday names)
+        Assert.That(weekdays[0], Does.StartWith("Sonntag").Or.StartWith("1. Sonntag"), "First weekday should be Sunday");
+        Assert.That(weekdays[1], Does.StartWith("Montag").Or.StartWith("1. Montag"), "Second weekday should be Monday");
+    }
+
     #endregion
 }

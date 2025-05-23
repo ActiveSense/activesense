@@ -3,37 +3,38 @@ using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.ViewModels.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ActiveSense.Desktop.ViewModels;
 
 public partial class MainViewModel : ViewModelBase, IDialogProvider
 {
-    [ObservableProperty] private bool _isPaneOpen = true;
+    private readonly DialogService _dialogService;
+    private readonly PageFactory _pageFactory;
+    private readonly IPathService _pathService;
+    private readonly ISharedDataService _sharedDataService;
     [ObservableProperty] private PageViewModel _activePage;
+
+    [ObservableProperty] private DialogViewModel _dialog;
+    [ObservableProperty] private bool _isPaneOpen = true;
     [ObservableProperty] private string _title = "ActiveSense";
 
-    [ObservableProperty] private Dialogs.DialogViewModel _dialog;
-    private readonly PageFactory _pageFactory;
-    private readonly DialogService _dialogService;
-    private readonly IPathService _pathService;
-
-    /// <inheritdoc/>
-    public MainViewModel(Dialogs.DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService, IPathService pathService)
+    /// <inheritdoc />
+    public MainViewModel(DialogViewModel dialog, PageFactory pageFactory, DialogService dialogService,
+        IPathService pathService, ISharedDataService sharedDataService)
     {
         _pageFactory = pageFactory;
         _dialog = dialog;
         _dialogService = dialogService;
         _pathService = pathService;
+        _sharedDataService = sharedDataService;
     }
 
 
     public async Task Initialize()
     {
-        await Task.Run(() =>
-        {
-            ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse);
-        });
+        await Task.Run(() => { ActivePage = _pageFactory.GetPageViewModel(ApplicationPageNames.Analyse); });
         await CopyResourcesOnStartup();
     }
 
@@ -44,22 +45,34 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 
     public async Task<bool> ConfirmOnClose()
     {
-        var dialog = new Dialogs.WarningDialogViewModel
+        try
         {
-            Title = "Programm beenden?",
-            SubTitle = "Ungespeicherte Analysen gehen verloren.",
-            CloseButtonText = "Abbrechen",
-            OkButtonText = "Schliessen"
-        };
+            if (_sharedDataService.HasUnsavedChanges())
+            {
+                var dialog = new WarningDialogViewModel
+                {
+                    Title = "Programm beenden?",
+                    SubTitle = "Ungespeicherte Analysen gehen verloren.",
+                    CloseButtonText = "Abbrechen",
+                    OkButtonText = "Schliessen"
+                };
+                await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(this, dialog);
 
-        await _dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(this, dialog);
-        
-        // Clear the output directory on exit
-        if (dialog.Confirmed)
-        {
-            _pathService.ClearDirectory(_pathService.OutputDirectory);
+                if (!dialog.Confirmed) return false;
+            }
+
+            return true;
         }
-        
-        return dialog.Confirmed;
+        finally
+        {
+            try
+            {
+                _pathService.ClearDirectory(_pathService.OutputDirectory);
+            }
+            catch
+            {
+                // Ignore any errors during cleanup
+            }
+        }
     }
 }

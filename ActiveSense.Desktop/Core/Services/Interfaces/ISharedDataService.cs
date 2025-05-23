@@ -10,6 +10,7 @@ namespace ActiveSense.Desktop.Core.Services.Interfaces
         ObservableCollection<IAnalysis> SelectedAnalyses { get; }
         ObservableCollection<IAnalysis> AllAnalyses { get; }
         bool IsProcessingInBackground { get; set; }
+        bool HasUnsavedChanges();
         
         event EventHandler BackgroundProcessingChanged;
         event EventHandler SelectedAnalysesChanged;

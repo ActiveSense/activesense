@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,176 +18,155 @@ using Moq;
 using NUnit.Framework;
 using Serilog;
 
-namespace ActiveSense.Desktop.Tests.ViewModelTests
+namespace ActiveSense.Desktop.Tests.ViewModelTests;
+
+[TestFixture]
+public class ExportDialogViewModelTests
 {
-    [TestFixture]
-    public class ExportDialogViewModelTests
+    [SetUp]
+    public void Setup()
     {
-        private ExportDialogViewModel _viewModel;
-        private Mock<ISharedDataService> _mockSharedDataService;
-        private Mock<MainViewModel> _mockMainViewModel;
-        private Mock<IExporter> _mockExporter;
-        private ObservableCollection<IAnalysis> _selectedAnalyses;
-        private GeneActiveAnalysis _testAnalysis;
-        private ServiceProvider _serviceProvider;
-        private string _tempDir;
-        private Mock<Func<bool, Task<string>>> _mockFilePickerFunc;
-        private bool _filePicked = false;
-        private string _pickedFilePath = "test_output.pdf";
+        _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(_tempDir);
 
-        [SetUp]
-        public void Setup()
+        var dateConverter = new DateToWeekdayConverter();
+        _testAnalysis = new GeneActiveAnalysis(dateConverter)
         {
-            // Create a temp directory for any file operations
-            _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(_tempDir);
+            FileName = "TestAnalysis",
+            FilePath = Path.Combine(_tempDir, "analysis")
+        };
 
-            // Setup test data
-            var dateConverter = new DateToWeekdayConverter();
-            _testAnalysis = new GeneActiveAnalysis(dateConverter)
-            {
-                FileName = "TestAnalysis",
-                FilePath = Path.Combine(_tempDir, "analysis")
-            };
+        _selectedAnalyses = new ObservableCollection<IAnalysis> { _testAnalysis };
 
-            _selectedAnalyses = new ObservableCollection<IAnalysis> { _testAnalysis };
+        _mockSharedDataService = new Mock<ISharedDataService>();
+        _mockSharedDataService.Setup(s => s.SelectedAnalyses).Returns(_selectedAnalyses);
+        _mockSharedDataService.Setup(s => s.UpdateAllAnalyses(It.IsAny<IEnumerable<IAnalysis>>()));
 
-            // Setup mocks for interfaces we need to control
-            _mockSharedDataService = new Mock<ISharedDataService>();
-            _mockSharedDataService.Setup(s => s.SelectedAnalyses).Returns(_selectedAnalyses);
-            _mockSharedDataService.Setup(s => s.UpdateAllAnalyses(It.IsAny<System.Collections.Generic.IEnumerable<IAnalysis>>()));
+        _mockExporter = new Mock<IExporter>();
+        _mockExporter.Setup(e => e.ExportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>(), It.IsAny<bool>()))
+            .ReturnsAsync(true);
 
-            // Setup mock exporter
-            _mockExporter = new Mock<IExporter>();
-            _mockExporter.Setup(e => e.ExportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>(), It.IsAny<bool>()))
-                .ReturnsAsync(true);
+        _mockFilePickerFunc = new Mock<Func<bool, Task<string>>>();
+        _mockFilePickerFunc.Setup(f => f(It.IsAny<bool>()))
+            .Callback<bool>(_ => _filePicked = true)
+            .ReturnsAsync(() => string.IsNullOrEmpty(_pickedFilePath) ? null : _pickedFilePath);
 
-            // Setup mock file picker function
-            _mockFilePickerFunc = new Mock<Func<bool, Task<string>>>();
-            _mockFilePickerFunc.Setup(f => f(It.IsAny<bool>()))
-                .Callback<bool>(_ => _filePicked = true)
-                .ReturnsAsync(() => string.IsNullOrEmpty(_pickedFilePath) ? null : _pickedFilePath);
+        var mockPageFactoryFunc = Mock.Of<Func<ApplicationPageNames, PageViewModel>>();
+        var mockPageFactory = new Mock<PageFactory>(mockPageFactoryFunc);
 
-            // Setup mock main view model
-            var mockPageFactoryFunc = Mock.Of<Func<ApplicationPageNames, PageViewModel>>();
-            var mockPageFactory = new Mock<PageFactory>(mockPageFactoryFunc);
-            
-            _mockMainViewModel = new Mock<MainViewModel>(
-                Mock.Of<DialogViewModel>(),
-                mockPageFactory.Object,
-                Mock.Of<DialogService>(),
-                Mock.Of<IPathService>());
+        _mockMainViewModel = new Mock<MainViewModel>(
+            Mock.Of<DialogViewModel>(),
+            mockPageFactory.Object,
+            Mock.Of<DialogService>(),
+            Mock.Of<IPathService>(),
+            _mockSharedDataService.Object);
 
-            // Build service provider with real implementations where needed
-            var services = new ServiceCollection();
+        var services = new ServiceCollection();
 
-            // Add logger
-            var logger = new LoggerConfiguration().CreateLogger();
-            services.AddSingleton<ILogger>(logger);
+        var logger = new LoggerConfiguration().CreateLogger();
+        services.AddSingleton<ILogger>(logger);
 
-            // Add mocked services
-            services.AddSingleton(_mockSharedDataService.Object);
-            services.AddSingleton(_mockMainViewModel.Object);
+        services.AddSingleton(_mockSharedDataService.Object);
+        services.AddSingleton(_mockMainViewModel.Object);
 
-            // Add mock dialog service
-            services.AddSingleton<DialogService>();
+        services.AddSingleton<DialogService>();
 
-            // Add exporter factory with mock exporter
-            services.AddSingleton<Func<SensorTypes, IExporter>>(_ => _ => _mockExporter.Object);
-            services.AddSingleton<ExporterFactory>();
+        services.AddSingleton<Func<SensorTypes, IExporter>>(_ => _ => _mockExporter.Object);
+        services.AddSingleton<ExporterFactory>();
 
-            // Register the file picker function
-            services.AddSingleton(_mockFilePickerFunc.Object);
+        services.AddSingleton(_mockFilePickerFunc.Object);
 
-            // Register the view model under test
-            services.AddSingleton<ExportDialogViewModel>();
+        services.AddSingleton<ExportDialogViewModel>();
 
-            // Build the service provider
-            _serviceProvider = services.BuildServiceProvider();
+        _serviceProvider = services.BuildServiceProvider();
 
-            // Get the view model from the service provider
-            _viewModel = _serviceProvider.GetRequiredService<ExportDialogViewModel>();
-        }
+        _viewModel = _serviceProvider.GetRequiredService<ExportDialogViewModel>();
+    }
 
-        [TearDown]
-        public void TearDown()
-        {
-            // Clean up temp directory
-            if (Directory.Exists(_tempDir))
-            {
-                Directory.Delete(_tempDir, true);
-            }
+    [TearDown]
+    public void TearDown()
+    {
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
 
-            // Dispose service provider
-            _serviceProvider.Dispose();
-        }
+        _serviceProvider.Dispose();
+    }
 
-        [Test]
-        public void Constructor_InitializesProperties()
-        {
-            // Assert
-            Assert.That(_viewModel, Is.Not.Null);
-            Assert.That(_viewModel.SelectedSensorType, Is.EqualTo(SensorTypes.GENEActiv));
-            Assert.That(_viewModel.IncludeRawData, Is.False);
-            Assert.That(_viewModel.ExportStarted, Is.False);
-            Assert.That(_viewModel.SelectedAnalysesCount, Is.EqualTo(1));
-        }
+    private ExportDialogViewModel _viewModel;
+    private Mock<ISharedDataService> _mockSharedDataService;
+    private Mock<MainViewModel> _mockMainViewModel;
+    private Mock<IExporter> _mockExporter;
+    private ObservableCollection<IAnalysis> _selectedAnalyses;
+    private GeneActiveAnalysis _testAnalysis;
+    private ServiceProvider _serviceProvider;
+    private string _tempDir;
+    private Mock<Func<bool, Task<string>>> _mockFilePickerFunc;
+    private bool _filePicked;
+    private string _pickedFilePath = "test_output.pdf";
 
-        [Test]
-        public void GetFirstSelectedAnalysis_ReturnsCorrectAnalysis()
-        {
-            // Act
-            var result = _viewModel.GetFirstSelectedAnalysis();
+    [Test]
+    public void Constructor_InitializesProperties()
+    {
+        // Assert
+        Assert.That(_viewModel, Is.Not.Null);
+        Assert.That(_viewModel.SelectedSensorType, Is.EqualTo(SensorTypes.GENEActiv));
+        Assert.That(_viewModel.IncludeRawData, Is.False);
+        Assert.That(_viewModel.ExportStarted, Is.False);
+        Assert.That(_viewModel.SelectedAnalysesCount, Is.EqualTo(1));
+    }
 
-            // Assert
-            Assert.That(result, Is.SameAs(_testAnalysis));
-        }
+    [Test]
+    public void GetFirstSelectedAnalysis_ReturnsCorrectAnalysis()
+    {
+        // Act
+        var result = _viewModel.GetFirstSelectedAnalysis();
 
-        [Test]
-        public void CancelCommand_CanExecute()
-        {
-            // Act
-            var canExecute = _viewModel.CancelCommand.CanExecute(null);
+        // Assert
+        Assert.That(result, Is.SameAs(_testAnalysis));
+    }
 
-            // Assert
-            Assert.That(canExecute, Is.True);
-        }
+    [Test]
+    public void CancelCommand_CanExecute()
+    {
+        // Act
+        var canExecute = _viewModel.CancelCommand.CanExecute(null);
 
-        [Test]
-        public async Task ExportAnalysis_WithCanceledFilePicker_DoesNotExport()
-        {
-            // Arrange
-            _pickedFilePath = null; // Simulate canceled file picker
-            _viewModel.FilePickerRequested += (includeRaw) => Task.FromResult(_pickedFilePath);
+        // Assert
+        Assert.That(canExecute, Is.True);
+    }
 
-            // Act
-            await _viewModel.ExportAnalysisCommand.ExecuteAsync(null);
+    [Test]
+    public async Task ExportAnalysis_WithCanceledFilePicker_DoesNotExport()
+    {
+        // Arrange
+        _pickedFilePath = null; // Simulate canceled file picker
+        _viewModel.FilePickerRequested += includeRaw => Task.FromResult(_pickedFilePath);
 
-            // Assert
-            _mockExporter.Verify(e => e.ExportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
-            Assert.That(_testAnalysis.Exported, Is.False);
-        }
+        // Act
+        await _viewModel.ExportAnalysisCommand.ExecuteAsync(null);
 
-        [Test]
-        public async Task ExportAnalysis_SetsExportStartedFlagDuringExport()
-        {
-            // Arrange
-            bool exportStartedDuringExport = false;
-            
-            _mockExporter.Setup(e => e.ExportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>(), It.IsAny<bool>()))
-                .Callback(() => exportStartedDuringExport = _viewModel.ExportStarted)
-                .ReturnsAsync(true);
-                
-            _viewModel.FilePickerRequested += (includeRaw) => Task.FromResult(_pickedFilePath);
+        // Assert
+        _mockExporter.Verify(e => e.ExportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>(), It.IsAny<bool>()),
+            Times.Never);
+        Assert.That(_testAnalysis.Exported, Is.False);
+    }
 
-            // Act
-            await _viewModel.ExportAnalysisCommand.ExecuteAsync(null);
+    [Test]
+    public async Task ExportAnalysis_SetsExportStartedFlagDuringExport()
+    {
+        // Arrange
+        var exportStartedDuringExport = false;
 
-            // Assert
-            Assert.That(exportStartedDuringExport, Is.True, "ExportStarted should be true during export");
-            Assert.That(_viewModel.ExportStarted, Is.False, "ExportStarted should be reset after export");
-        }
-        
-       
+        _mockExporter.Setup(e => e.ExportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>(), It.IsAny<bool>()))
+            .Callback(() => exportStartedDuringExport = _viewModel.ExportStarted)
+            .ReturnsAsync(true);
+
+        _viewModel.FilePickerRequested += includeRaw => Task.FromResult(_pickedFilePath);
+
+        // Act
+        await _viewModel.ExportAnalysisCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(exportStartedDuringExport, Is.True, "ExportStarted should be true during export");
+        Assert.That(_viewModel.ExportStarted, Is.False, "ExportStarted should be reset after export");
     }
 }

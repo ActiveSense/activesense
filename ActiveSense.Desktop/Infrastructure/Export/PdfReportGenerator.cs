@@ -119,14 +119,9 @@ public class PdfReportGenerator(
     {
         // Section title
         column.Item().PaddingTop(15)
-            .Text("Zusammenfassung")
+            .Text("Zeitraum der Analyse")
             .Bold()
             .FontSize(14);
-
-        column.Item().PaddingTop(3)
-            .Text("Überblick der wichtigsten Messwerte")
-            .FontSize(9)
-            .Italic();
 
         // Date range for activity data
         if (activityAnalysis.ActivityRecords.Any())
