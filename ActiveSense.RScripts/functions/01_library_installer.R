@@ -7,53 +7,90 @@
 #' @param librarys A vector of strings of libraries that are required to install.
 #'
 
-library_installer <- function(librarys) { # 'librarys' is a vector of package names
-  # Get current repository settings once, to show the user
-  current_repos <- getOption("repos")
+# Surpress checking for newer binaries to source. 
+options(install.packages.check.source = "no")
+
+# ==================================
+# INSTALLER FUNCTION
+# ==================================
+
+install_libraries <- function(libraries) {
   
-  # Print a general message about repositories being used
-  if (length(current_repos) == 0 || (length(current_repos) == 1 && current_repos[1] == "@CRAN@")) {
-    message("INFO: No specific repositories are configured, or only the default CRAN placeholder is set.")
-    message("      'install.packages()' will likely prompt you to choose a CRAN mirror or use a default.")
+  os_type <- Sys.info()["sysname"]
+  libraries_to_install <- check_if_install_needed(libraries)
+  
+  if (length(libraries_to_install) == 0) {
+    message("###### EVERYTHING'S ALREADY INSTALLED ######")
+    return()
   } else {
-    message("INFO: 'install.packages()' will use the following repositories (in this order):")
-    # Nicely print named repositories
-    if (!is.null(names(current_repos))) {
-      for (repo_name in names(current_repos)) {
-        if (nzchar(repo_name)) { # Check if the name is not empty
-          message(paste0("      - ", repo_name, ": ", current_repos[repo_name]))
-        } else { # Handle cases where some might be unnamed if mixed
-          message(paste0("      - (Unnamed): ", current_repos[repo_name]))
-        }
-      }
-    } else { # All repositories are unnamed
-      for(repo_url in current_repos){
-        message(paste0("      - (Unnamed): ", repo_url))
-      }
-    }
+    message("###### THE FOLLOWING PACKAGES WILL BE INSTALLED FOR --- ", toupper(os_type), " --- ######")
+    message(paste(libraries_to_install, collapse = "\n"))
   }
-  message("--- Starting package checks ---")
   
-  for (pkg_name in librarys) {
-    message(paste0("\nChecking for package: '", pkg_name, "'...")) # Add a newline for readability per package
-    if (pkg_name %in% rownames(installed.packages()) == FALSE) {
-      message(paste0("   -> '", pkg_name, "' is NOT installed. Attempting installation..."))
-      
-      # install.packages will use the repositories from getOption("repos")
-      # R tries them in the order they are listed in getOption("repos")
-      install.packages(pkg_name, dependencies = TRUE)
-      
-      # After attempting installation, check again
-      if (pkg_name %in% rownames(installed.packages())) {
-        message(paste0("   SUCCESS: '", pkg_name, "' was installed."))
-        message(paste0("      It was installed using your configured repositories (listed above)."))
-        message(paste0("      R would have used the *first* repository in that list where '", pkg_name, "' was found."))
-      } else {
-        message(paste0("   FAILURE: '", pkg_name, "' could NOT be installed. See messages above from install.packages()."))
-      }
+  
+  for (pkg_name in libraries_to_install) {
+    message(paste0("\n==== Installing '", pkg_name, "' ===="))
+    
+    if (os_type == "Windows" || os_type == "Darwin") {
+      install.packages(pkg_name, type = "binary")
+    } else if (os_type == "Linux") {
+      install.packages(pkg_name)
+    }
+    
+    success <- pkg_name %in% rownames(installed.packages())
+    if (success) {
+      message(paste0("\n-> Package ", pkg_name, " successfully  installed.\n"))
     } else {
-      message(paste0("   -> '", pkg_name, "' is ALREADY installed."))
+      message(paste0("\n-> Package ", pkg_name, " couldn't be installed.\n"))
+      stop("!!!ERROR: '", pkg_name, "' package couldn't be installed.")
     }
   }
-  message("\n--- Package check complete ---")
+  
+}
+
+# ==================================
+# HELPER FUNCTIONS
+# ==================================
+
+check_if_install_needed <- function(libraries) {
+  
+  message(paste0("###### CHECK IF INSTALLATION NEEDED ######\n"))
+  
+  temp_libs = c()
+  
+  for (pkg_name in libraries) {
+    message(paste0("==== Check for ", pkg_name, " ===="))
+    
+    isInstalled <- pkg_name %in% rownames(installed.packages())
+    isGENEApackage <- grepl("GENEA", pkg_name)
+    
+    # Already installed, but not from custom repository
+    if (isInstalled && isGENEApackage) {
+      repo_info <- packageDescription(pkg_name, fields = "Repository")
+      custom <- !is.na(repo_info) && grepl("activesense", repo_info)
+      
+      if (!custom) {
+        message(paste0(" -> installed, but not CUSTOM version. Reinstallation neccessary.\n"))
+        temp_libs <- c(temp_libs, pkg_name)
+      } else {
+        message(paste0(" -> Correct CUSTOM version installed. No installation neccessary\n"))
+      }
+      next
+    }
+    
+    # Not installed
+    if (!isInstalled) {
+      message(paste0("-> MISSING. Installation neccessary.\n"))
+      temp_libs <- c(temp_libs, pkg_name)
+      
+      next
+    }
+    
+    # Already installed
+    if (isInstalled) {
+      message(paste0("-> ALREADY installed. No Installation neccessary.\n"))
+    }
+  }
+  
+  return(temp_libs)
 }

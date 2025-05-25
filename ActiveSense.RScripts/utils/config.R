@@ -36,30 +36,18 @@ if (!is.null(mmap_setting_from_test)) {
 
 source("functions/01_library_installer.R")
 
-librarys <- c(
+libraries <- c(
   "GENEAread",
   "GENEAclassify",
-  "profvis",
-  "scales",
-  "reshape2",
-  "future",
-  "promises",
-  "versions",
-  "optparse",
-  "testthat"
+  "optparse"
 )
 
-library_installer(librarys)
+install_libraries(libraries)
 
 library(GENEAread)
 library(GENEAclassify)
-library(profvis)
-library(scales)
-library(reshape2)
-library(future)
-library(promises)
 library(optparse)
-library(testthat)
+# library(testthat) // Only needed, when running tests
 
 # ==================================
 # SOURCE
