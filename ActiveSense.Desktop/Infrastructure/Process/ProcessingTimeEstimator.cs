@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using iText.Layout.Element;
 
@@ -23,7 +24,7 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
 
     private static readonly Lazy<double> MachineSpeedFactor = new Lazy<double>(CalculateMachineSpeedFactor, LazyThreadSafetyMode.ExecutionAndPublication);
 
-    public TimeSpan EstimateProcessingTime(double totalFileSizesMB)
+    public TimeSpan EstimateProcessingTime(double totalFileSizesMB, IList<ScriptArgument> arguments)
     {
         if (totalFileSizesMB <= 10)
         {
@@ -36,12 +37,58 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
 
         if (actualEstimatedSeconds < 0) actualEstimatedSeconds = 0;
         
+        // Apply reduction based on disabled analysis types
+        double reductionFactor = GetReductionFactor(arguments);
+        actualEstimatedSeconds *= reductionFactor;
+        
         if (totalFileSizesMB < 20)
         {
             return TimeSpan.FromSeconds(actualEstimatedSeconds + 15);
         }
 
         return TimeSpan.FromSeconds(actualEstimatedSeconds);
+    }
+
+    private static double GetReductionFactor(IList<ScriptArgument> arguments)
+    {
+        if (arguments == null || arguments.Count == 0)
+        {
+            return 1.0; // No reduction if no arguments provided
+        }
+
+        bool activityEnabled = true;
+        bool sleepEnabled = true;
+
+        foreach (var arg in arguments)
+        {
+            if (arg is BoolArgument boolArg)
+            {
+                if (boolArg.Flag == "activity")
+                {
+                    activityEnabled = boolArg.Value;
+                }
+                else if (boolArg.Flag == "sleep")
+                {
+                    sleepEnabled = boolArg.Value;
+                }
+            }
+        }
+
+        // If both are enabled, no reduction (factor = 1.0)
+        // If one is disabled, half the time (factor = 0.5)
+        // If both are disabled, still some processing time (factor = 0.1)
+        if (activityEnabled && sleepEnabled)
+        {
+            return 1.0;
+        }
+        else if (activityEnabled || sleepEnabled)
+        {
+            return 0.5;
+        }
+        else
+        {
+            return 0.1; // Some minimal processing even if both are disabled
+        }
     }
 
     private static double CalculateMachineSpeedFactor()

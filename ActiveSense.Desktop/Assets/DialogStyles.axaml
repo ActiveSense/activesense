@@ -57,6 +57,7 @@
         <Setter Property="Margin" Value="0,0,0,12" />
         <Setter Property="Padding" Value="12" />
     </Style>
+    
     <!-- Dialog Error Message - for error dialogs -->
     <Style Selector="TextBlock.dialog-error-message">
         <Setter Property="TextWrapping" Value="Wrap" />

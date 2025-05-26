@@ -81,7 +81,7 @@ public class GeneActiveProcessor(
         }
     }
 
-    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files)
+    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files, IList<ScriptArgument> arguments)
     {
         long totalSizeBytes = 0;
         foreach (var filePath in files)
@@ -99,7 +99,7 @@ public class GeneActiveProcessor(
 
         var totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
 
-        return await Task.Run(() => timeEstimator.EstimateProcessingTime(totalSizeMB));
+        return await Task.Run(() => timeEstimator.EstimateProcessingTime(totalSizeMB, arguments));
     }
 
     public async Task CopyFilesAsync(string[] files, string processingDirectory, string outputDirectory)
@@ -109,6 +109,8 @@ public class GeneActiveProcessor(
 
     public string ProcessingInfo =>
         "Einstellungen werden nur auf die Verarbeitung von .bin-Dateien angewendet. Beim Import als PDF werden die Einstellungen ignoriert.";
+
+    #region Arguments
 
     private static List<ScriptArgument> CreateDefaultArguments()
     {
@@ -135,7 +137,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "sedentary_left",
                 Name = "Sedentary Threshold (Left)",
-                Description = "Threshold for sedentary activity on left wrist (in g)",
+                Description = "Threshold for sedentary activity on left wrist in g",
                 MinValue = 0.01,
                 MaxValue = 0.1,
                 Value = 0.04
@@ -145,7 +147,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "light_left",
                 Name = "Light Threshold (Left)",
-                Description = "Threshold for light activity on left wrist",
+                Description = "Threshold for light activity on left wrist in g",
                 MinValue = 100,
                 MaxValue = 500,
                 Value = 217
@@ -155,7 +157,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "moderate_left",
                 Name = "Moderate Threshold (Left)",
-                Description = "Threshold for moderate activity on left wrist",
+                Description = "Threshold for moderate activity on left wrist in g",
                 MinValue = 300,
                 MaxValue = 1000,
                 Value = 644
@@ -165,7 +167,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "vigorous_left",
                 Name = "Vigorous Threshold (Left)",
-                Description = "Threshold for vigorous activity on left wrist",
+                Description = "Threshold for vigorous activity on left wrist in g",
                 MinValue = 1000,
                 MaxValue = 3000,
                 Value = 1810
@@ -176,7 +178,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "sedentary_right",
                 Name = "Sedentary Threshold (Right)",
-                Description = "Threshold for sedentary activity on right wrist (in g)",
+                Description = "Threshold for sedentary activity on right wrist in g",
                 MinValue = 0.01,
                 MaxValue = 0.1,
                 Value = 0.04
@@ -186,7 +188,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "light_right",
                 Name = "Light Threshold (Right)",
-                Description = "Threshold for light activity on right wrist",
+                Description = "Threshold for light activity on right wrist in g",
                 MinValue = 100,
                 MaxValue = 800,
                 Value = 386
@@ -196,7 +198,7 @@ public class GeneActiveProcessor(
             {
                 Flag = "moderate_right",
                 Name = "Moderate Threshold (Right)",
-                Description = "Threshold for moderate activity on right wrist",
+                Description = "Threshold for moderate activity on right wrist in g",
                 MinValue = 200,
                 MaxValue = 800,
                 Value = 439
@@ -206,11 +208,13 @@ public class GeneActiveProcessor(
             {
                 Flag = "vigorous_right",
                 Name = "Vigorous Threshold (Right)",
-                Description = "Threshold for vigorous activity on right wrist",
+                Description = "Threshold for vigorous activity on right wrist in g",
                 MinValue = 1000,
                 MaxValue = 3500,
                 Value = 2098
             }
         ];
     }
+
+    #endregion
 }

@@ -187,7 +187,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             IsProcessing = true;
 
             StatusMessage = "Laufzeit wird berechnet...";
-            var estimatedTime = await processor.GetEstimatedProcessingTimeAsync(SelectedFiles);
+            var estimatedTime = await processor.GetEstimatedProcessingTimeAsync(SelectedFiles, Arguments.ToList());
             StartCountdown(estimatedTime);
                 
             _sharedDataService.IsProcessingInBackground = true;
@@ -206,7 +206,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             if (Directory.EnumerateFiles(processingDirectory).Any())
             {
                 var (scriptSuccess, output) =
-                    await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
+                    await processor.ProcessAsync(Arguments.ToList(), _cancellationTokenSource.Token);
                 ScriptOutput = output;
                 ShowScriptOutput = true;
 
