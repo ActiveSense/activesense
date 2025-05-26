@@ -3,17 +3,17 @@
 # ==================================
 
 # Sets up renv // automatic dependency management
-source("utils/renv_setup.R")
+#source("utils/renv_setup.R")
 
 # clears persistent data objects
 rm(list=ls())
 
 # Sets repository
 local({
-  r <- getOption("repos")
-  r["ACTIVESENSE_UNIVERSE"] <- "https://activesense.r-universe.dev"
-  r["CRAN"] <- "http://cran.r-project.org"
-  options(repos = r)
+  options(repos = c(
+    ACTIVESENSE_UNIVERSE = "https://activesense.r-universe.dev",
+    CRAN = "http://cran.r-project.org"
+  ))
 })
 
 # time zone
@@ -34,22 +34,20 @@ if (!is.null(mmap_setting_from_test)) {
 # LIBRARIES
 # ==================================
 
+source("functions/01_library_installer.R")
+
+libraries <- c(
+  "GENEAread",
+  "GENEAclassify",
+  "optparse"
+)
+
+install_libraries(libraries)
+
 library(GENEAread)
 library(GENEAclassify)
-library(profvis)
-library(scales)
-library(reshape2)
-library(future)
-library(promises)
 library(optparse)
-library(testthat)
-library(bitops)
-library(mmap)
-library(MASS)
-library(changepoint)
-library(zoo)
-library(signal)
-library(rpart)
+# library(testthat) // Only needed, when running tests
 
 # ==================================
 # SOURCE
