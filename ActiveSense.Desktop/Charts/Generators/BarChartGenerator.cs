@@ -85,7 +85,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             var colors = chartColors.GetColorPalette(barData.Length);
             var colorIndex = 0;
 
-            bool hasSingleBarSeries = barData.Length == 1;
+            var hasSingleBarSeries = barData.Length == 1;
 
             foreach (var dto in barData)
             {
@@ -103,7 +103,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
                     ScalesYAt = 0
                 });
 
-                var meanValue = rawValues.Any() ? Math.Round(rawValues.Average(), 2)  : 0;
+                var meanValue = rawValues.Any() ? Math.Round(rawValues.Average(), 2) : 0;
                 var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
                 series.Add(new LineSeries<double>
                 {
@@ -164,7 +164,7 @@ public class BarChartGenerator(ChartDataDTO[]? barData, ChartColors chartColors,
             Series = series.ToArray(),
             XAxes = [xAxis],
             YAxes = yAxes.ToArray(),
-            LegendPosition = LegendPosition.Right,
+            LegendPosition = LegendPosition.Right
         };
     }
 }

@@ -11,6 +11,7 @@ public partial class GeneralPageView : UserControl
         InitializeComponent();
         AddHandler(PointerWheelChangedEvent, OnPreviewMouseWheel, RoutingStrategies.Tunnel);
     }
+
     private void OnPreviewMouseWheel(object? sender, PointerWheelEventArgs e)
     {
         if (MainScrollViewer != null)

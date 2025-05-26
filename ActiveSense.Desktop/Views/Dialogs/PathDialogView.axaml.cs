@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using ActiveSense.Desktop.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -19,22 +18,19 @@ public partial class PathDialogView : UserControl
     {
         var sp = GetStorageProvider();
         if (sp is null) return;
-        
+
         var result = await sp.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Select R Installation (Rscript)",
             FileTypeFilter = GetFileTypes(),
             AllowMultiple = false
         });
-        
+
         if (result.Count > 0)
         {
-            string selectedPath = result[0].Path.LocalPath;
-            
-            if (DataContext is PathDialogViewModel viewModel)
-            {
-                viewModel.SelectedRInstallationPath = selectedPath;
-            }
+            var selectedPath = result[0].Path.LocalPath;
+
+            if (DataContext is PathDialogViewModel viewModel) viewModel.RPath = selectedPath;
         }
     }
 
@@ -52,7 +48,7 @@ public partial class PathDialogView : UserControl
             {
                 MimeTypes = ["application/x-executable"]
             },
-            FilePickerFileTypes.All,
+            FilePickerFileTypes.All
         ];
     }
 }

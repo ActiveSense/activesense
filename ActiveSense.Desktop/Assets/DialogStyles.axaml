@@ -12,6 +12,10 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
+    <Style Selector="TextBox">
+        <Setter Property="ContextFlyout" Value="{x:Null}" />
+    </Style>
+
     <!-- Dialog Header -->
     <Style Selector="TextBlock.dialog-title">
         <Setter Property="FontSize" Value="20" />
@@ -53,6 +57,7 @@
         <Setter Property="Margin" Value="0,0,0,12" />
         <Setter Property="Padding" Value="12" />
     </Style>
+
     <!-- Dialog Error Message - for error dialogs -->
     <Style Selector="TextBlock.dialog-error-message">
         <Setter Property="TextWrapping" Value="Wrap" />

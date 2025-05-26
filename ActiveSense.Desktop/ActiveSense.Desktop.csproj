@@ -6,89 +6,89 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	  <Company>Ostschweizer Fachhochschule</Company>
-	  <Product>ActiveSense</Product>
-	  <Description>Sensor Data Analysis Application</Description>
-	  <Version>1.0.0</Version>
-	  <Authors>Karim Hamscho, David Trapp</Authors>
+        <Company>Ostschweizer Fachhochschule</Company>
+        <Product>ActiveSense</Product>
+        <Description>Sensor Data Analysis Application</Description>
+        <Version>1.0.0</Version>
+        <Authors>Karim Hamscho, David Trapp</Authors>
     </PropertyGroup>
-	
+
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
-	  <Content Include="..\ActiveSense.RScripts\**\*.*">
-	    <Link>RScripts\%(RecursiveDir)%(Filename)%(Extension)</Link>
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+        <AvaloniaResource Include="Assets\**"/>
+        <Content Include="..\ActiveSense.RScripts\**\*.*">
+            <Link>RScripts\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.2.5" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+        <PackageReference Include="Avalonia" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.1"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-        <PackageReference Include="CsvHelper" Version="33.0.1" />
-        <PackageReference Include="Hardware.Info" Version="101.0.1" />
-        <PackageReference Include="itext7" Version="9.1.0" />
-        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-        <PackageReference Include="QuestPDF" Version="2025.4.0" />
-        <PackageReference Include="ScottPlot.Avalonia" Version="5.0.55" />
-        <PackageReference Include="Semi.Avalonia" Version="11.2.1.6" />
-        <PackageReference Include="Serilog" Version="4.3.0" />
-        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+        <PackageReference Include="CsvHelper" Version="33.0.1"/>
+        <PackageReference Include="Hardware.Info" Version="101.0.1"/>
+        <PackageReference Include="itext7" Version="9.1.0"/>
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="5.0.0"/>
+        <PackageReference Include="QuestPDF" Version="2025.4.0"/>
+        <PackageReference Include="ScottPlot.Avalonia" Version="5.0.55"/>
+        <PackageReference Include="Semi.Avalonia" Version="11.2.1.6"/>
+        <PackageReference Include="Serilog" Version="4.3.0"/>
+        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Views\AnalysisPages\GeneralPageView.axaml.cs">
-        <DependentUpon>GeneralPageView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\AnalysisPages\ActivityPageView.axaml.cs">
-        <DependentUpon>ActivityPageView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\AnalysisPages\SleepPageView.axaml.cs">
-        <DependentUpon>SleepPageView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Remove="ViewModels\Charts\DataListViewModel.cs" />
-      <Compile Update="Views\Dialogs\WarningDialogView.axaml.cs">
-        <DependentUpon>WarningDialogView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\Dialogs\PathDialogView.axaml.cs">
-        <DependentUpon>PathDialogView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="Views\AnalysisPages\GeneralPageView.axaml.cs">
+            <DependentUpon>GeneralPageView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\AnalysisPages\ActivityPageView.axaml.cs">
+            <DependentUpon>ActivityPageView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\AnalysisPages\SleepPageView.axaml.cs">
+            <DependentUpon>SleepPageView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Remove="ViewModels\Charts\DataListViewModel.cs"/>
+        <Compile Update="Views\Dialogs\WarningDialogView.axaml.cs">
+            <DependentUpon>WarningDialogView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Dialogs\PathDialogView.axaml.cs">
+            <DependentUpon>PathDialogView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="publish\linux\libSkiaSharp.so" />
-      <None Remove="publish\linux\NUnit3.TestAdapter.pdb" />
-      <None Remove="publish\linux\ActiveSense.Desktop.pdb" />
-      <None Remove="deploy\linux\ActiveSense\RScripts\_main.R" />
-      <None Remove="deploy\linux\ActiveSense\NUnit3.TestAdapter.pdb" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\OFL.txt" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-SemiBoldItalic.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-SemiBold.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-MediumItalic.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Medium.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Light.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraLightItalic.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraBoldItalic.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraBold.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Bold.ttf" />
-      <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-BlackItalic.ttf" />
-      <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop.pdb" />
-      <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop" />
-      <None Remove="RScripts\data\27101995_left wrist_105046_2024-08-26 14-36-44.bin" />
+        <None Remove="publish\linux\libSkiaSharp.so"/>
+        <None Remove="publish\linux\NUnit3.TestAdapter.pdb"/>
+        <None Remove="publish\linux\ActiveSense.Desktop.pdb"/>
+        <None Remove="deploy\linux\ActiveSense\RScripts\_main.R"/>
+        <None Remove="deploy\linux\ActiveSense\NUnit3.TestAdapter.pdb"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\OFL.txt"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-SemiBoldItalic.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-SemiBold.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-MediumItalic.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Medium.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Light.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraLightItalic.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraBoldItalic.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-ExtraBold.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-Bold.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\LatoFont\Lato-BlackItalic.ttf"/>
+        <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop.pdb"/>
+        <None Remove="deploy\linux\ActiveSense\ActiveSense.Desktop"/>
+        <None Remove="RScripts\data\27101995_left wrist_105046_2024-08-26 14-36-44.bin"/>
     </ItemGroup>
 </Project>

@@ -5,9 +5,8 @@ namespace ActiveSense.Desktop.ViewModels.Dialogs;
 
 public partial class DialogViewModel : ViewModelBase
 {
-    [ObservableProperty] private bool _isDialogOpen;
-
     private TaskCompletionSource _closeTask = new();
+    [ObservableProperty] private bool _isDialogOpen;
 
     public async Task WaitAsync()
     {

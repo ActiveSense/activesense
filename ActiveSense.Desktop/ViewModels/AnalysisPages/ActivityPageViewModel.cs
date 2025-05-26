@@ -7,7 +7,6 @@ using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Core.Domain.Models;
-using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
@@ -18,38 +17,38 @@ public partial class ActivityPageViewModel : PageViewModel
 {
     private readonly ChartColors _chartColors;
     private readonly ISharedDataService _sharedDataService;
-    [ObservableProperty] private bool _chartsVisible = false;
+    [ObservableProperty] private bool _chartsVisible;
     [ObservableProperty] private ObservableCollection<IAnalysis> _selectedAnalyses = [];
 
     [ObservableProperty] private string _activityDistributionTitle = "Aktivitätsverteilung";
     [ObservableProperty] private string _activityDistributionDescription = "Aktivitätsverteilung pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _activityDistributionChart = [];
-    [ObservableProperty] private bool _isActivityDistributionExpanded = false;
+    [ObservableProperty] private bool _isActivityDistributionExpanded;
 
     [ObservableProperty] private string _stepsTitle = "Schritte pro Tag";
     [ObservableProperty] private string _stepsDescription = "Durchschnittliche Schritte pro Tag";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _stepsCharts = [];
-    [ObservableProperty] private bool _isStepsExpanded = false;
+    [ObservableProperty] private bool _isStepsExpanded;
 
     [ObservableProperty] private string _sedentaryTitle = "Inaktive Zeit";
     [ObservableProperty] private string _sedentaryDescription = "Inaktive Zeit pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _sedentaryCharts = [];
-    [ObservableProperty] private bool _isSedentaryExpanded = false;
+    [ObservableProperty] private bool _isSedentaryExpanded;
 
     [ObservableProperty] private string _lightTitle = "Leichte Aktivität";
     [ObservableProperty] private string _lightDescription = "Leichte Aktivität pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _lightCharts = [];
-    [ObservableProperty] private bool _isLightExpanded = false;
+    [ObservableProperty] private bool _isLightExpanded;
 
     [ObservableProperty] private string _moderateTitle = "Mittlere Aktivität";
     [ObservableProperty] private string _moderateDescription = "Mittlere Aktivität pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _moderateCharts = [];
-    [ObservableProperty] private bool _isModerateExpanded = false;
+    [ObservableProperty] private bool _isModerateExpanded;
 
     [ObservableProperty] private string _vigorousTitle = "Intensive Aktivität";
     [ObservableProperty] private string _vigorousDescription = "Intensive Aktivität pro Tag in Stunden";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _vigorousCharts = [];
-    [ObservableProperty] private bool _isVigorousExpanded = false;
+    [ObservableProperty] private bool _isVigorousExpanded;
 
     public ActivityPageViewModel(ISharedDataService sharedDataService, ChartColors chartColors)
     {
@@ -80,12 +79,12 @@ public partial class ActivityPageViewModel : PageViewModel
     }
 
     #region Chart Generation
+
     private void CreateActivityDistributionChart()
     {
         ActivityDistributionChart.Clear();
 
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IActivityAnalysis activityAnalysis &&
                 analysis is IChartDataProvider chartProvider)
             {
@@ -95,7 +94,6 @@ public partial class ActivityPageViewModel : PageViewModel
                     $"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Aktivitätsverteilung pro Tag"));
             }
-        }
     }
 
     private void CreateStepsChart()
@@ -104,12 +102,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetStepsChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -124,12 +118,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetSedentaryChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -144,12 +134,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetLightActivityChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -164,12 +150,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetModerateActivityChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -184,12 +166,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetVigorousActivityChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -197,5 +175,6 @@ public partial class ActivityPageViewModel : PageViewModel
             "Intensive Aktivität pro Tag",
             "Intensive Aktivität pro Tag"));
     }
+
     #endregion
 }

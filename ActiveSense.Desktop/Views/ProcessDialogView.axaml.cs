@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ActiveSense.Desktop.ViewModels;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 
 namespace ActiveSense.Desktop.Views;
@@ -24,21 +20,18 @@ public partial class ProcessDialogView : UserControl
         var sp = GetStorageProvider();
         if (sp is null) return;
 
-        var result = await sp.OpenFilePickerAsync(new FilePickerOpenOptions()
+        var result = await sp.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Open File",
             FileTypeFilter = GetFileTypes(),
-            AllowMultiple = true,
+            AllowMultiple = true
         });
 
         if (result != null && result.Count > 0)
         {
             var filePaths = result.Select(file => file.Path.LocalPath).ToArray();
 
-            if (DataContext is ProcessDialogViewModel viewModel)
-            {
-                viewModel.SetSelectedFiles(filePaths);
-            }
+            if (DataContext is ProcessDialogViewModel viewModel) viewModel.SetSelectedFiles(filePaths);
         }
     }
 
@@ -48,12 +41,12 @@ public partial class ProcessDialogView : UserControl
         return topLevel?.StorageProvider;
     }
 
-    List<FilePickerFileType>? GetFileTypes()
+    private List<FilePickerFileType>? GetFileTypes()
     {
         return
         [
             FilePickerFileTypes.All,
-                FilePickerFileTypes.TextPlain
+            FilePickerFileTypes.TextPlain
         ];
     }
 }

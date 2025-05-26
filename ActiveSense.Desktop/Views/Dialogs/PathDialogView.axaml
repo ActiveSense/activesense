@@ -3,96 +3,156 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dialogs="clr-namespace:ActiveSense.Desktop.ViewModels.Dialogs"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
              x:Class="ActiveSense.Desktop.Views.Dialogs.PathDialogView"
              x:DataType="dialogs:PathDialogViewModel">
-    
+
+    <!-- Reference to centralized styles -->
     <UserControl.Styles>
         <StyleInclude Source="/Assets/DialogStyles.axaml" />
     </UserControl.Styles>
 
-    <Border Classes="dialog-container" MaxWidth="480">
+    <Border Classes="dialog-container" MaxWidth="500">
         <Grid RowDefinitions="Auto, *, Auto">
+
             <!-- Header -->
             <Grid Grid.Row="0" Margin="24,24,24,0">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBlock Text="{Binding Title}"
-                                   Classes="dialog-title"
-                                    />
-                    </StackPanel>
-                    <TextBlock Text="{Binding SubTitle}"
-                               Classes="dialog-subtitle"
-                               TextWrapping="Wrap"
-                               Margin="0,8,0,0" />
-                </StackPanel>
-            </Grid>
-
-            <!-- Content -->
-            <Grid Grid.Row="1" Margin="24,16" RowDefinitions="Auto,Auto,Auto,*">
-                <!-- Path input and browse button -->
-                <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,8,0,0">
-                    <TextBox Grid.Column="0"
-                             Watermark="Pfad zu R-Installation"
-                             Text="{Binding SelectedRInstallationPath}"
-                             Classes="pathTextBox" 
-                             VerticalAlignment="Center"
-                             ContextFlyout="{x:Null}"/>
-                    
-                    <Button Name="OpenFileButton" 
-                            Grid.Column="1"
-                            Margin="8,0,0,0"
-                            Classes="Primary"
-                            Theme="{DynamicResource SolidButton}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <PathIcon Data="{StaticResource folder_regular}" Height="10"></PathIcon>
-                            <TextBlock Text="Durchsuchen..." />
-                        </StackPanel>
-                    </Button>
-                </Grid>
-                
-                <!-- Status/Message area -->
-                <Border Grid.Row="2"
+                <StackPanel Spacing="8">
+                    <TextBlock Text="R Installation nicht gefunden"
+                               Classes="dialog-title" />
+                    <Border
                         BorderThickness="1"
                         BorderBrush="#DDDDDD"
                         Background="#F6F6F6"
                         CornerRadius="4"
-                        Padding="12"
-                        Margin="0,16,0,0"
-                        IsVisible="{Binding !!Message}">
-                    <Grid ColumnDefinitions="Auto,*">
-                        <PathIcon Grid.Column="0"
-                                       Data="{StaticResource important_regular}" 
-                                       Foreground="#E81123" 
-                                       FontSize="16"
-                                       VerticalAlignment="Top"
-                                       Margin="0,2,8,0" />
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding Message}"
-                                   TextWrapping="Wrap"
-                                   Foreground="#333333" />
-                    </Grid>
-                </Border>
+                        Padding="12">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Grid.Column="0"
+                                      Data="{StaticResource info_regular}"
+                                      Height="16"
+                                      VerticalAlignment="Top"
+                                      Margin="0,2,8,0" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Description}"
+                                       Classes="Primary"
+                                       TextWrapping="Wrap"
+                                       Foreground="#333333" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Grid>
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="12,20,12,0">
+                <StackPanel Spacing="20">
+                    <!-- Download Section in Expander -->
+                    <Expander Header="R installieren">
+                        <StackPanel Spacing="12" Margin="0,12,0,0">
+
+                            <!-- Windows -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="Windows"
+                                           VerticalAlignment="Center"
+                                           FontWeight="Medium" />
+                                <Button Grid.Column="1"
+                                        Content="Download"
+                                        Command="{Binding OpenWindowsDownloadCommand}"
+                                        Classes="Tertiary" />
+                            </Grid>
+
+                            <!-- macOS -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="macOS"
+                                           VerticalAlignment="Center"
+                                           FontWeight="Medium" />
+                                <Button Grid.Column="1"
+                                        Content="Download"
+                                        Command="{Binding OpenMacDownloadCommand}"
+                                        Classes="Tertiary" />
+                            </Grid>
+
+                            <!-- Linux -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="Linux"
+                                           VerticalAlignment="Center"
+                                           FontWeight="Medium" />
+                                <Button Grid.Column="1"
+                                        Content="Anweisungen"
+                                        Command="{Binding OpenLinuxDownloadCommand}"
+                                        Classes="Tertiary" />
+                            </Grid>
+                            <Border
+                                BorderThickness="1"
+                                BorderBrush="#DDDDDD"
+                                CornerRadius="4"
+                                Padding="12">
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <PathIcon Grid.Column="0"
+                                              Data="{StaticResource info_regular}"
+                                              Height="16"
+                                              VerticalAlignment="Top"
+                                              Margin="0,2,8,0" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding DownloadInstructions}"
+                                               Classes="Primary"
+                                               TextWrapping="Wrap"
+                                               Foreground="#333333" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Manual Path Section -->
+                    <Expander Header="Pfad manuell angeben">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Manueller Pfad zur Rscript-Datei:"
+                                       FontWeight="Medium"
+                                       FontSize="14" />
+
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding RPath}"
+                                         Watermark="z.B. C:\Program Files\R\R-4.3.0\bin\Rscript.exe" />
+                                <Button Grid.Column="1"
+                                        Content="Durchsuchen"
+                                        Name="OpenFileButton"
+                                        Margin="8,0,0,0"
+                                        Classes="Secondary" />
+                                <Button Grid.Column="2" Content="{Binding TestButtonText}"
+                                        Command="{Binding TestPathCommand}"
+                                        HorizontalAlignment="Left"
+                                        IsEnabled="{Binding !IsTestingPath}"
+                                        Margin="8,0,0,0"
+                                        Classes="Tertiary" />
+                            </Grid>
+
+
+                            <!-- Test Result -->
+                            <TextBlock Text="{Binding TestResultMessage}"
+                                       IsVisible="{Binding TestResult}"
+                                       Foreground="{Binding TestResultColor}"
+                                       FontWeight="Medium" />
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
             </Grid>
 
             <!-- Footer -->
             <Grid Grid.Row="2"
                   Margin="24,20"
-                  ColumnDefinitions="Auto, *, Auto">
-                <Button Grid.Column="0"
-                        Classes="Secondary"
-                        Command="{Binding CancelCommand}">
-                    <TextBlock Text="{Binding CloseButtonText}" />
-                </Button>
-                
-                <Button Grid.Column="2" 
-                        Classes="Primary" 
-                        Theme="{DynamicResource SolidButton}" 
-                        Command="{Binding OkCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="{Binding OkButtonText}" />
-                    </StackPanel>
-                </Button>
+                  ColumnDefinitions="*,Auto,Auto">
+                <Button Grid.Column="1"
+                        Content="Abbrechen"
+                        Command="{Binding CancelCommand}"
+                        Margin="0,0,8,0"
+                        Classes="Secondary" />
+                <Button Grid.Column="2"
+                        Content="OK"
+                        Command="{Binding SaveCommand}"
+                        IsEnabled="{Binding IsPathValid}"
+                        Classes="Primary" />
             </Grid>
         </Grid>
     </Border>

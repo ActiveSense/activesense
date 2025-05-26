@@ -9,9 +9,10 @@ namespace ActiveSense.Desktop.Core.Services;
 
 public class SharedDataService : ISharedDataService
 {
-    public ObservableCollection<IAnalysis> SelectedAnalyses { get; } = new ObservableCollection<IAnalysis>();
-    public ObservableCollection<IAnalysis> AllAnalyses { get; } = new();
     private bool _isProcessingInBackground;
+    public ObservableCollection<IAnalysis> SelectedAnalyses { get; } = new();
+    public ObservableCollection<IAnalysis> AllAnalyses { get; } = new();
+
     public bool IsProcessingInBackground
     {
         get => _isProcessingInBackground;
@@ -24,6 +25,7 @@ public class SharedDataService : ISharedDataService
             }
         }
     }
+
     public event EventHandler? BackgroundProcessingChanged;
     public event EventHandler? SelectedAnalysesChanged;
     public event EventHandler? AllAnalysesChanged;
@@ -31,13 +33,11 @@ public class SharedDataService : ISharedDataService
     public void UpdateSelectedAnalyses(ObservableCollection<IAnalysis> analyses)
     {
         SelectedAnalyses.Clear();
-        foreach (var analysis in analyses)
-        {
-            SelectedAnalyses.Add(analysis);
-        }
+        foreach (var analysis in analyses) SelectedAnalyses.Add(analysis);
 
         SelectedAnalysesChanged?.Invoke(this, EventArgs.Empty);
     }
+
     public void UpdateAllAnalyses(IEnumerable<IAnalysis> newAnalyses)
     {
         foreach (var newAnalysis in newAnalyses)
@@ -47,7 +47,7 @@ public class SharedDataService : ISharedDataService
             if (existingItem != null)
             {
                 newAnalysis.Exported = existingItem.Exported;
-                int index = AllAnalyses.IndexOf(existingItem);
+                var index = AllAnalyses.IndexOf(existingItem);
                 AllAnalyses[index] = newAnalysis;
             }
             else
@@ -57,5 +57,10 @@ public class SharedDataService : ISharedDataService
         }
 
         AllAnalysesChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool HasUnsavedChanges()
+    {
+        return AllAnalyses.Any(a => !a.Exported);
     }
 }

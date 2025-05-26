@@ -7,11 +7,9 @@ using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Core.Domain.Models;
-using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.ViewModels.Charts;
 using CommunityToolkit.Mvvm.ComponentModel;
-using ScottPlot.Palettes;
 
 namespace ActiveSense.Desktop.ViewModels.AnalysisPages;
 
@@ -25,17 +23,17 @@ public partial class GeneralPageViewModel : PageViewModel
     [ObservableProperty] private string _movementTitle = "Aktivitätsverteilung";
     [ObservableProperty] private string _movementDescription = "Die durchschnittliche Verteilung der Aktivität über 24h in Stunden.";
     [ObservableProperty] private ObservableCollection<PieChartViewModel> _movementPieCharts = [];
-    [ObservableProperty] private bool _isMovementExpanded = false;
+    [ObservableProperty] private bool _isMovementExpanded;
     
     [ObservableProperty] private string _averageSleepTitle = "Durchschnittlicher Schlaf";
     [ObservableProperty] private string _averageSleepDescription = "Durchschnittlicher Schlaf pro Nacht in Stunden.";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _averageSleepCharts = [];
-    [ObservableProperty] private bool _isAverageSleepExpanded = false;
+    [ObservableProperty] private bool _isAverageSleepExpanded;
     
     [ObservableProperty] private string _averageActivityTitle = "Durchschnittliche Aktivität";
     [ObservableProperty] private string _averageActivityDescription = "Durchschnittliche Aktivität pro Tag in Stunden. Light, moderate und vigorous activity addiert.";
     [ObservableProperty] private ObservableCollection<BarChartViewModel> _averageActivityCharts = [];
-    [ObservableProperty] private bool _isAverageActivityExpanded = false;
+    [ObservableProperty] private bool _isAverageActivityExpanded;
     
 
     public GeneralPageViewModel(ISharedDataService sharedDataService, ChartColors chartColors)
@@ -72,7 +70,8 @@ public partial class GeneralPageViewModel : PageViewModel
             var dto = chartProvider.GetMovementPatternChartData();
             var pieChartGenerator = new PieChartGenerator(dto, _chartColors);
             if (SelectedAnalyses.Any())
-                MovementPieCharts.Add(pieChartGenerator.GenerateChart($"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
+                MovementPieCharts.Add(pieChartGenerator.GenerateChart(
+                    $"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Die durchschnittliche Verteilung der Aktivität über 24h"));
         }
     }
@@ -88,8 +87,8 @@ public partial class GeneralPageViewModel : PageViewModel
         foreach (var analysis in SelectedAnalyses)
         {
             if (analysis is not ISleepAnalysis sleepAnalysis) continue;
-        
-            double averageSleepTimeInHours = Math.Round(sleepAnalysis.AverageSleepTime / 3600, 2);
+
+            var averageSleepTimeInHours = Math.Round(sleepAnalysis.AverageSleepTime / 3600, 2);
             data.Add(averageSleepTimeInHours);
             labels.Add(analysis.FileName);
         }
@@ -102,10 +101,10 @@ public partial class GeneralPageViewModel : PageViewModel
         };
 
         var chartGenerator = new BarChartGenerator(new[] { chartData }, _chartColors);
-        AverageSleepCharts.Add(chartGenerator.GenerateChart("Durchschnittlicher Schlaf pro Analyse", 
+        AverageSleepCharts.Add(chartGenerator.GenerateChart("Durchschnittlicher Schlaf pro Analyse",
             "Vergleich der durchschnittlichen Schlafzeit in Stunden"));
     }
-    
+
     private void CreateAverageActivityChart()
     {
         AverageActivityCharts.Clear();
@@ -116,8 +115,11 @@ public partial class GeneralPageViewModel : PageViewModel
         foreach (var analysis in SelectedAnalyses)
         {
             if (analysis is not IActivityAnalysis activityAnalysis) continue;
-        
-            double averageActivityTimeInHours = Math.Round((activityAnalysis.AverageLightActivity + activityAnalysis.AverageModerateActivity + activityAnalysis.AverageVigorousActivity) / 3600, 2) ;
+
+            var averageActivityTimeInHours =
+                Math.Round(
+                    (activityAnalysis.AverageLightActivity + activityAnalysis.AverageModerateActivity +
+                     activityAnalysis.AverageVigorousActivity) / 3600, 2);
             data.Add(averageActivityTimeInHours);
             labels.Add(analysis.FileName);
         }
@@ -130,11 +132,9 @@ public partial class GeneralPageViewModel : PageViewModel
         };
 
         var chartGenerator = new BarChartGenerator(new[] { chartData }, _chartColors);
-        AverageActivityCharts.Add(chartGenerator.GenerateChart("Durchschnittliche Aktivität pro Analyse", 
+        AverageActivityCharts.Add(chartGenerator.GenerateChart("Durchschnittliche Aktivität pro Analyse",
             "Vergleich der durchschnittlichen Aktivitätszeit in Stunden"));
     }
-    
-    
 
     #endregion
 }

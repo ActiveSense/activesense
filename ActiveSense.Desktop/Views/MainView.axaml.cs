@@ -1,24 +1,22 @@
 using System.ComponentModel;
+using ActiveSense.Desktop.ViewModels;
 using Avalonia.Controls;
 
 namespace ActiveSense.Desktop.Views;
 
-public partial class MainView : Window 
+public partial class MainView : Window
 {
-    private bool _closingConfirmed = false;
+    private bool _closingConfirmed;
 
     public MainView()
     {
         InitializeComponent();
-        this.Loaded += (s, e) =>
+        Loaded += (s, e) =>
         {
-            if (DataContext is ViewModels.MainViewModel viewModel)
-            {
-                viewModel.Initialize();
-            }
+            if (DataContext is MainViewModel viewModel) viewModel.Initialize();
         };
 
-        this.Closing += OnWindowClosing;
+        Closing += OnWindowClosing;
     }
 
     private async void OnWindowClosing(object sender, CancelEventArgs e)
@@ -28,7 +26,7 @@ public partial class MainView : Window
 
         e.Cancel = true;
 
-        if (DataContext is ViewModels.MainViewModel viewModel)
+        if (DataContext is MainViewModel viewModel)
         {
             var result = await viewModel.ConfirmOnClose();
 

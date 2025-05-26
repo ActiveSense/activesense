@@ -62,14 +62,14 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
         LoadDefaultInformation();
     }
-    
+
     // public ProcessDialogViewModel() {}
 
     private void LoadDefaultInformation()
     {
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
         ProcessingInfo = processor.ProcessingInfo;
-        
+
         Arguments.Clear();
 
         foreach (var arg in processor.DefaultArguments)
@@ -116,7 +116,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
         if (remaining.TotalSeconds <= 0)
         {
-            TimeRemaining = "Finalizing...";
+            TimeRemaining = "Fertigstellen...";
             ProgressValue = 100;
         }
         else
@@ -187,9 +187,9 @@ public partial class ProcessDialogViewModel : DialogViewModel
             IsProcessing = true;
 
             StatusMessage = "Laufzeit wird berechnet...";
-            var estimatedTime = await processor.GetEstimatedProcessingTimeAsync(SelectedFiles);
+            var estimatedTime = await processor.GetEstimatedProcessingTimeAsync(SelectedFiles, Arguments.ToList());
             StartCountdown(estimatedTime);
-                
+
             _sharedDataService.IsProcessingInBackground = true;
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -198,26 +198,26 @@ public partial class ProcessDialogViewModel : DialogViewModel
             var processingDirectory = _pathService.ScriptInputPath;
             var outputDirectory = _pathService.OutputDirectory;
 
-            processor.CopyFiles(SelectedFiles, processingDirectory, outputDirectory);
 
+            await processor.CopyFilesAsync(SelectedFiles, processingDirectory, outputDirectory);
 
             StatusMessage = "Dateien werden verarbeitet...";
 
             if (Directory.EnumerateFiles(processingDirectory).Any())
             {
                 var (scriptSuccess, output) =
-                    await processor.ProcessAsync(Arguments, _cancellationTokenSource.Token);
+                    await processor.ProcessAsync(Arguments.ToList(), _cancellationTokenSource.Token);
                 ScriptOutput = output;
                 ShowScriptOutput = true;
 
                 if (!scriptSuccess)
                 {
-                    var dialog = new InfoDialogViewModel()
+                    var dialog = new InfoDialogViewModel
                     {
                         Title = "Fehler",
                         Message = "Script Execution failed",
                         ExtendedMessage = output,
-                        OkButtonText = "Schliessen",
+                        OkButtonText = "Schliessen"
                     };
                     await _dialogService.ShowDialog<MainViewModel, InfoDialogViewModel>(_mainViewModel, dialog);
                     return;
@@ -229,26 +229,18 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StopCountdown();
             await ParseResults();
         }
-        
+
         catch (OperationCanceledException)
         {
             Close();
         }
-        
+
         catch (FileNotFoundException)
         {
-            var dialog = new PathDialogViewModel()
-            {
-                Title = "Fehler",
-                SubTitle = "R Installation nicht gefunden",
-                Message =
-                    "Es wurde kein R-Installationsverzeichnis gefunden. Bitte geben Sie den Pfad zu Ihrer R-Installation an.",
-                OkButtonText = "Speichern",
-                CloseButtonText = "Abbrechen"
-            };
+            var dialog = new PathDialogViewModel();
             await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
         }
-        
+
         catch (Exception ex)
         {
             var dialog = new InfoDialogViewModel
@@ -261,7 +253,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             };
             await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
         }
-        
+
         finally
         {
             StopCountdown();

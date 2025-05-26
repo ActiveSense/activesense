@@ -12,29 +12,15 @@ using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
-public class GeneActiveProcessor : ISensorProcessor
+public class GeneActiveProcessor(
+    IPathService pathService,
+    IScriptExecutor scriptExecutor,
+    IFileManager fileManager,
+    IProcessingTimeEstimator timeEstimator,
+    ILogger logger)
+    : ISensorProcessor
 {
-    private readonly List<ScriptArgument> _defaultArguments;
-    private readonly IFileManager _fileManager;
-    private readonly IPathService _pathService;
-    private readonly IScriptExecutor _scriptExecutor;
-    private readonly IProcessingTimeEstimator _timeEstimator;
-    Serilog.ILogger _logger; 
-
-    public GeneActiveProcessor(
-        IPathService pathService,
-        IScriptExecutor scriptExecutor,
-        IFileManager fileManager,
-        IProcessingTimeEstimator timeEstimator,
-        Serilog.ILogger logger)
-    {
-        _logger = logger;
-        _pathService = pathService;
-        _scriptExecutor = scriptExecutor;
-        _fileManager = fileManager;
-        _timeEstimator = timeEstimator;
-        _defaultArguments = CreateDefaultArguments();
-    }
+    private readonly List<ScriptArgument> _defaultArguments = CreateDefaultArguments();
 
     private static string[] SupportedFileTypes => [".bin"];
 
@@ -43,22 +29,24 @@ public class GeneActiveProcessor : ISensorProcessor
     public IReadOnlyList<ScriptArgument> DefaultArguments => _defaultArguments;
 
     public async Task<(bool Success, string Output)> ProcessAsync(
-        IEnumerable<ScriptArgument> arguments, CancellationToken cancellationToken = default)
+        IList<ScriptArgument> arguments, CancellationToken cancellationToken = default)
     {
         try
         {
-            var scriptPath = _pathService.MainScriptPath;
-            var executablePath = _pathService.ScriptExecutablePath;
-            var workingDirectory = _pathService.ScriptBasePath;
-            
-            _logger.Information("Starting GeneActive processing");
-            _logger.Information($"Script path: {scriptPath}");
-            _logger.Information($"Executable path: {executablePath}");
-            _logger.Information($"Working directory: {workingDirectory}");
+            var scriptPath = pathService.MainScriptPath;
+            var executablePath = pathService.ScriptExecutablePath;
+            var workingDirectory = pathService.ScriptBasePath;
 
-            var argsToUse = arguments?.ToList() ?? _defaultArguments;
+            logger.Information("Processing started");
+            logger.Information($"Script path: {scriptPath}");
+            logger.Information($"Executable path: {executablePath}");
+            logger.Information($"Working directory: {workingDirectory}");
+            logger.Information("Processing Arguments: {Arguments}",
+                string.Join(", ", arguments.Select(a => a.ToCommandLineArgument())));
 
-            var outputDir = $"-d \"{_pathService.OutputDirectory}\"";
+            var argsToUse = arguments;
+
+            var outputDir = $"-d \"{pathService.OutputDirectory}\"";
 
             var scriptArguments = string.Join(" ",
                 argsToUse
@@ -67,160 +55,175 @@ public class GeneActiveProcessor : ISensorProcessor
 
             var processArguments = $"\"{scriptPath}\" {outputDir} {scriptArguments}";
 
-            var result = await _scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
+            var result = await scriptExecutor.ExecuteScriptAsync(executablePath, processArguments, workingDirectory,
                 cancellationToken);
-            
-            _logger.Information("Processing completed");
-            
+
+            logger.Information("Processing completed");
+
             return result;
         }
+
         catch (OperationCanceledException)
         {
             throw;
         }
+
         catch (FileNotFoundException)
         {
-            _logger.Error("R executable not found.");
+            logger.Error("R executable not found.");
             throw;
         }
+
         catch (Exception ex)
         {
-            _logger.Error(ex.Message, "Error executing R script");
+            logger.Error(ex.Message, "Error executing R script");
             return (false, $"Failed to execute R script: {ex.Message}");
         }
     }
 
-    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files)
+    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files,
+        IList<ScriptArgument> arguments)
     {
         long totalSizeBytes = 0;
-        foreach (string filePath in files)
+        foreach (var filePath in files)
         {
-            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) continue;
+            try
             {
-                try
-                {
-                    totalSizeBytes += new FileInfo(filePath).Length;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
-                }
+                totalSizeBytes += new FileInfo(filePath).Length;
+            }
+            catch (Exception ex)
+            {
+                logger.Warning("Could not get size for file {filePath}. Error: {error}", filePath, ex.Message);
             }
         }
-        double totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
-        
-        return await Task.Run(() => _timeEstimator.EstimateProcessingTime(totalSizeMB));
+
+        var totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
+
+        return await Task.Run(() => timeEstimator.EstimateProcessingTime(totalSizeMB, arguments));
     }
 
-    public void CopyFiles(string[] files, string processingDirectory, string outputDirectory)
+    public async Task CopyFilesAsync(string[] files, string processingDirectory, string outputDirectory)
     {
-        _fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes);
+        await Task.Run(() => fileManager.CopyFiles(files, processingDirectory, outputDirectory, SupportedFileTypes));
     }
 
     public string ProcessingInfo =>
         "Einstellungen werden nur auf die Verarbeitung von .bin-Dateien angewendet. Beim Import als PDF werden die Einstellungen ignoriert.";
 
-    private List<ScriptArgument> CreateDefaultArguments()
+    #region Arguments
+
+    private static List<ScriptArgument> CreateDefaultArguments()
     {
         return
         [
             new BoolArgument
             {
                 Flag = "activity",
-                Name = "Activity Analysis",
-                Description = "Run activity analysis",
+                Name = "Aktivitätsanalyse",
                 Value = true
             },
 
             new BoolArgument
             {
                 Flag = "sleep",
-                Name = "Sleep Analysis",
-                Description = "Run sleep analysis",
+                Name = "Schlafanalyse",
                 Value = true
             },
-            
+
+            new BoolArgument
+            {
+                Flag = "legacy",
+                Name = "Legacy Mode",
+                Description =
+                    "Setzt die Libraries auf die originalen Versionen zurück. Die Analyse dauert dardurch länger. Nicht empfohlen.",
+                Value = false
+            },
+
+            new BoolArgument
+            {
+                Flag = "clipping",
+                Name = "Ersten und letzten Tag entfernen",
+                Description = "Entfernt den ersten und letzten Tag der Aktivitätsdaten.",
+                Value = true
+            },
+
             // Left wrist thresholds
             new NumericArgument
             {
                 Flag = "sedentary_left",
                 Name = "Sedentary Threshold (Left)",
-                Description = "Threshold for sedentary activity on left wrist (in g)",
+                Description = "Schwellenwert für sitzende Aktivität am linken Handgelenk in g (Standard: 0,04)",
                 MinValue = 0.01,
                 MaxValue = 0.1,
                 Value = 0.04
             },
-
             new NumericArgument
             {
                 Flag = "light_left",
                 Name = "Light Threshold (Left)",
-                Description = "Threshold for light activity on left wrist",
+                Description = "Schwellenwert für leichte Aktivität am linken Handgelenk in g (Standard: 217)",
                 MinValue = 100,
                 MaxValue = 500,
                 Value = 217
             },
-
             new NumericArgument
             {
                 Flag = "moderate_left",
                 Name = "Moderate Threshold (Left)",
-                Description = "Threshold for moderate activity on left wrist",
+                Description = "Schwellenwert für moderate Aktivität am linken Handgelenk in g (Standard: 644)",
                 MinValue = 300,
                 MaxValue = 1000,
                 Value = 644
             },
-
             new NumericArgument
             {
                 Flag = "vigorous_left",
                 Name = "Vigorous Threshold (Left)",
-                Description = "Threshold for vigorous activity on left wrist",
+                Description = "Schwellenwert für intensive Aktivität am linken Handgelenk in g (Standard: 1810)",
                 MinValue = 1000,
                 MaxValue = 3000,
                 Value = 1810
             },
-
             // Right wrist thresholds
             new NumericArgument
             {
                 Flag = "sedentary_right",
                 Name = "Sedentary Threshold (Right)",
-                Description = "Threshold for sedentary activity on right wrist (in g)",
+                Description = "Schwellenwert für sitzende Aktivität am rechten Handgelenk in g (Standard: 0,04)",
                 MinValue = 0.01,
                 MaxValue = 0.1,
                 Value = 0.04
             },
-
             new NumericArgument
             {
                 Flag = "light_right",
                 Name = "Light Threshold (Right)",
-                Description = "Threshold for light activity on right wrist",
+                Description = "Schwellenwert für leichte Aktivität am rechten Handgelenk in g (Standard: 386)",
                 MinValue = 100,
                 MaxValue = 800,
                 Value = 386
             },
-
             new NumericArgument
             {
                 Flag = "moderate_right",
                 Name = "Moderate Threshold (Right)",
-                Description = "Threshold for moderate activity on right wrist",
+                Description = "Schwellenwert für moderate Aktivität am rechten Handgelenk in g (Standard: 439)",
                 MinValue = 200,
                 MaxValue = 800,
                 Value = 439
             },
-
             new NumericArgument
             {
                 Flag = "vigorous_right",
                 Name = "Vigorous Threshold (Right)",
-                Description = "Threshold for vigorous activity on right wrist",
+                Description = "Schwellenwert für intensive Aktivität am rechten Handgelenk in g (Standard: 2098)",
                 MinValue = 1000,
                 MaxValue = 3500,
                 Value = 2098
             }
         ];
     }
+
+    #endregion
 }

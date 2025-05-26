@@ -1,25 +1,23 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Common Control Styles -->
-        
-    <!-- Add simple styles for our custom setting items -->
+    <!-- styles for setting items -->
     <Style Selector="Border.setting-item">
-        <Setter Property="Padding" Value="12,8"/>
-        <Setter Property="Margin" Value="0,4"/>
-        <Setter Property="Background" Value="#F6F6F6"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Margin" Value="0,4" />
+        <Setter Property="Background" Value="#F6F6F6" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
-        
+
     <Style Selector="TextBlock.setting-title">
-        <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="Margin" Value="0,0,0,2"/>
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Margin" Value="0,0,0,2" />
     </Style>
-        
+
     <Style Selector="TextBlock.setting-description">
-        <Setter Property="Opacity" Value="0.7"/>
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Margin" Value="0,0,0,8"/>
+        <Setter Property="Opacity" Value="0.7" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Margin" Value="0,0,4,8" />
     </Style>
 
     <Style Selector="Border.card">

@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
 using ActiveSense.Desktop.ViewModels;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 
 namespace ActiveSense.Desktop.Views;
 
@@ -15,13 +12,9 @@ public partial class ExportDialogView : UserControl
     {
         InitializeComponent();
 
-        // Wire up the file picker event when the DataContext is set
-        this.DataContextChanged += (sender, e) =>
+        DataContextChanged += (sender, e) =>
         {
-            if (DataContext is ExportDialogViewModel viewModel)
-            {
-                viewModel.FilePickerRequested += ShowFilePickerAsync;
-            }
+            if (DataContext is ExportDialogViewModel viewModel) viewModel.FilePickerRequested += ShowFilePickerAsync;
         };
     }
 
@@ -30,47 +23,35 @@ public partial class ExportDialogView : UserControl
         var sp = GetStorageProvider();
         if (sp is null) return null;
 
-        if (DataContext is ExportDialogViewModel viewModel)
+        if (DataContext is not ExportDialogViewModel { SelectedAnalysesCount: 1 } viewModel) return null;
+        var selectedAnalysis = viewModel.GetFirstSelectedAnalysis();
+
+        // Determine file extension and type based on export options
+        string extension;
+        List<FilePickerFileType> fileTypes;
+
+        if (includeRawData)
         {
-            if (viewModel.SelectedAnalysesCount == 1)
-            {
-                var selectedAnalysis = viewModel.GetFirstSelectedAnalysis();
-
-                // Determine file extension and type based on export options
-                string extension;
-                List<FilePickerFileType> fileTypes;
-
-                if (includeRawData)
-                {
-                    extension = ".zip";
-                    fileTypes = GetZipFileType();
-                }
-                else
-                {
-                    extension = ".pdf";
-                    fileTypes = GetPdfFileType();
-                }
-
-                var fileName = $"{selectedAnalysis.FileName}{extension}";
-
-                var result = await sp.SaveFilePickerAsync(new FilePickerSaveOptions()
-                {
-                    Title = "Save Analysis",
-                    SuggestedFileName = fileName,
-                    FileTypeChoices = fileTypes,
-                    DefaultExtension = extension
-                });
-
-                return result?.Path.LocalPath;
-            }
-            else
-            {
-                viewModel.StatusMessage = "Please select exactly one analysis to export";
-                return null;
-            }
+            extension = ".zip";
+            fileTypes = GetZipFileType();
+        }
+        else
+        {
+            extension = ".pdf";
+            fileTypes = GetPdfFileType();
         }
 
-        return null;
+        var fileName = $"{selectedAnalysis.FileName}{extension}";
+
+        var result = await sp.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Analysis",
+            SuggestedFileName = fileName,
+            FileTypeChoices = fileTypes,
+            DefaultExtension = extension
+        });
+
+        return result?.Path.LocalPath;
     }
 
     private IStorageProvider? GetStorageProvider()
@@ -81,25 +62,25 @@ public partial class ExportDialogView : UserControl
 
     private List<FilePickerFileType> GetPdfFileType()
     {
-        return new List<FilePickerFileType>
-        {
+        return
+        [
             new FilePickerFileType("PDF Document")
             {
-                Patterns = new[] { "*.pdf" },
-                MimeTypes = new[] { "application/pdf" }
+                Patterns = ["*.pdf"],
+                MimeTypes = ["application/pdf"]
             }
-        };
+        ];
     }
 
     private List<FilePickerFileType> GetZipFileType()
     {
-        return new List<FilePickerFileType>
-        {
+        return
+        [
             new FilePickerFileType("ZIP Archive")
             {
-                Patterns = new[] { "*.zip" },
-                MimeTypes = new[] { "application/zip" }
+                Patterns = ["*.zip"],
+                MimeTypes = ["application/zip"]
             }
-        };
+        ];
     }
 }

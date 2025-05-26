@@ -260,7 +260,8 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
             Labels = new[] { "Aktivität", "Schlaf", "Sitzzeit" },
             Data = new[]
             {
-                Math.Round((AverageLightActivity + AverageModerateActivity + AverageVigorousActivity) / 3600, 2), Math.Round(AverageSleepTime / 3600, 2) , Math.Round(AverageSedentaryTime / 3600, 2) 
+                Math.Round((AverageLightActivity + AverageModerateActivity + AverageVigorousActivity) / 3600, 2),
+                Math.Round(AverageSleepTime / 3600, 2), Math.Round(AverageSedentaryTime / 3600, 2)
             },
             Title = $"{FileName}"
         };
@@ -335,12 +336,12 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
         _cache.Clear();
     }
 
-    private T GetCachedValue<T>(Func<T> valueFactory, [CallerMemberName] string key = null)
+    private T GetCachedValue<T>(Func<T> valueFactory, [CallerMemberName] string key = null!)
     {
         if (_cache.TryGetValue(key, out var value) && value is T cachedValue) return cachedValue;
 
         var newValue = valueFactory();
-        _cache[key] = newValue;
+        _cache[key] = newValue!;
         return newValue;
     }
 
@@ -359,7 +360,7 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
 
     private string[] GetUniqueWeekdayLabels(string[] weekdays)
     {
-        if (weekdays == null || weekdays.Length == 0)
+        if (weekdays.Length == 0)
             return [];
 
         var uniqueLabels = new string[weekdays.Length];

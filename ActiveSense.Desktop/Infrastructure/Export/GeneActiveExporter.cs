@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Export;
 
@@ -10,7 +11,7 @@ public class GeneActiveExporter(
     IPdfReportGenerator pdfReportGenerator,
     ICsvExporter csvExporter,
     IArchiveCreator archiveCreator,
-    Serilog.ILogger logger)
+    ILogger logger)
     : IExporter
 {
     public async Task<bool> ExportAsync(IAnalysis analysis, string outputPath, bool exportRawData = false)
@@ -24,10 +25,7 @@ public class GeneActiveExporter(
 
     private async Task<bool> ExportPdfAndCsvZipAsync(IAnalysis analysis, string outputPath)
     {
-        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
-        {
-            return false;
-        }
+        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis)) return false;
 
         try
         {

@@ -9,7 +9,7 @@ public static class GeneActiveAnalysisExtensions
 {
     public static string GetSleepDateRange(this ISleepAnalysis analysis, string format = "dd.MM.yyyy")
     {
-        if (analysis == null || analysis.SleepRecords == null || !analysis.SleepRecords.Any())
+        if (!analysis.SleepRecords.Any())
             return "No sleep data available";
 
         try
@@ -35,7 +35,7 @@ public static class GeneActiveAnalysisExtensions
 
     public static string GetActivityDateRange(this IActivityAnalysis analysis, string format = "dd.MM.yyyy")
     {
-        if (analysis == null || analysis.ActivityRecords == null || !analysis.ActivityRecords.Any())
+        if (!analysis.ActivityRecords.Any())
             return "No activity data available";
 
         try

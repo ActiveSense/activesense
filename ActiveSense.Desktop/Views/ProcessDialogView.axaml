@@ -22,7 +22,6 @@
             Height="530"
             Width="650">
         <Grid RowDefinitions="Auto, *, Auto, Auto">
-            <!-- Header -->
             <Grid Grid.Row="0" IsVisible="{Binding !IsProcessing}"
                   Margin="24,24,24,0">
                 <StackPanel>
@@ -43,10 +42,9 @@
                 HorizontalAlignment="Right"
                 Background="Transparent"
                 BorderThickness="0">
-                <PathIcon Data="{StaticResource arrow_minimize_regular}"></PathIcon>
+                <PathIcon Data="{StaticResource arrow_minimize_regular}" />
             </Button>
 
-            <!-- Content -->
             <ScrollViewer Grid.Row="1"
                           Padding="24,0,24,0"
                           VerticalScrollBarVisibility="Auto">
@@ -93,7 +91,7 @@
                                                                             TextWrapping="Wrap" />
                                                                     </StackPanel>
                                                                     <NumericUpDown Grid.Column="1"
-                                                                        Value="{Binding Value}"
+                                                                        Value="{Binding DisplayValue}"
                                                                         Minimum="{Binding MinValue}"
                                                                         Maximum="{Binding MaxValue}"
                                                                         Increment="0.01"
@@ -114,7 +112,6 @@
 
                     </StackPanel>
 
-                    <!-- Separator -->
                     <Rectangle Grid.Column="1" Fill="Transparent" />
 
                     <!-- Right column - File selection -->
@@ -128,15 +125,13 @@
                                     CornerRadius="6"
                                     Padding="6">
                                 <Grid>
-                                    <!-- "No files" message -->
                                     <TextBlock Text="Keine Dateien ausgewählt"
                                                IsVisible="{Binding SelectedFiles, Converter={x:Static ObjectConverters.IsNull}}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                Foreground="#888888"
                                                Margin="0,40,0,40" />
-                 
-                                    <!-- Files list -->
+
                                     <ListBox ItemsSource="{Binding SelectedFiles}"
                                              Background="Transparent"
                                              Padding="0"
@@ -145,7 +140,8 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid ColumnDefinitions="Auto, *" Margin="0,3">
-                                                    <PathIcon Data="{StaticResource folder_regular}" Height="15" Margin="0 0 5 0"></PathIcon>
+                                                    <PathIcon Data="{StaticResource folder_regular}" Height="15"
+                                                              Margin="0 0 5 0" />
                                                     <TextBlock Grid.Column="1"
                                                                Text="{Binding}"
                                                                TextWrapping="NoWrap"
@@ -171,7 +167,7 @@
                                     Margin="0,8,0,0"
                                     Classes="dialog-secondary-button">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <PathIcon Data="{StaticResource folder_add_regular}" Height="15"/>
+                                    <PathIcon Data="{StaticResource folder_add_regular}" Height="15" />
                                     <TextBlock>Dateien auswählen</TextBlock>
                                 </StackPanel>
                             </Button>
@@ -209,8 +205,7 @@
                     </StackPanel>
                 </Border>
             </Grid>
-            
-            <!-- Message section between content and footer -->
+
             <Border Grid.Row="2"
                     BorderThickness="1"
                     BorderBrush="#DDDDDD"
@@ -221,23 +216,22 @@
                     IsVisible="{Binding !IsProcessing}">
                 <Grid ColumnDefinitions="Auto,*">
                     <PathIcon Grid.Column="0"
-                           Data="{StaticResource info_regular}" 
-                           Height="16"
-                           VerticalAlignment="Top"
-                           Margin="0,2,8,0" />
+                              Data="{StaticResource info_regular}"
+                              Height="16"
+                              VerticalAlignment="Top"
+                              Margin="0,2,8,0" />
                     <TextBlock Grid.Column="1"
-                       Text="{Binding ProcessingInfo}"
-                       Classes="Primary"
-                       TextWrapping="Wrap"
-                       Foreground="#333333" />
+                               Text="{Binding ProcessingInfo}"
+                               Classes="Primary"
+                               TextWrapping="Wrap"
+                               Foreground="#333333" />
                 </Grid>
             </Border>
 
-            <!-- Footer -->
             <Grid Grid.Row="3"
                   Margin="24,20"
                   ColumnDefinitions="Auto, *, Auto">
-                
+
                 <Button Grid.Column="0"
                         Classes="Secondary"
                         Command="{Binding CancelCommand}">

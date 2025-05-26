@@ -12,7 +12,6 @@
                   VerticalScrollBarVisibility="Visible"
                   HorizontalScrollBarVisibility="Disabled">
         <Grid>
-            <!-- Empty state message when no charts are visible -->
             <Border IsVisible="{Binding !ChartsVisible}"
                     CornerRadius="8"
                     Padding="20"
@@ -21,7 +20,6 @@
                     VerticalAlignment="Center"
                     MaxWidth="400">
                 <StackPanel Spacing="15" HorizontalAlignment="Center">
-                    <!-- Message -->
                     <TextBlock Text="Keine Daten ausgewählt"
                                FontSize="20"
                                FontWeight="SemiBold"
@@ -144,7 +142,6 @@
                     </StackPanel>
                 </Expander>
 
-
                 <!-- Light Chart Section -->
                 <Expander Header="{Binding LightTitle}"
                           IsExpanded="{Binding IsLightExpanded}"
@@ -177,7 +174,7 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
-                
+
                 <!-- Moderate Chart Section -->
                 <Expander Header="{Binding ModerateTitle}"
                           IsExpanded="{Binding IsModerateExpanded}"
@@ -210,7 +207,7 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
-                
+
                 <!-- Vigorous Chart Section -->
                 <Expander Header="{Binding VigorousTitle}"
                           IsExpanded="{Binding IsVigorousExpanded}"

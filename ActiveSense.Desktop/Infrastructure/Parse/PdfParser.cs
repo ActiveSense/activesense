@@ -10,10 +10,11 @@ using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Parse;
 
-public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter, Serilog.ILogger logger)
+public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter, ILogger logger)
     : IPdfParser
 {
     private readonly DateToWeekdayConverter _dateConverter = dateConverter;
@@ -35,7 +36,6 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
         await Task.Run(() =>
         {
             foreach (var file in pdfFiles)
-            {
                 try
                 {
                     logger.Information("Parsing PDF file: {File}", file);
@@ -51,7 +51,6 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
                     logger.Error(e, "Error parsing PDF file: {File}", file);
                     throw new InvalidDataException($"Error parsing PDF file {file}: {e.Message}");
                 }
-            }
         });
 
         return analyses;

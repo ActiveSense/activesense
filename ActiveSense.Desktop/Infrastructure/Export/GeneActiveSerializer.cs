@@ -14,9 +14,7 @@ public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSer
     public virtual string ExportToBase64(IAnalysis analysis)
     {
         if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
-        {
             throw new ArgumentException("Analysis must be an IActivityAnalysis or ISleepAnalysis.");
-        }
 
         try
         {
@@ -25,7 +23,7 @@ public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSer
                 FileName = analysis.FileName,
                 FilePath = analysis.FilePath,
                 ActivityRecords = activityAnalysis.ActivityRecords,
-                SleepRecords = sleepAnalysis.SleepRecords,
+                SleepRecords = sleepAnalysis.SleepRecords
             };
 
             var json = JsonConvert.SerializeObject(serializable, Formatting.None);

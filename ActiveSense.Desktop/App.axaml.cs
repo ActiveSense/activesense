@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using ActiveSense.Desktop.Charts;
-using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
@@ -21,7 +20,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
@@ -36,7 +34,7 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
@@ -62,7 +60,6 @@ public class App : Application
         collection.AddSingleton<GeneActiveProcessor>();
 
         // Register export components
-        collection.AddSingleton<IChartRenderer, ChartRenderer>();
         collection.AddSingleton<ICsvExporter, CsvExporter>();
         collection.AddSingleton<IArchiveCreator, ArchiveCreator>();
         collection.AddSingleton<IPdfReportGenerator, PdfReportGenerator>();
@@ -82,7 +79,7 @@ public class App : Application
         collection.AddSingleton<IPathService, PathService>();
 
         // Register view models
-        collection.AddSingleton<ViewModels.MainViewModel>();
+        collection.AddSingleton<MainViewModel>();
         collection.AddTransient<DialogService>();
         collection.AddTransient<DialogViewModel>();
         collection.AddTransient<ProcessDialogViewModel>();
@@ -94,12 +91,12 @@ public class App : Application
 
         // Register converters
         collection.AddTransient<DateToWeekdayConverter>();
-        
+
         // Logging
         collection.AddSingleton(Log.Logger);
-        collection.AddLogging(loggingBuilder => 
+        collection.AddLogging(loggingBuilder =>
             loggingBuilder.AddSerilog(dispose: true));
-        
+
 
         // Register charts
         collection.AddTransient<BarChartViewModel>();
@@ -112,28 +109,28 @@ public class App : Application
             ApplicationPageNames.Schlaf => x.GetRequiredService<SleepPageViewModel>(),
             ApplicationPageNames.Aktivität => x.GetRequiredService<ActivityPageViewModel>(),
             ApplicationPageNames.Allgemein => x.GetRequiredService<GeneralPageViewModel>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         // Register processors 
         collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveProcessor>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         // Register parsers
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         // Register exporters
         collection.AddSingleton<Func<SensorTypes, IExporter>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveExporter>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         var services = collection.BuildServiceProvider();
@@ -142,11 +139,11 @@ public class App : Application
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit
             DisableAvaloniaDataAnnotationValidation();
-            
+
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView
             {
-                DataContext = services.GetRequiredService<ViewModels.MainViewModel>()
+                DataContext = services.GetRequiredService<MainViewModel>()
             };
         }
 
