@@ -9,12 +9,10 @@
 rm(list=ls())
 
 # Sets repository
-local({
-  options(repos = c(
-    ACTIVESENSE_UNIVERSE = "https://activesense.r-universe.dev",
-    CRAN = "http://cran.r-project.org"
-  ))
-})
+options(repos = c(
+  ACTIVESENSE_UNIVERSE = "https://activesense.r-universe.dev",
+  CRAN = "http://cran.r-project.org"
+))
 
 # time zone
 Sys.setenv(TZ = "GMT")
@@ -30,52 +28,19 @@ if (!is.null(mmap_setting_from_test)) {
   print(paste0("Using default mmap.load: ", mmap.load))
 }
 
-# ==================================
-# LIBRARIES
-# ==================================
-
+# Needs early source, since helper functions needed
 source("functions/01_library_installer.R")
-
-libraries <- c(
-  "GENEAread",
-  "GENEAclassify",
-  "optparse"
-)
-
-install_libraries(libraries)
-
-library(GENEAread)
-library(GENEAclassify)
-library(optparse)
-# library(testthat) // Only needed, when running tests
-
-# ==================================
-# SOURCE
-# ==================================
-
-# functions
-source("analysis/activity_analysis.R")
-source("analysis/sleep_analysis.R")
-source("functions/01_library_installer.R")
-source("functions/02_activity_combine_segment_data.R")
-source("functions/02_sleep_combine_segment_data.R")
-source("functions/03_naming_protocol.R")
-source("functions/04_activity_create_df_pcp.R")
-source("functions/04_sleep_create_df_pcp.R")
-source("functions/05_number_of_days.R")
-source("functions/06_bed_rise_detect.R")
-source("functions/07_activity_state_rearrange.R")
-source("functions/07_sleep_state_rearrange.R")
-source("functions/08_activity_summary.R")
-source("functions/08_sleep_summary.R")
-
-# utils
-source("utils/timer.R")
-source("utils/cleanup.R")
 
 # ==================================
 # PARAMETERS
 # ==================================
+
+if ("optparse" %in% rownames(installed.packages()) == FALSE) {
+  message("==== Installing optparse====")
+  install_package("optparse")
+}
+
+library(optparse)
 
 # Define command line options
 option_list <- list(
@@ -85,6 +50,8 @@ option_list <- list(
               help="Run activity analysis [default: %default]"),
   make_option(c("-s", "--sleep"), type="logical", default=TRUE,
               help="Run sleep analysis [default: %default]"),
+  make_option(c("-l", "--legacy"), type="logical", default=FALSE,
+              help="Use old GENEA libraries [default: %default]"),
   
   # --- LEFT WRIST ---
   make_option("--sedentary_left", type="double", default=0.04,
@@ -115,6 +82,7 @@ opt <- parse_args(opt_parser)
 output_dir <- opt$directory
 analyze_activity <- opt$activity
 analyze_sleep <- opt$sleep
+use_legacy <- opt$legacy
 
 # left wrist
 sedentary_left <- opt$sedentary_left
@@ -131,6 +99,47 @@ vigorous_right <- opt$vigorous_right
 # Create directories
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
 dir.create(file.path(output_dir), showWarnings = FALSE)
+
+# ==================================
+# LIBRARIES
+# ==================================
+
+libraries <- c(
+  "GENEAread",
+  "GENEAclassify"
+)
+
+# If use_legacy == TRUE, only use CRAN
+if (use_legacy) { options(repos = c(CRAN = "http://cran.r-project.org")) }
+
+install_libraries(libraries)
+
+library(GENEAread)
+library(GENEAclassify)
+
+# ==================================
+# SOURCE
+# ==================================
+
+# functions
+source("analysis/activity_analysis.R")
+source("analysis/sleep_analysis.R")
+source("functions/01_library_installer.R")
+source("functions/02_activity_combine_segment_data.R")
+source("functions/02_sleep_combine_segment_data.R")
+source("functions/03_naming_protocol.R")
+source("functions/04_activity_create_df_pcp.R")
+source("functions/04_sleep_create_df_pcp.R")
+source("functions/05_number_of_days.R")
+source("functions/06_bed_rise_detect.R")
+source("functions/07_activity_state_rearrange.R")
+source("functions/07_sleep_state_rearrange.R")
+source("functions/08_activity_summary.R")
+source("functions/08_sleep_summary.R")
+
+# utils
+source("utils/timer.R")
+source("utils/cleanup.R")
 
 # ==================================
 # DATACOLS

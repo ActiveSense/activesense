@@ -15,27 +15,19 @@ options(install.packages.check.source = "no")
 # ==================================
 
 install_libraries <- function(libraries) {
-  
-  os_type <- Sys.info()["sysname"]
   libraries_to_install <- check_if_install_needed(libraries)
   
   if (length(libraries_to_install) == 0) {
     message("###### EVERYTHING'S ALREADY INSTALLED ######")
     return()
   } else {
-    message("###### THE FOLLOWING PACKAGES WILL BE INSTALLED FOR --- ", toupper(os_type), " --- ######")
+    message("###### THE FOLLOWING PACKAGES WILL BE INSTALLED FOR --- ", toupper(Sys.info()["sysname"]), " --- ######")
     message(paste(libraries_to_install, collapse = "\n"))
   }
   
-  
   for (pkg_name in libraries_to_install) {
     message(paste0("\n==== Installing '", pkg_name, "' ===="))
-    
-    if (os_type == "Windows" || os_type == "Darwin") {
-      install.packages(pkg_name, type = "binary")
-    } else if (os_type == "Linux") {
-      install.packages(pkg_name)
-    }
+    install_package(pkg_name)
     
     success <- pkg_name %in% rownames(installed.packages())
     if (success) {
@@ -52,6 +44,16 @@ install_libraries <- function(libraries) {
 # HELPER FUNCTIONS
 # ==================================
 
+install_package <- function(pkg) {
+  os_type <- Sys.info()["sysname"]
+  
+  if (os_type == "Windows" || os_type == "Darwin") {
+    install.packages(pkg, type = "binary")
+  } else if (os_type == "Linux") {
+    install.packages(pkg)
+  }
+}
+
 check_if_install_needed <- function(libraries) {
   
   message(paste0("###### CHECK IF INSTALLATION NEEDED ######\n"))
@@ -64,17 +66,22 @@ check_if_install_needed <- function(libraries) {
     isInstalled <- pkg_name %in% rownames(installed.packages())
     isGENEApackage <- grepl("GENEA", pkg_name)
     
-    # Already installed, but not from custom repository
+    # Already installed, but wrong version
     if (isInstalled && isGENEApackage) {
       repo_info <- packageDescription(pkg_name, fields = "Repository")
-      custom <- !is.na(repo_info) && grepl("activesense", repo_info)
       
-      if (!custom) {
-        message(paste0(" -> installed, but not CUSTOM version. Reinstallation neccessary.\n"))
-        temp_libs <- c(temp_libs, pkg_name)
+      expected_pattern <- if (use_legacy) "CRAN" else "activesense"
+      version_type <- if (use_legacy) "LEGACY (CRAN)" else "CUSTOM"
+      
+      is_correct_version <- !is.na(repo_info) && grepl(expected_pattern, repo_info)
+      
+      if (is_correct_version) {
+        message(sprintf(" -> Correct %s version installed. No installation necessary\n", version_type))
       } else {
-        message(paste0(" -> Correct CUSTOM version installed. No installation neccessary\n"))
+        message(sprintf(" -> installed, but not %s version. Reinstallation necessary.\n", version_type))
+        temp_libs <- c(temp_libs, pkg_name)
       }
+      
       next
     }
     
