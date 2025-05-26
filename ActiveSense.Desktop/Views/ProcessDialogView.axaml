@@ -91,7 +91,7 @@
                                                                             TextWrapping="Wrap" />
                                                                     </StackPanel>
                                                                     <NumericUpDown Grid.Column="1"
-                                                                        Value="{Binding Value}"
+                                                                        Value="{Binding DisplayValue}"
                                                                         Minimum="{Binding MinValue}"
                                                                         Maximum="{Binding MaxValue}"
                                                                         Increment="0.01"

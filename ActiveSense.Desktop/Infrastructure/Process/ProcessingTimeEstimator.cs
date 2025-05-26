@@ -53,11 +53,12 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     {
         if (arguments == null || arguments.Count == 0)
         {
-            return 1.0; // No reduction if no arguments provided
+            return 1.0;
         }
 
         bool activityEnabled = true;
         bool sleepEnabled = true;
+        bool legacyEnabled = false;
 
         foreach (var arg in arguments)
         {
@@ -71,24 +72,33 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
                 {
                     sleepEnabled = boolArg.Value;
                 }
+                else if (boolArg.Flag == "legacy")
+                {
+                    legacyEnabled = boolArg.Value;
+                }
             }
         }
 
-        // If both are enabled, no reduction (factor = 1.0)
-        // If one is disabled, half the time (factor = 0.5)
-        // If both are disabled, still some processing time (factor = 0.1)
+        double baseFactor;
         if (activityEnabled && sleepEnabled)
         {
-            return 1.0;
+            baseFactor = 1.0;
         }
         else if (activityEnabled || sleepEnabled)
         {
-            return 0.5;
+            baseFactor = 0.5;
         }
         else
         {
-            return 0.1; // Some minimal processing even if both are disabled
+            baseFactor = 0.1;
         }
+
+        if (legacyEnabled)
+        {
+            baseFactor *= 2.0; // Legacy mode takes double the time
+        }
+
+        return baseFactor;
     }
 
     private static double CalculateMachineSpeedFactor()
@@ -101,7 +111,7 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
         }
 
         var average = values.Average();
-        if (average <=0)
+        if (average <= 0)
         {
             return 1.0;
         }

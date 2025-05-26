@@ -74,7 +74,7 @@ public class GeneActiveProcessorTests
 
         // Assert
         Assert.That(args, Is.Not.Null);
-        Assert.That(args.Count, Is.EqualTo(10));
+        Assert.That(args.Count, Is.EqualTo(12));
 
         // Check for activity analysis argument
         var activityArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "activity");
@@ -86,6 +86,16 @@ public class GeneActiveProcessorTests
         Assert.That(sleepArg, Is.Not.Null);
         Assert.That((sleepArg as BoolArgument)?.Value, Is.True);
 
+        // Check for sleep analysis argument
+        var legacyArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "legacy");
+        Assert.That(legacyArg, Is.Not.Null);
+        Assert.That((legacyArg as BoolArgument)?.Value, Is.False);
+        
+        // Check for sleep analysis argument
+        var clippingArg = args.FirstOrDefault(a => a is BoolArgument arg && arg.Flag == "clipping");
+        Assert.That(clippingArg, Is.Not.Null);
+        Assert.That((clippingArg as BoolArgument)?.Value, Is.True);
+        
         // Check for left wrist thresholds
         var sedentaryLeftArg = args.FirstOrDefault(a => a is NumericArgument arg && arg.Flag == "sedentary_left");
         Assert.That(sedentaryLeftArg, Is.Not.Null);

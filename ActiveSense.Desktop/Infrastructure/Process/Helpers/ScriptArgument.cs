@@ -1,40 +1,50 @@
-using System;
+using System.Globalization;
 
-namespace ActiveSense.Desktop.Infrastructure.Process.Helpers
+namespace ActiveSense.Desktop.Infrastructure.Process.Helpers;
+
+public abstract class ScriptArgument
 {
-    public abstract class ScriptArgument
-    {
-        public required string Flag { get; set; }        // Command-line flag (e.g., "a" for "-a")
-        public string Name { get; set; } = String.Empty;        // Display name
-        public string Description { get; set; } = String.Empty;  // Description for UI
+    public required string Flag { get; set; } // Command-line flag (e.g., "a" for "--a")
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 
-        public abstract string ToCommandLineArgument();
+    public abstract string ToCommandLineArgument();
+}
+
+public class BoolArgument : ScriptArgument
+{
+    public bool Value { get; set; }
+
+    public override string ToCommandLineArgument()
+    {
+        if (Value == false) return $"--{Flag} FALSE";
+
+        return $"--{Flag} TRUE";
     }
+}
 
-    public class BoolArgument : ScriptArgument
+public class NumericArgument : ScriptArgument
+{
+    public double Value { get; set; }
+
+    public double MinValue { get; set; }
+    public double MaxValue { get; set; }
+
+    public string DisplayValue
     {
-        public bool Value { get; set; }
-
-        public override string ToCommandLineArgument()
+        get => Value.ToString(CultureInfo.InvariantCulture);
+        set
         {
-            if (Value == false)
-            {
-                return $"--{Flag} FALSE";
-            }
+            if (string.IsNullOrWhiteSpace(value))
+                return;
 
-            return $"--{Flag} TRUE";
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
+                Value = result;
         }
     }
 
-    public class NumericArgument : ScriptArgument
+    public override string ToCommandLineArgument()
     {
-        public double Value { get; set; }
-        public double MinValue { get; set; }
-        public double MaxValue { get; set; }
-
-        public override string ToCommandLineArgument()
-        {
-            return $"--{Flag} {Value}";
-        }
+        return $"--{Flag} {Value.ToString(CultureInfo.InvariantCulture)}";
     }
 }

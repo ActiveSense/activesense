@@ -81,7 +81,8 @@ public class GeneActiveProcessor(
         }
     }
 
-    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files, IList<ScriptArgument> arguments)
+    public async Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files,
+        IList<ScriptArgument> arguments)
     {
         long totalSizeBytes = 0;
         foreach (var filePath in files)
@@ -119,16 +120,31 @@ public class GeneActiveProcessor(
             new BoolArgument
             {
                 Flag = "activity",
-                Name = "Activity Analysis",
-                Description = "Run activity analysis",
+                Name = "Aktivitätsanalyse",
                 Value = true
             },
 
             new BoolArgument
             {
                 Flag = "sleep",
-                Name = "Sleep Analysis",
-                Description = "Run sleep analysis",
+                Name = "Schlafanalyse",
+                Value = true
+            },
+
+            new BoolArgument
+            {
+                Flag = "legacy",
+                Name = "Legacy Mode",
+                Description =
+                    "Setzt die Libraries auf die originalen Versionen zurück. Die Analyse dauert dardurch länger. Nicht empfohlen.",
+                Value = false
+            },
+
+            new BoolArgument
+            {
+                Flag = "clipping",
+                Name = "Ersten und letzten Tag entfernen",
+                Description = "Entfernt den ersten und letzten Tag der Aktivitätsdaten.",
                 Value = true
             },
 
@@ -137,78 +153,71 @@ public class GeneActiveProcessor(
             {
                 Flag = "sedentary_left",
                 Name = "Sedentary Threshold (Left)",
-                Description = "Threshold for sedentary activity on left wrist in g",
+                Description = "Schwellenwert für sitzende Aktivität am linken Handgelenk in g (Standard: 0,04)",
                 MinValue = 0.01,
                 MaxValue = 0.1,
                 Value = 0.04
             },
-
             new NumericArgument
             {
                 Flag = "light_left",
                 Name = "Light Threshold (Left)",
-                Description = "Threshold for light activity on left wrist in g",
+                Description = "Schwellenwert für leichte Aktivität am linken Handgelenk in g (Standard: 217)",
                 MinValue = 100,
                 MaxValue = 500,
                 Value = 217
             },
-
             new NumericArgument
             {
                 Flag = "moderate_left",
                 Name = "Moderate Threshold (Left)",
-                Description = "Threshold for moderate activity on left wrist in g",
+                Description = "Schwellenwert für moderate Aktivität am linken Handgelenk in g (Standard: 644)",
                 MinValue = 300,
                 MaxValue = 1000,
                 Value = 644
             },
-
             new NumericArgument
             {
                 Flag = "vigorous_left",
                 Name = "Vigorous Threshold (Left)",
-                Description = "Threshold for vigorous activity on left wrist in g",
+                Description = "Schwellenwert für intensive Aktivität am linken Handgelenk in g (Standard: 1810)",
                 MinValue = 1000,
                 MaxValue = 3000,
                 Value = 1810
             },
-
             // Right wrist thresholds
             new NumericArgument
             {
                 Flag = "sedentary_right",
                 Name = "Sedentary Threshold (Right)",
-                Description = "Threshold for sedentary activity on right wrist in g",
+                Description = "Schwellenwert für sitzende Aktivität am rechten Handgelenk in g (Standard: 0,04)",
                 MinValue = 0.01,
                 MaxValue = 0.1,
                 Value = 0.04
             },
-
             new NumericArgument
             {
                 Flag = "light_right",
                 Name = "Light Threshold (Right)",
-                Description = "Threshold for light activity on right wrist in g",
+                Description = "Schwellenwert für leichte Aktivität am rechten Handgelenk in g (Standard: 386)",
                 MinValue = 100,
                 MaxValue = 800,
                 Value = 386
             },
-
             new NumericArgument
             {
                 Flag = "moderate_right",
                 Name = "Moderate Threshold (Right)",
-                Description = "Threshold for moderate activity on right wrist in g",
+                Description = "Schwellenwert für moderate Aktivität am rechten Handgelenk in g (Standard: 439)",
                 MinValue = 200,
                 MaxValue = 800,
                 Value = 439
             },
-
             new NumericArgument
             {
                 Flag = "vigorous_right",
                 Name = "Vigorous Threshold (Right)",
-                Description = "Threshold for vigorous activity on right wrist in g",
+                Description = "Schwellenwert für intensive Aktivität am rechten Handgelenk in g (Standard: 2098)",
                 MinValue = 1000,
                 MaxValue = 3500,
                 Value = 2098
