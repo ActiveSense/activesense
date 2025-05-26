@@ -4,10 +4,8 @@ using System.Linq;
 using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.ViewModels.Charts;
 using LiveChartsCore;
-using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using SkiaSharp;
 
 namespace ActiveSense.Desktop.Charts.Generators;
 
@@ -16,14 +14,12 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
     public BarChartViewModel GenerateChart(string title, string description)
     {
         if (chartDataDtos.Length == 0)
-        {
             return new BarChartViewModel
             {
                 Series = [],
                 XAxes = new[] { new Axis { Labels = ["No Data"] } },
                 YAxes = new[] { new Axis { MinLimit = 0, MaxLimit = 100 } }
             };
-        }
 
         var allLabels = chartDataDtos
             .SelectMany(dto => dto.Labels)
@@ -32,16 +28,16 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
 
         var series = new List<ISeries>();
         var colors = chartColors.GetColorPalette(chartDataDtos.Length);
-        int colorIndex = 0;
+        var colorIndex = 0;
 
         // track means per series
         var seriesMeans = new Dictionary<string, double>();
 
         foreach (var dto in chartDataDtos)
         {
-            double mean = dto.Data.Length > 0 ? Math.Round(dto.Data.Average(), 2)  : 0;
-            
-            string seriesName = dto.Title;
+            var mean = dto.Data.Length > 0 ? Math.Round(dto.Data.Average(), 2) : 0;
+
+            var seriesName = dto.Title;
             seriesMeans[seriesName] = mean;
 
             series.Add(new StackedColumnSeries<double>
@@ -58,12 +54,11 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
         colorIndex = 0;
         foreach (var kvp in seriesMeans)
         {
-            var seriesName = kvp.Key;
             var meanValue = kvp.Value;
             var meanValues = Enumerable.Repeat(meanValue, allLabels.Length).ToArray();
-            
+
             var seriesColor = colors[colorIndex++];
-            
+
             series.Add(new LineSeries<double>
             {
                 Values = meanValues,
@@ -72,9 +67,9 @@ public class StackedBarGenerator(ChartDataDTO[] chartDataDtos, ChartColors chart
                 GeometrySize = 0,
                 GeometryFill = null,
                 GeometryStroke = null,
-                Name = $"Durchschnitt",
+                Name = "Durchschnitt",
                 LineSmoothness = 0,
-                IsVisibleAtLegend = false,
+                IsVisibleAtLegend = false
             });
         }
 

@@ -9,10 +9,11 @@ using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using CsvHelper;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Parse;
 
-public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter, Serilog.ILogger logger)
+public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter, ILogger logger)
     : IFileParser
 {
     public AnalysisType DetermineAnalysisType(string[] headers)
@@ -35,7 +36,6 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
         await Task.Run(() =>
         {
             foreach (var file in csvFiles)
-            {
                 try
                 {
                     logger.Information("Parsing CSV file: {File}", file);
@@ -46,17 +46,14 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
                     logger.Error(e, "Error parsing CSV file: {File}", file);
                     throw new Exception($"Error parsing file {file}: {e.Message}", e);
                 }
-            }
         });
 
         return analysis;
     }
+
     public bool ParseCsvFile(string filePath, IAnalysis analysis)
     {
-        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis))
-        {
-            return false;
-        }
+        if (analysis is not (IActivityAnalysis activityAnalysis and ISleepAnalysis sleepAnalysis)) return false;
 
         using var reader = new StreamReader(filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -73,17 +70,15 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
             case AnalysisType.Activity:
                 activityAnalysis.SetActivityRecords(csv.GetRecords<ActivityRecord>().ToList());
                 return true;
-            
+
             case AnalysisType.Sleep:
                 sleepAnalysis.SetSleepRecords(csv.GetRecords<SleepRecord>().ToList());
                 return true;
-            
+
             case AnalysisType.Unknown:
-                
+
             default:
                 return false;
         }
     }
-
-
 }

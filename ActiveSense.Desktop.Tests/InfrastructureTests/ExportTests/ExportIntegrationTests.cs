@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Converters;
@@ -29,12 +30,11 @@ public class ExportIntegrationTests
         // Create all components directly instead of using mocks
         var dateConverter = new DateToWeekdayConverter();
         var chartColors = new ChartColors();
-        var chartRenderer = new ChartRenderer(chartColors);
         var serializer = new AnalysisSerializer(dateConverter);
         var pdfGenerator = new PdfReportGenerator(serializer);
         var csvExporter = new CsvExporter();
         var archiveCreator = new ArchiveCreator();
-        var logger = new Serilog.LoggerConfiguration()
+        var logger = new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
         
@@ -134,7 +134,7 @@ public class ExportIntegrationTests
             var buffer = new byte[5];
             int bytesRead = stream.Read(buffer, 0, 5);
             Assert.That(bytesRead, Is.EqualTo(5), "Failed to read expected number of bytes");
-            Assert.That(System.Text.Encoding.ASCII.GetString(buffer), Is.EqualTo("%PDF-"));
+            Assert.That(Encoding.ASCII.GetString(buffer), Is.EqualTo("%PDF-"));
         }
     }
 

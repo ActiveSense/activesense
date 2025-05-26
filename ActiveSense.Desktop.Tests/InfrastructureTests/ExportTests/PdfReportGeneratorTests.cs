@@ -18,7 +18,6 @@ public class PdfReportGeneratorTests
     [SetUp]
     public void Setup()
     {
-        _mockChartRenderer = new Mock<IChartRenderer>();
         _dateConverter = new DateToWeekdayConverter();
 
         // Create a test double for AnalysisSerializer
@@ -66,23 +65,8 @@ public class PdfReportGeneratorTests
                 Vigorous = "0"
             }
         });
-
-        // Setup mock chart renderer to return valid PNG data
-        _mockChartRenderer.Setup(x => x.RenderSleepDistributionChart(It.IsAny<IChartDataProvider>()))
-            .Returns(ValidPngImageData);
-        _mockChartRenderer.Setup(x => x.RenderMovementPatternChart(It.IsAny<IChartDataProvider>()))
-            .Returns(ValidPngImageData);
-        _mockChartRenderer.Setup(x => x.RenderStepsChart(It.IsAny<IChartDataProvider>()))
-            .Returns(ValidPngImageData);
-        _mockChartRenderer.Setup(x => x.RenderSleepWithEfficiencyChart(It.IsAny<IChartDataProvider>()))
-            .Returns(ValidPngImageData);
-        _mockChartRenderer.Setup(x => x.RenderStepsWithSleepEfficiencyChart(It.IsAny<IChartDataProvider>()))
-            .Returns(ValidPngImageData);
-        _mockChartRenderer.Setup(x => x.RenderActivityDistributionChart(It.IsAny<IChartDataProvider>()))
-            .Returns(ValidPngImageData);
     }
 
-    private Mock<IChartRenderer> _mockChartRenderer;
     private TestAnalysisSerializer _serializer;
     private PdfReportGenerator _pdfGenerator;
     private GeneActiveAnalysis _analysis;

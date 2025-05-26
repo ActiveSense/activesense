@@ -1,20 +1,20 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Parse;
 
-public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser, Serilog.ILogger logger) : IResultParser
+public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser, ILogger logger) : IResultParser
 {
     private readonly ApplicationPageNames[] _analysisPages =
     [
         ApplicationPageNames.Allgemein,
         ApplicationPageNames.Aktivität,
-        ApplicationPageNames.Schlaf,
+        ApplicationPageNames.Schlaf
     ];
 
     public ApplicationPageNames[] GetAnalysisPages()
@@ -25,27 +25,21 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
     public async Task<IEnumerable<IAnalysis>> ParseResultsAsync(string outputDirectory)
     {
         logger.Information("Parsing GeneActive results");
-        
+
         var analyses = new List<IAnalysis>();
 
-        if (!Directory.Exists(outputDirectory))
-        {
-            return analyses;
-        }
+        if (!Directory.Exists(outputDirectory)) return analyses;
 
-        // Parse PDF files
         var pdfAnalyses = await pdfParser.ParsePdfFilesAsync(outputDirectory);
         analyses.AddRange(pdfAnalyses);
 
-        // Parse CSV files in directories
         var csvAnalyses = await ParseCsvDirectoriesAsync(outputDirectory);
         analyses.AddRange(csvAnalyses);
 
-        // Assign tags
         foreach (var analysis in analyses) AssignTags(analysis);
-        
+
         logger.Information("Parsing completed");
-        
+
         return analyses;
     }
 
@@ -57,7 +51,7 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
         foreach (var directory in directories)
         {
             var analysis = await fileParser.ParseCsvDirectoryAsync(directory);
-            if (analysis != null) analyses.Add(analysis);
+            analyses.Add(analysis);
         }
 
         return analyses;

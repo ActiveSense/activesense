@@ -25,7 +25,7 @@ public class ChartColors
             return predefinedColors.Take(count).ToArray();
         }
 
-        // Generate additional colors if needed
+        // Generate additional
         var colors = new SKColor[count];
         for (int i = 0; i < count; i++)
         {

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using ActiveSense.Desktop.Charts;
-using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
@@ -21,7 +20,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ActivityPageViewModel = ActiveSense.Desktop.ViewModels.AnalysisPages.ActivityPageViewModel;
@@ -62,7 +60,6 @@ public class App : Application
         collection.AddSingleton<GeneActiveProcessor>();
 
         // Register export components
-        collection.AddSingleton<IChartRenderer, ChartRenderer>();
         collection.AddSingleton<ICsvExporter, CsvExporter>();
         collection.AddSingleton<IArchiveCreator, ArchiveCreator>();
         collection.AddSingleton<IPdfReportGenerator, PdfReportGenerator>();
@@ -82,7 +79,7 @@ public class App : Application
         collection.AddSingleton<IPathService, PathService>();
 
         // Register view models
-        collection.AddSingleton<ViewModels.MainViewModel>();
+        collection.AddSingleton<MainViewModel>();
         collection.AddTransient<DialogService>();
         collection.AddTransient<DialogViewModel>();
         collection.AddTransient<ProcessDialogViewModel>();
@@ -146,7 +143,7 @@ public class App : Application
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView
             {
-                DataContext = services.GetRequiredService<ViewModels.MainViewModel>()
+                DataContext = services.GetRequiredService<MainViewModel>()
             };
         }
 

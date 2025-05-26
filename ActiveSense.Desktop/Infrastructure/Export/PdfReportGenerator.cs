@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
@@ -61,16 +59,12 @@ public class PdfReportGenerator(
                                               .FontColor(Colors.Grey.Medium));
                                     });
 
-                                // Add tags
                                 AddTags(column, analysis);
 
-                                // General Section with overview metrics
                                 AddGeneralSection(column, sleepAnalysis, activityAnalysis);
 
-                                // Sleep Section - tables only
                                 AddSleepSection(column, sleepAnalysis);
 
-                                // Activity Section - tables only
                                 AddActivitySection(column, activityAnalysis);
 
                                 // Hidden serialization data
@@ -117,13 +111,11 @@ public class PdfReportGenerator(
 
     private void AddGeneralSection(ColumnDescriptor column, ISleepAnalysis sleepAnalysis, IActivityAnalysis activityAnalysis)
     {
-        // Section title
         column.Item().PaddingTop(15)
             .Text("Zeitraum der Analyse")
             .Bold()
             .FontSize(14);
 
-        // Date range for activity data
         if (activityAnalysis.ActivityRecords.Any())
         {
             column.Item().PaddingTop(5)
@@ -132,7 +124,6 @@ public class PdfReportGenerator(
                 .FontColor(Colors.Grey.Darken1);
         }
 
-        // Date range for sleep data
         if (sleepAnalysis.SleepRecords.Any())
         {
             column.Item().PaddingTop(2)
@@ -141,7 +132,6 @@ public class PdfReportGenerator(
                 .FontColor(Colors.Grey.Darken1);
         }
 
-        // Section separator
         column.Item().PaddingTop(15)
             .LineHorizontal(1)
             .LineColor(Colors.Grey.Lighten2);
@@ -149,7 +139,6 @@ public class PdfReportGenerator(
 
     private void AddSleepSection(ColumnDescriptor column, ISleepAnalysis sleepAnalysis)
     {
-        // Section title
         column.Item().PaddingTop(15)
             .Text("Schlafanalyse")
             .Bold()
@@ -166,7 +155,6 @@ public class PdfReportGenerator(
                 .FontSize(9)
                 .Italic();
 
-            // Sleep averages table
             column.Item().PaddingTop(10)
                 .Table(table =>
                 {
@@ -176,20 +164,17 @@ public class PdfReportGenerator(
                         columns.RelativeColumn();
                     });
 
-                    // Headers
                     table.Cell().Background(Colors.Grey.Lighten3).Padding(5)
                         .Text("Messwert").Bold();
                     table.Cell().Background(Colors.Grey.Lighten3).Padding(5)
                         .Text("Durchschnitt").Bold();
 
-                    // Rows
                     AddTableRow(table, "Tägliche Schlafzeit", $"{sleepAnalysis.AverageSleepTime / 3600:F1} Stunden");
                     AddTableRow(table, "Schlafeffizienz", $"{sleepAnalysis.SleepEfficiency.Average():F1}%");
                     AddTableRow(table, "Wachphasen pro Nacht", $"{sleepAnalysis.SleepRecords.Average(r => double.Parse(r.NumActivePeriods)):F1}");
                     AddTableRow(table, "Wachzeit pro Nacht", $"{sleepAnalysis.AverageWakeTime / 60:F0} Minuten");
                 });
             
-            // Add explanation if needed
             column.Item().PaddingTop(5)
                 .Text("Die Schlafeffizienz beschreibt das Verhältnis zwischen Schlafzeit und insgesamt im Bett verbrachter Zeit.")
                 .FontSize(8)
@@ -197,7 +182,6 @@ public class PdfReportGenerator(
                 .Italic();
         }
 
-        // Section separator
         column.Item().PaddingTop(15)
             .LineHorizontal(1)
             .LineColor(Colors.Grey.Lighten2);
@@ -205,7 +189,6 @@ public class PdfReportGenerator(
 
     private void AddActivitySection(ColumnDescriptor column, IActivityAnalysis activityAnalysis)
     {
-        // Section title
         column.Item().PaddingTop(15)
             .Text("Aktivitätsanalyse")
             .Bold()
@@ -222,7 +205,6 @@ public class PdfReportGenerator(
                 .FontSize(9)
                 .Italic();
 
-            // Activity averages table
             column.Item().PaddingTop(10)
                 .Table(table =>
                 {
@@ -232,13 +214,11 @@ public class PdfReportGenerator(
                         columns.RelativeColumn();
                     });
 
-                    // Headers
                     table.Cell().Background(Colors.Grey.Lighten3).Padding(5)
                         .Text("Messwert").Bold();
                     table.Cell().Background(Colors.Grey.Lighten3).Padding(5)
                         .Text("Durchschnitt").Bold();
 
-                    // Activity metrics
                     AddTableRow(table, "Schritte pro Tag", $"{activityAnalysis.StepsPerDay.Average():N0}");
                     AddTableRow(table, "Sitzzeit pro Tag", $"{activityAnalysis.AverageSedentaryTime / 3600:F1} Stunden");
                     AddTableRow(table, "Leichte Aktivität", $"{activityAnalysis.AverageLightActivity / 60:F0} Minuten pro Tag");
@@ -246,7 +226,6 @@ public class PdfReportGenerator(
                     AddTableRow(table, "Intensive Aktivität", $"{activityAnalysis.AverageVigorousActivity / 60:F0} Minuten pro Tag");
                 });
             
-            // Add explanation
             column.Item().PaddingTop(5)
                 .Text("")
                 .FontSize(8)

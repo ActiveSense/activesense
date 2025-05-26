@@ -1,8 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewModels="clr-namespace:ActiveSense.Desktop.ViewModels"
              xmlns:dialogs="clr-namespace:ActiveSense.Desktop.ViewModels.Dialogs"
              x:Class="ActiveSense.Desktop.Views.Dialogs.WarningDialogView"
              x:DataType="dialogs:WarningDialogViewModel">
@@ -29,14 +26,7 @@
             </Grid>
 
             <!-- Content -->
-            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*">
-                <!-- <Border Grid.Row="0"  -->
-                <!--         Margin="0,10,0,0"> -->
-                <!--     <TextBlock Text="{Binding Message}" -->
-                <!--                Classes="dialog-content-text" -->
-                <!--                TextWrapping="Wrap"/> -->
-                <!-- </Border> -->
-            </Grid>
+            <Grid Grid.Row="1" Margin="24,0" RowDefinitions="Auto,Auto,*" />
 
             <!-- Footer -->
             <Grid Grid.Row="2"
@@ -46,11 +36,11 @@
                 <Button Grid.Column="0"
                         Classes="Secondary"
                         Command="{Binding CancelCommand}">
-                    <TextBlock Text="{Binding CloseButtonText}"></TextBlock>
+                    <TextBlock Text="{Binding CloseButtonText}" />
                 </Button>
                 <Button Grid.Column="2" Classes="Danger" Theme="{DynamicResource SolidButton}" Command="{Binding OkCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="{Binding OkButtonText}"></TextBlock>
+                        <TextBlock Text="{Binding OkButtonText}" />
                     </StackPanel>
                 </Button>
             </Grid>
