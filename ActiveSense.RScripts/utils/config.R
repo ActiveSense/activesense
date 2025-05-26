@@ -83,7 +83,6 @@ output_dir <- opt$directory
 analyze_activity <- opt$activity
 analyze_sleep <- opt$sleep
 use_legacy <- opt$legacy
-use_clipping <- opt$clipping
 
 # left wrist
 sedentary_left <- opt$sedentary_left
