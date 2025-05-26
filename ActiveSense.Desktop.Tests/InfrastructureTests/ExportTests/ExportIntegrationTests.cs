@@ -165,7 +165,7 @@ public class ExportIntegrationTests
     }
 
    [Test]
-    public async Task ExportAsync_WithInvalidOutputPath_ThrowsException()
+    public Task ExportAsync_WithInvalidOutputPath_ThrowsException()
     {
         // Arrange
         string invalidPath = Path.Combine(_tempDir, "nonexistent", "nested", "directory", "output.pdf");
@@ -177,5 +177,6 @@ public class ExportIntegrationTests
         });
     
         StringAssert.Contains("Error generating PDF report", ex.Message);
+        return Task.CompletedTask;
     }
 }

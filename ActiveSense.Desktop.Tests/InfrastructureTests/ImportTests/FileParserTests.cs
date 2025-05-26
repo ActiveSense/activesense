@@ -225,7 +225,7 @@ public class FileParserTests
     }
 
     [Test]
-    public async Task ParseCsvDirectoryAsync_WithInvalidFiles_ReturnsNull()
+    public Task ParseCsvDirectoryAsync_WithInvalidFiles_ReturnsNull()
     {
         // Arrange
         string directoryPath = Path.Combine(_tempDir, "invalid_directory");
@@ -243,5 +243,6 @@ public class FileParserTests
         {
             await _fileParser.ParseCsvDirectoryAsync(directoryPath);
         });
+        return Task.CompletedTask;
     }
 }

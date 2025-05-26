@@ -132,7 +132,7 @@ public partial class PathDialogViewModel : DialogViewModel
         TestResult = true;
     }
 
-    private static async Task OpenUrl(string url)
+    private static Task OpenUrl(string url)
     {
         try
         {
@@ -146,5 +146,7 @@ public partial class PathDialogViewModel : DialogViewModel
         {
             // Ignore if we can't open the URL
         }
+
+        return Task.CompletedTask;
     }
 }

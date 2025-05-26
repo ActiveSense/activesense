@@ -176,7 +176,7 @@ public class PdfParserTests
     }
 
     [Test]
-    public async Task ParsePdfFilesAsync_WhenExtractionFails_HaltsProcessing()
+    public Task ParsePdfFilesAsync_WhenExtractionFails_HaltsProcessing()
     {
         // Arrange
         // Create files
@@ -202,5 +202,6 @@ public class PdfParserTests
         // Act & Assert
         // Since _mockPdfParser is already a mock, just use it directly
         Assert.ThrowsAsync<InvalidDataException>(() => _mockPdfParser.Object.ParsePdfFilesAsync(_tempDir));
+        return Task.CompletedTask;
     }
 }

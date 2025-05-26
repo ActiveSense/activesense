@@ -88,7 +88,7 @@ public class ArchiveCreatorTests
     }
 
     [Test]
-    public async Task CreateArchiveAsync_WithInvalidOutputPath_Throws()
+    public Task CreateArchiveAsync_WithInvalidOutputPath_Throws()
     {
         // Arrange
         string invalidPath = Path.Combine(_tempDir, "invalid", "nested", "path", "output.zip");
@@ -103,6 +103,7 @@ public class ArchiveCreatorTests
                 "sleep data",
                 "activity data");
         });
+        return Task.CompletedTask;
     }
 
     [Test]

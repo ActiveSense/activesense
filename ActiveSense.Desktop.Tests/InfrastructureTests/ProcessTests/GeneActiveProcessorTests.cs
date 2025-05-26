@@ -202,7 +202,7 @@ public class GeneActiveProcessorTests
     }
 
     [Test]
-    public async Task ProcessAsync_WithCancellation_Throws()
+    public Task ProcessAsync_WithCancellation_Throws()
     {
         // Arrange
         var arguments = new List<ScriptArgument>
@@ -225,6 +225,7 @@ public class GeneActiveProcessorTests
         {
             await _processor.ProcessAsync(arguments, cancellationTokenSource.Token);
         });
+        return Task.CompletedTask;
     }
 
     [Test]

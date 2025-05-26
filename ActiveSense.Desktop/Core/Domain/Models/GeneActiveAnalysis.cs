@@ -335,12 +335,12 @@ public class GeneActiveAnalysis(DateToWeekdayConverter dateToWeekdayConverter)
         _cache.Clear();
     }
 
-    private T GetCachedValue<T>(Func<T> valueFactory, [CallerMemberName] string key = null)
+    private T GetCachedValue<T>(Func<T> valueFactory, [CallerMemberName] string key = null!)
     {
         if (_cache.TryGetValue(key, out var value) && value is T cachedValue) return cachedValue;
 
         var newValue = valueFactory();
-        _cache[key] = newValue;
+        _cache[key] = newValue!;
         return newValue;
     }
 

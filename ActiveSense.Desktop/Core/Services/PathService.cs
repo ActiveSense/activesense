@@ -129,7 +129,7 @@ public class PathService : IPathService
         var platformPath = OperatingSystem.IsWindows() ? FindWindowsRInstallation()
             : OperatingSystem.IsMacOS() ? FindMacOSRInstallation()
             : OperatingSystem.IsLinux() ? FindLinuxRInstallation()
-            : null;
+            : throw new FileNotFoundException("Could not locate R installation.");
 
         if (IsValidRPath(platformPath)) return platformPath;
 
