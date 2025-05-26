@@ -7,7 +7,6 @@ using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Charts.Generators;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Core.Domain.Models;
-using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using BarChartViewModel = ActiveSense.Desktop.ViewModels.Charts.BarChartViewModel;
@@ -80,12 +79,12 @@ public partial class ActivityPageViewModel : PageViewModel
     }
 
     #region Chart Generation
+
     private void CreateActivityDistributionChart()
     {
         ActivityDistributionChart.Clear();
 
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IActivityAnalysis activityAnalysis &&
                 analysis is IChartDataProvider chartProvider)
             {
@@ -95,7 +94,6 @@ public partial class ActivityPageViewModel : PageViewModel
                     $"{analysis.FileName} ({activityAnalysis.GetActivityDateRange()})",
                     "Aktivitätsverteilung pro Tag"));
             }
-        }
     }
 
     private void CreateStepsChart()
@@ -104,12 +102,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetStepsChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -124,12 +118,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetSedentaryChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -144,12 +134,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetLightActivityChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -164,12 +150,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetModerateActivityChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -184,12 +166,8 @@ public partial class ActivityPageViewModel : PageViewModel
 
         var dtos = new List<ChartDataDTO>();
         foreach (var analysis in SelectedAnalyses)
-        {
             if (analysis is IChartDataProvider chartProvider)
-            {
                 dtos.Add(chartProvider.GetVigorousActivityChartData());
-            }
-        }
 
         if (dtos.Count == 0) return;
         var chartGenerator = new BarChartGenerator(dtos.ToArray(), _chartColors);
@@ -197,5 +175,6 @@ public partial class ActivityPageViewModel : PageViewModel
             "Intensive Aktivität pro Tag",
             "Intensive Aktivität pro Tag"));
     }
+
     #endregion
 }

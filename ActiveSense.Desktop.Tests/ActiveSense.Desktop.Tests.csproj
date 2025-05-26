@@ -1,27 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
-    
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net9.0</TargetFrameworks>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
-    <PackageReference Include="NUnit" Version="4.3.2" />
-  </ItemGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ActiveSense.Desktop\ActiveSense.Desktop.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
+        <PackageReference Include="Moq" Version="4.20.72"/>
+        <PackageReference Include="MSTest.TestAdapter" Version="3.8.3"/>
+        <PackageReference Include="MSTest.TestFramework" Version="3.8.3"/>
+        <PackageReference Include="NUnit" Version="4.3.2"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CoreTests\" />
-    <Folder Include="InfrastructureTests\" />
-  </ItemGroup>
-  
+    <ItemGroup>
+        <ProjectReference Include="..\ActiveSense.Desktop\ActiveSense.Desktop.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="CoreTests\"/>
+        <Folder Include="InfrastructureTests\"/>
+    </ItemGroup>
+
 </Project>

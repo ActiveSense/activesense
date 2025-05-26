@@ -16,13 +16,6 @@ namespace ActiveSense.Desktop.Infrastructure.Parse;
 public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter, ILogger logger)
     : IFileParser
 {
-    public AnalysisType DetermineAnalysisType(string[] headers)
-    {
-        if (headerAnalyzer.IsActivityCsv(headers)) return AnalysisType.Activity;
-        if (headerAnalyzer.IsSleepCsv(headers)) return AnalysisType.Sleep;
-        return AnalysisType.Unknown;
-    }
-
     public async Task<IAnalysis> ParseCsvDirectoryAsync(string directory)
     {
         var analysis = new GeneActiveAnalysis(dateConverter)
@@ -49,6 +42,13 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
         });
 
         return analysis;
+    }
+
+    public AnalysisType DetermineAnalysisType(string[] headers)
+    {
+        if (headerAnalyzer.IsActivityCsv(headers)) return AnalysisType.Activity;
+        if (headerAnalyzer.IsSleepCsv(headers)) return AnalysisType.Sleep;
+        return AnalysisType.Unknown;
     }
 
     public bool ParseCsvFile(string filePath, IAnalysis analysis)

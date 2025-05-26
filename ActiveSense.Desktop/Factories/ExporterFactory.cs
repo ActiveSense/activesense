@@ -6,5 +6,8 @@ namespace ActiveSense.Desktop.Factories;
 
 public class ExporterFactory(Func<SensorTypes, IExporter> exporterFactory)
 {
-    public IExporter GetExporter(SensorTypes sensorType) => exporterFactory.Invoke(sensorType);
+    public IExporter GetExporter(SensorTypes sensorType)
+    {
+        return exporterFactory.Invoke(sensorType);
+    }
 }

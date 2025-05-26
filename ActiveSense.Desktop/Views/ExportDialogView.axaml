@@ -66,7 +66,7 @@
                 <Button Grid.Column="2" Classes="Primary" Theme="{DynamicResource SolidButton}"
                         Command="{Binding ExportAnalysisCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{StaticResource save_regular}" Height="15"></PathIcon>
+                        <PathIcon Data="{StaticResource save_regular}" Height="15" />
                         <TextBlock>Speichern</TextBlock>
                     </StackPanel>
                 </Button>

@@ -7,5 +7,5 @@ public enum ApplicationPageNames
     Upload,
     Aktivität,
     Schlaf,
-    Allgemein,
+    Allgemein
 }

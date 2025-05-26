@@ -10,7 +10,7 @@
     <Design.DataContext>
         <analysisPages:SleepPageViewModel />
     </Design.DataContext>
-    
+
     <ScrollViewer x:Name="MainScrollViewer"
                   VerticalScrollBarVisibility="Visible"
                   HorizontalScrollBarVisibility="Disabled">
@@ -111,7 +111,7 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
-                
+
                 <!-- Sleep Duration With Efficiency Charts Section -->
                 <Expander Header="{Binding SleepTimeWithEfficiencyTitle}"
                           IsExpanded="{Binding IsSleepTimeWithEfficiencyExpanded}"
@@ -127,7 +127,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <TextBlock Grid.Row="0" Margin="4,10,4,4" FontWeight="Medium"
+                                        <TextBlock Margin="4,10,4,4" FontWeight="Medium"
                                                    Text="{Binding Title}" />
                                         <Border Classes="Shadow"
                                                 Theme="{DynamicResource CardBorder}"

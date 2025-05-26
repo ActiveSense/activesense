@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using ActiveSense.Desktop.Charts.DTOs;
 
 namespace ActiveSense.Desktop.Core.Domain.Interfaces;
+
 public interface IChartDataProvider
 {
     ChartDataDTO GetStepsChartData();
@@ -15,5 +16,4 @@ public interface IChartDataProvider
     ChartDataDTO GetVigorousActivityChartData();
     ChartDataDTO GetSleepEfficiencyChartData();
     ChartDataDTO GetActivePeriodsChartData();
-
 }

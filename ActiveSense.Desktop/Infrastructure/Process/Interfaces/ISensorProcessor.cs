@@ -11,8 +11,11 @@ public interface ISensorProcessor
 {
     SensorTypes SupportedType { get; }
     IReadOnlyList<ScriptArgument> DefaultArguments { get; }
-    Task<(bool Success, string Output)> ProcessAsync(IList<ScriptArgument> arguments, CancellationToken cancellationToken);
-    Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files, IList<ScriptArgument> arguments);
     string ProcessingInfo { get; }
+
+    Task<(bool Success, string Output)> ProcessAsync(IList<ScriptArgument> arguments,
+        CancellationToken cancellationToken);
+
+    Task<TimeSpan> GetEstimatedProcessingTimeAsync(IEnumerable<string> files, IList<ScriptArgument> arguments);
     Task CopyFilesAsync(string[] files, string processingDirectory, string outputDirectory);
 }

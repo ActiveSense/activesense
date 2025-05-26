@@ -18,33 +18,25 @@ namespace ActiveSense.Desktop.Tests.InfrastructureTests.ImportTests;
 [TestFixture]
 public class ImportIntegrationTests
 {
-    private Mock<IPdfParser> _mockPdfParser;
-    private IFileParser _fileParser;
-    private IResultParser _resultParser;
-    private DateToWeekdayConverter _dateConverter;
-    private IAnalysisSerializer _serializer;
-    private Mock<ILogger> _mockLogger;
-    private string _tempDir;
-
     [SetUp]
     public void Setup()
     {
         // Create temp directory for test files
         _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(_tempDir);
-        
+
         // Create test components
         _dateConverter = new DateToWeekdayConverter();
         _serializer = new AnalysisSerializer(_dateConverter);
         _mockLogger = new Mock<ILogger>();
-        
+
         // Mock the PDF parser since we're having issues with PDF creation
         _mockPdfParser = new Mock<IPdfParser>();
-        
+
         // Use real file parser
         var headerAnalyzer = new HeaderAnalyzer();
         _fileParser = new FileParser(headerAnalyzer, _dateConverter, _mockLogger.Object);
-        
+
         // Use our result parser with the mocked PDF parser
         _resultParser = new GeneActiveResultParser(_mockPdfParser.Object, _fileParser, _mockLogger.Object);
     }
@@ -53,11 +45,16 @@ public class ImportIntegrationTests
     public void TearDown()
     {
         // Clean up the temporary directory
-        if (Directory.Exists(_tempDir))
-        {
-            Directory.Delete(_tempDir, true);
-        }
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
     }
+
+    private Mock<IPdfParser> _mockPdfParser;
+    private IFileParser _fileParser;
+    private IResultParser _resultParser;
+    private DateToWeekdayConverter _dateConverter;
+    private IAnalysisSerializer _serializer;
+    private Mock<ILogger> _mockLogger;
+    private string _tempDir;
 
     [Test]
     public async Task ImportExportRoundTrip_WithCSVFiles_ShouldPreserveData()
@@ -70,52 +67,60 @@ public class ImportIntegrationTests
         };
 
         // Add sleep records
-        originalAnalysis.SetSleepRecords(new[] { new SleepRecord
+        originalAnalysis.SetSleepRecords(new[]
         {
-            NightStarting = "2024-11-29",
-            SleepOnsetTime = "21:25",
-            RiseTime = "06:58",
-            TotalElapsedBedTime = "34225",
-            TotalSleepTime = "26676",
-            TotalWakeTime = "7549",
-            SleepEfficiency = "77.9",
-            NumActivePeriods = "50",
-            MedianActivityLength = "124"
-        }});
+            new SleepRecord
+            {
+                NightStarting = "2024-11-29",
+                SleepOnsetTime = "21:25",
+                RiseTime = "06:58",
+                TotalElapsedBedTime = "34225",
+                TotalSleepTime = "26676",
+                TotalWakeTime = "7549",
+                SleepEfficiency = "77.9",
+                NumActivePeriods = "50",
+                MedianActivityLength = "124"
+            }
+        });
 
         // Add activity records
-        originalAnalysis.SetActivityRecords(new[] { new ActivityRecord
+        originalAnalysis.SetActivityRecords(new[]
         {
-            Day = "1",
-            Steps = "3624",
-            NonWear = "0",
-            Sleep = "12994",
-            Sedentary = "26283",
-            Light = "14007",
-            Moderate = "3286",
-            Vigorous = "0"
-        }});
+            new ActivityRecord
+            {
+                Day = "1",
+                Steps = "3624",
+                NonWear = "0",
+                Sleep = "12994",
+                Sedentary = "26283",
+                Light = "14007",
+                Moderate = "3286",
+                Vigorous = "0"
+            }
+        });
 
         // Create directory structure
-        string csvDir = Path.Combine(_tempDir, "csvdir");
+        var csvDir = Path.Combine(_tempDir, "csvdir");
         Directory.CreateDirectory(csvDir);
 
         // Export sleep data to CSV
-        string sleepCsvPath = Path.Combine(csvDir, "sleep.csv");
+        var sleepCsvPath = Path.Combine(csvDir, "sleep.csv");
         using (var writer = new StreamWriter(sleepCsvPath))
         {
-            writer.WriteLine("\"Night.Starting\",\"Sleep.Onset.Time\",\"Rise.Time\",\"Total.Elapsed.Bed.Time\",\"Total.Sleep.Time\",\"Total.Wake.Time\",\"Sleep.Efficiency\",\"Num.Active.Periods\",\"Median.Activity.Length\"");
+            writer.WriteLine(
+                "\"Night.Starting\",\"Sleep.Onset.Time\",\"Rise.Time\",\"Total.Elapsed.Bed.Time\",\"Total.Sleep.Time\",\"Total.Wake.Time\",\"Sleep.Efficiency\",\"Num.Active.Periods\",\"Median.Activity.Length\"");
             writer.WriteLine("\"2024-11-29\",\"21:25\",\"06:58\",\"34225\",\"26676\",\"7549\",\"77.9\",\"50\",\"124\"");
         }
 
         // Export activity data to CSV
-        string activityCsvPath = Path.Combine(csvDir, "activity.csv");
+        var activityCsvPath = Path.Combine(csvDir, "activity.csv");
         using (var writer = new StreamWriter(activityCsvPath))
         {
-            writer.WriteLine("\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\"");
+            writer.WriteLine(
+                "\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\"");
             writer.WriteLine("\"1\",\"3624\",\"0\",\"12994\",\"26283\",\"14007\",\"3286\",\"0\"");
         }
-        
+
         // Setup the mock PDF parser to return our original analysis
         _mockPdfParser.Setup(p => p.ParsePdfFilesAsync(_tempDir))
             .ReturnsAsync(new List<IAnalysis> { originalAnalysis });
@@ -171,23 +176,25 @@ public class ImportIntegrationTests
         // Arrange - Create a mix of valid and invalid files
 
         // Valid sleep CSV
-        string sleepCsvPath = Path.Combine(_tempDir, "sleep.csv");
+        var sleepCsvPath = Path.Combine(_tempDir, "sleep.csv");
         using (var writer = new StreamWriter(sleepCsvPath))
         {
-            writer.WriteLine("\"Night.Starting\",\"Sleep.Onset.Time\",\"Rise.Time\",\"Total.Elapsed.Bed.Time\",\"Total.Sleep.Time\",\"Total.Wake.Time\",\"Sleep.Efficiency\",\"Num.Active.Periods\",\"Median.Activity.Length\"");
+            writer.WriteLine(
+                "\"Night.Starting\",\"Sleep.Onset.Time\",\"Rise.Time\",\"Total.Elapsed.Bed.Time\",\"Total.Sleep.Time\",\"Total.Wake.Time\",\"Sleep.Efficiency\",\"Num.Active.Periods\",\"Median.Activity.Length\"");
             writer.WriteLine("\"2024-11-29\",\"21:25\",\"06:58\",\"34225\",\"26676\",\"7549\",\"77.9\",\"50\",\"124\"");
         }
 
         // Valid activity CSV
-        string activityCsvPath = Path.Combine(_tempDir, "activity.csv");
+        var activityCsvPath = Path.Combine(_tempDir, "activity.csv");
         using (var writer = new StreamWriter(activityCsvPath))
         {
-            writer.WriteLine("\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\"");
+            writer.WriteLine(
+                "\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\"");
             writer.WriteLine("\"1\",\"3624\",\"0\",\"12994\",\"26283\",\"14007\",\"3286\",\"0\"");
         }
 
         // Invalid CSV format
-        string invalidCsvPath = Path.Combine(_tempDir, "invalid.csv");
+        var invalidCsvPath = Path.Combine(_tempDir, "invalid.csv");
         using (var writer = new StreamWriter(invalidCsvPath))
         {
             writer.WriteLine("This is not a CSV file");
@@ -198,13 +205,14 @@ public class ImportIntegrationTests
             .ReturnsAsync(new List<IAnalysis>());
 
         // Create a subdirectory with CSV files
-        string subDir = Path.Combine(_tempDir, "subdir");
+        var subDir = Path.Combine(_tempDir, "subdir");
         Directory.CreateDirectory(subDir);
 
-        string subSleepCsvPath = Path.Combine(subDir, "sleep.csv");
+        var subSleepCsvPath = Path.Combine(subDir, "sleep.csv");
         using (var writer = new StreamWriter(subSleepCsvPath))
         {
-            writer.WriteLine("\"Night.Starting\",\"Sleep.Onset.Time\",\"Rise.Time\",\"Total.Elapsed.Bed.Time\",\"Total.Sleep.Time\",\"Total.Wake.Time\",\"Sleep.Efficiency\",\"Num.Active.Periods\",\"Median.Activity.Length\"");
+            writer.WriteLine(
+                "\"Night.Starting\",\"Sleep.Onset.Time\",\"Rise.Time\",\"Total.Elapsed.Bed.Time\",\"Total.Sleep.Time\",\"Total.Wake.Time\",\"Sleep.Efficiency\",\"Num.Active.Periods\",\"Median.Activity.Length\"");
             writer.WriteLine("\"2024-11-30\",\"22:25\",\"07:58\",\"34225\",\"26676\",\"7549\",\"77.9\",\"50\",\"124\"");
         }
 

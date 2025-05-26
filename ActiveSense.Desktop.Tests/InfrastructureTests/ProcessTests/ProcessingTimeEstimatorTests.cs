@@ -26,7 +26,7 @@ public class ProcessingTimeEstimatorTests
             new BoolArgument { Flag = "activity", Value = true },
             new BoolArgument { Flag = "sleep", Value = true }
         };
-        
+
         double totalSizeMB = 2400;
 
         // Act
@@ -169,26 +169,26 @@ public class ProcessingTimeEstimatorTests
     public void EstimateProcessingTime_WithLegacyMode_IsDoubleTime()
     {
         // Arrange
-        List<ScriptArgument> argumentsNormal = new List<ScriptArgument>
+        var argumentsNormal = new List<ScriptArgument>
         {
             new BoolArgument { Flag = "activity", Value = true },
             new BoolArgument { Flag = "sleep", Value = true },
             new BoolArgument { Flag = "legacy", Value = false }
         };
-        
-        List<ScriptArgument> argumentsLegacy = new List<ScriptArgument>
+
+        var argumentsLegacy = new List<ScriptArgument>
         {
             new BoolArgument { Flag = "activity", Value = true },
             new BoolArgument { Flag = "sleep", Value = true },
             new BoolArgument { Flag = "legacy", Value = true }
         };
-        
+
         double totalSizeMB = 2400;
 
         // Act
         var resultNormal = _estimator.EstimateProcessingTime(totalSizeMB, argumentsNormal);
         var resultLegacy = _estimator.EstimateProcessingTime(totalSizeMB, argumentsLegacy);
-        
+
         // Assert
         Assert.That(resultLegacy.TotalSeconds, Is.EqualTo(resultNormal.TotalSeconds * 2.0).Within(0.1));
     }
@@ -197,26 +197,26 @@ public class ProcessingTimeEstimatorTests
     public void EstimateProcessingTime_WithLegacyAndOnlyActivity_IsDoubleHalfTime()
     {
         // Arrange
-        List<ScriptArgument> argumentsNormal = new List<ScriptArgument>
+        var argumentsNormal = new List<ScriptArgument>
         {
             new BoolArgument { Flag = "activity", Value = true },
             new BoolArgument { Flag = "sleep", Value = true },
             new BoolArgument { Flag = "legacy", Value = false }
         };
-        
-        List<ScriptArgument> argumentsLegacyActivityOnly = new List<ScriptArgument>
+
+        var argumentsLegacyActivityOnly = new List<ScriptArgument>
         {
             new BoolArgument { Flag = "activity", Value = true },
             new BoolArgument { Flag = "sleep", Value = false },
             new BoolArgument { Flag = "legacy", Value = true }
         };
-        
+
         double totalSizeMB = 2400;
 
         // Act
         var resultNormal = _estimator.EstimateProcessingTime(totalSizeMB, argumentsNormal);
         var resultLegacyActivityOnly = _estimator.EstimateProcessingTime(totalSizeMB, argumentsLegacyActivityOnly);
-        
+
         // Assert
         // Should be: normal_time * 0.5 (activity only) * 2.0 (legacy) = normal_time * 1.0
         Assert.That(resultLegacyActivityOnly.TotalSeconds, Is.EqualTo(resultNormal.TotalSeconds * 1.0).Within(0.1));

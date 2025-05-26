@@ -23,7 +23,8 @@ public class AnalysisModeFileTests
         _analysis = new GeneActiveAnalysis(_dateToWeekdayConverter);
 
         // Get directory for test files
-        _testsDirectory = Path.Combine(AppConfig.SolutionBasePath, "ActiveSense.Desktop.Tests", "CoreTests", "ModelTests", "Files");
+        _testsDirectory = Path.Combine(AppConfig.SolutionBasePath, "ActiveSense.Desktop.Tests", "CoreTests",
+            "ModelTests", "Files");
 
         // Load test data from CSV files
         LoadTestData();

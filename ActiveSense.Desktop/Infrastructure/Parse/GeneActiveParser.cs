@@ -51,7 +51,7 @@ public class GeneActiveResultParser(IPdfParser pdfParser, IFileParser fileParser
         foreach (var directory in directories)
         {
             var analysis = await fileParser.ParseCsvDirectoryAsync(directory);
-            analyses.Add(analysis);
+            if (analysis != null) analyses.Add(analysis);
         }
 
         return analyses;

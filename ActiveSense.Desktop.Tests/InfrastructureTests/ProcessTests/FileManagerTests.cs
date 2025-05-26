@@ -5,25 +5,19 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Process;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.InfrastructureTests.ProcessTests;
 
 [TestFixture]
 public class FileManagerTests
 {
-    private FileManager _fileManager;
-    private Mock<IPathService> _mockPathService;
-    private string _tempDir;
-    private string _processingDir;
-    private string _outputDir;
-    private Mock<Serilog.ILogger> _loggerMock;
-
     [SetUp]
     public void Setup()
     {
         _mockPathService = new Mock<IPathService>();
-        _loggerMock = new Mock<Serilog.ILogger>();
-        
+        _loggerMock = new Mock<ILogger>();
+
         _fileManager = new FileManager(_mockPathService.Object, _loggerMock.Object);
 
         // Create temp directory structure for tests
@@ -32,23 +26,19 @@ public class FileManagerTests
 
         _processingDir = Path.Combine(_tempDir, "processing");
         _outputDir = Path.Combine(_tempDir, "output");
-        
+
         // Setup mock path service
         _mockPathService.Setup(p => p.ClearDirectory(It.IsAny<string>()))
-            .Callback<string>(dir => {
-                if (Directory.Exists(dir))
-                {
-                    Directory.Delete(dir, true);
-                }
+            .Callback<string>(dir =>
+            {
+                if (Directory.Exists(dir)) Directory.Delete(dir, true);
                 Directory.CreateDirectory(dir);
             });
-            
+
         _mockPathService.Setup(p => p.EnsureDirectoryExists(It.IsAny<string>()))
-            .Callback<string>(dir => {
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
+            .Callback<string>(dir =>
+            {
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
             })
             .Returns(true);
     }
@@ -58,7 +48,6 @@ public class FileManagerTests
     {
         // Clean up the temporary directory
         if (Directory.Exists(_tempDir))
-        {
             try
             {
                 Directory.Delete(_tempDir, true);
@@ -68,20 +57,26 @@ public class FileManagerTests
                 // Files might be locked, try to delete what we can
                 Console.WriteLine("Warning: Could not completely clean up temp directory");
             }
-        }
     }
+
+    private FileManager _fileManager;
+    private Mock<IPathService> _mockPathService;
+    private string _tempDir;
+    private string _processingDir;
+    private string _outputDir;
+    private Mock<ILogger> _loggerMock;
 
     [Test]
     public void CopyFiles_WithSupportedFiles_CopiesOnlySupportedFiles()
     {
         // Arrange
         // Create source files
-        string sourceDir = Path.Combine(_tempDir, "source");
+        var sourceDir = Path.Combine(_tempDir, "source");
         Directory.CreateDirectory(sourceDir);
 
-        string supportedFile1 = Path.Combine(sourceDir, "supported1.bin");
-        string supportedFile2 = Path.Combine(sourceDir, "supported2.bin");
-        string unsupportedFile = Path.Combine(sourceDir, "unsupported.txt");
+        var supportedFile1 = Path.Combine(sourceDir, "supported1.bin");
+        var supportedFile2 = Path.Combine(sourceDir, "supported2.bin");
+        var unsupportedFile = Path.Combine(sourceDir, "unsupported.txt");
 
         File.WriteAllText(supportedFile1, "supported content 1");
         File.WriteAllText(supportedFile2, "supported content 2");
@@ -100,11 +95,11 @@ public class FileManagerTests
         // Verify that the PathService methods were called correctly
         _mockPathService.Verify(p => p.ClearDirectory(_processingDir), Times.Once);
         _mockPathService.Verify(p => p.EnsureDirectoryExists(_outputDir), Times.Once);
-        
+
         // Create the directories for verification
         Directory.CreateDirectory(_processingDir);
         Directory.CreateDirectory(_outputDir);
-        
+
         // Copy files manually since we mocked the file operations
         foreach (var file in new[] { supportedFile1, supportedFile2 })
         {
@@ -133,11 +128,11 @@ public class FileManagerTests
     {
         // Arrange
         // Create source files
-        string sourceDir = Path.Combine(_tempDir, "source");
+        var sourceDir = Path.Combine(_tempDir, "source");
         Directory.CreateDirectory(sourceDir);
 
-        string pdfFile = Path.Combine(sourceDir, "document.pdf");
-        string supportedFile = Path.Combine(sourceDir, "data.bin");
+        var pdfFile = Path.Combine(sourceDir, "document.pdf");
+        var supportedFile = Path.Combine(sourceDir, "data.bin");
 
         File.WriteAllText(pdfFile, "%PDF-1.4\nPDF content");
         File.WriteAllText(supportedFile, "supported content");
@@ -155,11 +150,11 @@ public class FileManagerTests
         // Verify that the PathService methods were called correctly
         _mockPathService.Verify(p => p.ClearDirectory(_processingDir), Times.Once);
         _mockPathService.Verify(p => p.EnsureDirectoryExists(_outputDir), Times.Once);
-        
+
         // Create the directories for verification
         Directory.CreateDirectory(_processingDir);
         Directory.CreateDirectory(_outputDir);
-        
+
         // Copy files manually since we mocked the file operations
         File.Copy(supportedFile, Path.Combine(_processingDir, Path.GetFileName(supportedFile)), true);
         File.Copy(pdfFile, Path.Combine(_outputDir, Path.GetFileName(pdfFile)), true);
@@ -185,7 +180,7 @@ public class FileManagerTests
     public void CopyFiles_WithNoFiles_CreatesEmptyDirectories()
     {
         // Arrange
-        string[] noFiles = Array.Empty<string>();
+        var noFiles = Array.Empty<string>();
         string[] supportedFileTypes = { ".bin" };
 
         // Act
@@ -195,7 +190,7 @@ public class FileManagerTests
         // Verify that the PathService methods were called correctly
         _mockPathService.Verify(p => p.ClearDirectory(_processingDir), Times.Once);
         _mockPathService.Verify(p => p.EnsureDirectoryExists(_outputDir), Times.Once);
-        
+
         // Create the directories for verification
         Directory.CreateDirectory(_processingDir);
         Directory.CreateDirectory(_outputDir);
@@ -245,10 +240,10 @@ public class FileManagerTests
     public void CopyFiles_WithEmptySupportedFileTypes_CopiesNoFiles()
     {
         // Arrange
-        string sourceFile = Path.Combine(_tempDir, "data.bin");
+        var sourceFile = Path.Combine(_tempDir, "data.bin");
         File.WriteAllText(sourceFile, "content");
 
-        string[] emptySupportedFileTypes = Array.Empty<string>();
+        var emptySupportedFileTypes = Array.Empty<string>();
 
         // Act
         _fileManager.CopyFiles(
@@ -261,7 +256,7 @@ public class FileManagerTests
         // Verify that the PathService methods were called correctly
         _mockPathService.Verify(p => p.ClearDirectory(_processingDir), Times.Once);
         _mockPathService.Verify(p => p.EnsureDirectoryExists(_outputDir), Times.Once);
-        
+
         // Create the directories for verification
         Directory.CreateDirectory(_processingDir);
         Directory.CreateDirectory(_outputDir);

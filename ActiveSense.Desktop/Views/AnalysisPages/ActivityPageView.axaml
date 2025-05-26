@@ -174,7 +174,7 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
-                
+
                 <!-- Moderate Chart Section -->
                 <Expander Header="{Binding ModerateTitle}"
                           IsExpanded="{Binding IsModerateExpanded}"
@@ -207,7 +207,7 @@
                         </ItemsControl>
                     </StackPanel>
                 </Expander>
-                
+
                 <!-- Vigorous Chart Section -->
                 <Expander Header="{Binding VigorousTitle}"
                           IsExpanded="{Binding IsVigorousExpanded}"

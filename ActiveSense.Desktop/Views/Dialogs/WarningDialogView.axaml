@@ -38,7 +38,8 @@
                         Command="{Binding CancelCommand}">
                     <TextBlock Text="{Binding CloseButtonText}" />
                 </Button>
-                <Button Grid.Column="2" Classes="Danger" Theme="{DynamicResource SolidButton}" Command="{Binding OkCommand}">
+                <Button Grid.Column="2" Classes="Danger" Theme="{DynamicResource SolidButton}"
+                        Command="{Binding OkCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock Text="{Binding OkButtonText}" />
                     </StackPanel>

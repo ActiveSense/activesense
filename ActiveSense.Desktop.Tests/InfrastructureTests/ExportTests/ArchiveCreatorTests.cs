@@ -10,10 +10,6 @@ namespace ActiveSense.Desktop.Tests.InfrastructureTests.ExportTests;
 [TestFixture]
 public class ArchiveCreatorTests
 {
-    private ArchiveCreator _archiveCreator;
-    private string _tempDir;
-    private string _tempPdfPath;
-
     [SetUp]
     public void Setup()
     {
@@ -32,23 +28,24 @@ public class ArchiveCreatorTests
     public void TearDown()
     {
         // Clean up the temporary directory
-        if (Directory.Exists(_tempDir))
-        {
-            Directory.Delete(_tempDir, true);
-        }
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
     }
+
+    private ArchiveCreator _archiveCreator;
+    private string _tempDir;
+    private string _tempPdfPath;
 
     [Test]
     public async Task CreateArchiveAsync_WithValidInputs_CreatesZipArchiveWithExpectedFiles()
     {
         // Arrange
-        string outputPath = Path.Combine(_tempDir, "output.zip");
-        string fileName = "TestAnalysis";
-        string sleepCsv = "Date,SleepTime,WakeTime\n2023-01-01,22:00,06:00";
-        string activityCsv = "Date,Steps,Calories\n2023-01-01,10000,2500";
+        var outputPath = Path.Combine(_tempDir, "output.zip");
+        var fileName = "TestAnalysis";
+        var sleepCsv = "Date,SleepTime,WakeTime\n2023-01-01,22:00,06:00";
+        var activityCsv = "Date,Steps,Calories\n2023-01-01,10000,2500";
 
         // Act
-        bool result = await _archiveCreator.CreateArchiveAsync(
+        var result = await _archiveCreator.CreateArchiveAsync(
             outputPath,
             _tempPdfPath,
             fileName,
@@ -74,14 +71,14 @@ public class ArchiveCreatorTests
             // Verify sleep CSV content
             using (var reader = new StreamReader(sleepEntry.Open()))
             {
-                string content = reader.ReadToEnd();
+                var content = reader.ReadToEnd();
                 Assert.That(content, Is.EqualTo(sleepCsv));
             }
 
             // Verify activity CSV content
             using (var reader = new StreamReader(activityEntry.Open()))
             {
-                string content = reader.ReadToEnd();
+                var content = reader.ReadToEnd();
                 Assert.That(content, Is.EqualTo(activityCsv));
             }
         }
@@ -91,7 +88,7 @@ public class ArchiveCreatorTests
     public Task CreateArchiveAsync_WithInvalidOutputPath_Throws()
     {
         // Arrange
-        string invalidPath = Path.Combine(_tempDir, "invalid", "nested", "path", "output.zip");
+        var invalidPath = Path.Combine(_tempDir, "invalid", "nested", "path", "output.zip");
 
         // Act & Assert
         Assert.ThrowsAsync<Exception>(async () =>
@@ -110,13 +107,13 @@ public class ArchiveCreatorTests
     public async Task CreateArchiveAsync_WithEmptyCsvData_CreatesValidArchive()
     {
         // Arrange
-        string outputPath = Path.Combine(_tempDir, "output.zip");
-        string fileName = "TestAnalysis";
-        string emptySleepCsv = "";
-        string emptyActivityCsv = "";
+        var outputPath = Path.Combine(_tempDir, "output.zip");
+        var fileName = "TestAnalysis";
+        var emptySleepCsv = "";
+        var emptyActivityCsv = "";
 
         // Act
-        bool result = await _archiveCreator.CreateArchiveAsync(
+        var result = await _archiveCreator.CreateArchiveAsync(
             outputPath,
             _tempPdfPath,
             fileName,
@@ -140,14 +137,14 @@ public class ArchiveCreatorTests
             // Verify sleep CSV is empty
             using (var reader = new StreamReader(sleepEntry.Open()))
             {
-                string content = reader.ReadToEnd();
+                var content = reader.ReadToEnd();
                 Assert.That(content, Is.Empty);
             }
 
             // Verify activity CSV is empty
             using (var reader = new StreamReader(activityEntry.Open()))
             {
-                string content = reader.ReadToEnd();
+                var content = reader.ReadToEnd();
                 Assert.That(content, Is.Empty);
             }
         }

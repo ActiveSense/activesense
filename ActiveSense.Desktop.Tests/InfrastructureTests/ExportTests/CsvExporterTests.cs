@@ -9,10 +9,6 @@ namespace ActiveSense.Desktop.Tests.InfrastructureTests.ExportTests;
 [TestFixture]
 public class CsvExporterTests
 {
-    private CsvExporter _csvExporter;
-    private List<SleepRecord> _sampleSleepRecords;
-    private List<ActivityRecord> _sampleActivityRecords;
-
     [SetUp]
     public void Setup()
     {
@@ -21,7 +17,7 @@ public class CsvExporterTests
         // Create sample sleep records
         _sampleSleepRecords = new List<SleepRecord>
         {
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-11-29",
                 SleepOnsetTime = "21:25",
@@ -33,7 +29,7 @@ public class CsvExporterTests
                 NumActivePeriods = "50",
                 MedianActivityLength = "124"
             },
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-11-30",
                 SleepOnsetTime = "21:55",
@@ -50,7 +46,7 @@ public class CsvExporterTests
         // Create sample activity records
         _sampleActivityRecords = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "1",
                 Steps = "3624",
@@ -61,7 +57,7 @@ public class CsvExporterTests
                 Moderate = "3286",
                 Vigorous = "0"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "2",
                 Steps = "10217",
@@ -75,11 +71,15 @@ public class CsvExporterTests
         };
     }
 
+    private CsvExporter _csvExporter;
+    private List<SleepRecord> _sampleSleepRecords;
+    private List<ActivityRecord> _sampleActivityRecords;
+
     [Test]
     public void ExportSleepRecords_WithValidRecords_ReturnsValidCsvString()
     {
         // Act
-        string result = _csvExporter.ExportSleepRecords(_sampleSleepRecords);
+        var result = _csvExporter.ExportSleepRecords(_sampleSleepRecords);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -104,7 +104,7 @@ public class CsvExporterTests
     public void ExportActivityRecords_WithValidRecords_ReturnsValidCsvString()
     {
         // Act
-        string result = _csvExporter.ExportActivityRecords(_sampleActivityRecords);
+        var result = _csvExporter.ExportActivityRecords(_sampleActivityRecords);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -132,7 +132,7 @@ public class CsvExporterTests
         var emptyRecords = new List<SleepRecord>();
 
         // Act
-        string result = _csvExporter.ExportSleepRecords(emptyRecords);
+        var result = _csvExporter.ExportSleepRecords(emptyRecords);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -154,7 +154,7 @@ public class CsvExporterTests
         var emptyRecords = new List<ActivityRecord>();
 
         // Act
-        string result = _csvExporter.ExportActivityRecords(emptyRecords);
+        var result = _csvExporter.ExportActivityRecords(emptyRecords);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -168,5 +168,4 @@ public class CsvExporterTests
         var lines = result.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         Assert.That(lines.Length, Is.EqualTo(1), "Expected only header line for empty collection");
     }
-
 }

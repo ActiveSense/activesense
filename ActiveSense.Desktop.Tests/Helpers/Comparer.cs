@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -21,19 +20,17 @@ public class Comparer
         if (records1.Count != records2.Count)
             return false;
 
-        for (int i = 0; i < records1.Count; i++)
-        {
+        for (var i = 0; i < records1.Count; i++)
             if (!CompareRecords(records1[i], records2[i]))
                 return false;
-        }
 
         return true;
     }
 
     private bool AreFilesIdentical(string file1, string file2)
     {
-        string content1 = File.ReadAllText(file1);
-        string content2 = File.ReadAllText(file2);
+        var content1 = File.ReadAllText(file1);
+        var content2 = File.ReadAllText(file2);
         return content1 == content2;
     }
 
@@ -53,15 +50,15 @@ public class Comparer
         {
             csv.Read();
             csv.ReadHeader();
-            string[] headers = csv.HeaderRecord;
+            var headers = csv.HeaderRecord;
 
             while (csv.Read())
             {
                 var record = new Dictionary<string, string>();
 
-                foreach (string header in headers)
+                foreach (var header in headers)
                 {
-                    string value = csv.GetField(header) ?? string.Empty;
+                    var value = csv.GetField(header) ?? string.Empty;
                     record[header] = value;
                 }
 
@@ -82,8 +79,8 @@ public class Comparer
             if (!record2.ContainsKey(key))
                 return false;
 
-            string value1 = NormalizeValue(record1[key]);
-            string value2 = NormalizeValue(record2[key]);
+            var value1 = NormalizeValue(record1[key]);
+            var value2 = NormalizeValue(record2[key]);
 
             if (value1 != value2)
                 return false;
@@ -94,15 +91,10 @@ public class Comparer
 
     private string NormalizeValue(string value)
     {
-        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out double numValue))
-        {
+        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var numValue))
             return numValue.ToString(CultureInfo.InvariantCulture);
-        }
 
-        if (DateTime.TryParse(value, out DateTime dateValue))
-        {
-            return dateValue.ToString("yyyy-MM-dd HH:mm:ss");
-        }
+        if (DateTime.TryParse(value, out var dateValue)) return dateValue.ToString("yyyy-MM-dd HH:mm:ss");
 
         return value.Trim();
     }

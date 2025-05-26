@@ -11,13 +11,6 @@ namespace ActiveSense.Desktop.Tests.CoreTests.ModelTests;
 [TestFixture]
 public class AnalysisModelTests
 {
-    private GeneActiveAnalysis _analysis;
-    private DateToWeekdayConverter _dateToWeekdayConverter;
-
-    // Sample data
-    private List<SleepRecord> _sampleSleepRecords;
-    private List<ActivityRecord> _sampleActivityRecords;
-
     [SetUp]
     public void Setup()
     {
@@ -33,13 +26,18 @@ public class AnalysisModelTests
         _analysis.FileName = "TestAnalysis";
     }
 
-    #region Helper Methods
+    private GeneActiveAnalysis _analysis;
+    private DateToWeekdayConverter _dateToWeekdayConverter;
+
+    // Sample data
+    private List<SleepRecord> _sampleSleepRecords;
+    private List<ActivityRecord> _sampleActivityRecords;
 
     private List<SleepRecord> LoadSampleSleepRecords()
     {
         return new List<SleepRecord>
         {
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-11-29",
                 SleepOnsetTime = "21:25",
@@ -51,7 +49,7 @@ public class AnalysisModelTests
                 NumActivePeriods = "50",
                 MedianActivityLength = "124"
             },
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-11-30",
                 SleepOnsetTime = "21:55",
@@ -63,7 +61,7 @@ public class AnalysisModelTests
                 NumActivePeriods = "67",
                 MedianActivityLength = "84"
             },
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-12-01",
                 SleepOnsetTime = "22:12",
@@ -82,7 +80,7 @@ public class AnalysisModelTests
     {
         return new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024-11-29",
                 Steps = "3624",
@@ -93,7 +91,7 @@ public class AnalysisModelTests
                 Moderate = "3286",
                 Vigorous = "0"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "2024-11-30",
                 Steps = "10217",
@@ -104,7 +102,7 @@ public class AnalysisModelTests
                 Moderate = "4440",
                 Vigorous = "2076"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "2024-12-01",
                 Steps = "11553",
@@ -118,10 +116,6 @@ public class AnalysisModelTests
         };
     }
 
-    #endregion
-
-    #region Sleep Metrics Tests
-
     [Test]
     public void TotalSleepTime_ShouldCalculateCorrectSum()
     {
@@ -130,7 +124,7 @@ public class AnalysisModelTests
 
         double expected = 26676 + 26998 + 18473; // Sum of all sleep times
 
-        double actual = sleepAnalysis.TotalSleepTime;
+        var actual = sleepAnalysis.TotalSleepTime;
 
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "TotalSleepTime calculation is incorrect");
     }
@@ -143,7 +137,7 @@ public class AnalysisModelTests
 
         double expected = 7549 + 9395 + 6790; // Sum of all wake times
 
-        double actual = sleepAnalysis.TotalWakeTime;
+        var actual = sleepAnalysis.TotalWakeTime;
 
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "TotalWakeTime calculation is incorrect");
     }
@@ -154,9 +148,9 @@ public class AnalysisModelTests
         // Cast to ISleepAnalysis to test the interface method
         ISleepAnalysis sleepAnalysis = _analysis;
 
-        double expected = (26676 + 26998 + 18473) / 3.0; // Average of all sleep times
+        var expected = (26676 + 26998 + 18473) / 3.0; // Average of all sleep times
 
-        double actual = sleepAnalysis.AverageSleepTime;
+        var actual = sleepAnalysis.AverageSleepTime;
 
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "AverageSleepTime calculation is incorrect");
     }
@@ -167,9 +161,9 @@ public class AnalysisModelTests
         // Cast to ISleepAnalysis to test the interface method
         ISleepAnalysis sleepAnalysis = _analysis;
 
-        double expected = (7549 + 9395 + 6790) / 3.0; // Average of all wake times
+        var expected = (7549 + 9395 + 6790) / 3.0; // Average of all wake times
 
-        double actual = sleepAnalysis.AverageWakeTime;
+        var actual = sleepAnalysis.AverageWakeTime;
 
         Assert.That(actual, Is.EqualTo(expected).Within(0.01), "AverageWakeTime calculation is incorrect");
     }
@@ -185,10 +179,9 @@ public class AnalysisModelTests
         var actual = sleepAnalysis.SleepEfficiency;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "SleepEfficiency array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
-            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01), $"SleepEfficiency value at index {i} is incorrect");
-        }
+        for (var i = 0; i < expected.Length; i++)
+            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01),
+                $"SleepEfficiency value at index {i} is incorrect");
     }
 
     [Test]
@@ -202,15 +195,10 @@ public class AnalysisModelTests
         var actual = sleepAnalysis.TotalSleepTimePerDay;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "TotalSleepTimePerDay array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
-            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01), $"TotalSleepTimePerDay value at index {i} is incorrect");
-        }
+        for (var i = 0; i < expected.Length; i++)
+            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01),
+                $"TotalSleepTimePerDay value at index {i} is incorrect");
     }
-
-    #endregion
-
-    #region Activity Metrics Tests
 
     [Test]
     public void StepsPerDay_ShouldReturnCorrectValues()
@@ -223,10 +211,9 @@ public class AnalysisModelTests
         var actual = activityAnalysis.StepsPerDay;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "StepsPerDay array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
-            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01), $"StepsPerDay value at index {i} is incorrect");
-        }
+        for (var i = 0; i < expected.Length; i++)
+            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01),
+                $"StepsPerDay value at index {i} is incorrect");
     }
 
     [Test]
@@ -238,10 +225,8 @@ public class AnalysisModelTests
         var actual = _analysis.Days;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "Days array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
+        for (var i = 0; i < expected.Length; i++)
             Assert.That(actual[i], Is.EqualTo(expected[i]), $"Days value at index {i} is incorrect");
-        }
     }
 
     [Test]
@@ -255,10 +240,9 @@ public class AnalysisModelTests
         var actual = activityAnalysis.ModerateActivity;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "ModerateActivity array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
-            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01), $"ModerateActivity value at index {i} is incorrect");
-        }
+        for (var i = 0; i < expected.Length; i++)
+            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01),
+                $"ModerateActivity value at index {i} is incorrect");
     }
 
     [Test]
@@ -272,10 +256,9 @@ public class AnalysisModelTests
         var actual = activityAnalysis.VigorousActivity;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "VigorousActivity array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
-            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01), $"VigorousActivity value at index {i} is incorrect");
-        }
+        for (var i = 0; i < expected.Length; i++)
+            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01),
+                $"VigorousActivity value at index {i} is incorrect");
     }
 
     [Test]
@@ -284,7 +267,8 @@ public class AnalysisModelTests
         // Cast to IActivityAnalysis to test the interface method
         IActivityAnalysis activityAnalysis = _analysis;
 
-        double[] expected = {
+        double[] expected =
+        {
             3624 / 10000.0 * 100,
             10217 / 10000.0 * 100,
             11553 / 10000.0 * 100
@@ -293,15 +277,10 @@ public class AnalysisModelTests
         var actual = activityAnalysis.StepsPercentage;
 
         Assert.That(actual.Length, Is.EqualTo(expected.Length), "StepsPercentage array length is incorrect");
-        for (int i = 0; i < expected.Length; i++)
-        {
-            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01), $"StepsPercentage value at index {i} is incorrect");
-        }
+        for (var i = 0; i < expected.Length; i++)
+            Assert.That(actual[i], Is.EqualTo(expected[i]).Within(0.01),
+                $"StepsPercentage value at index {i} is incorrect");
     }
-
-    #endregion
-
-    #region Data Access Method Tests
 
     [Test]
     public void SleepWeekdays_ShouldReturnCorrectWeekdays()
@@ -316,7 +295,7 @@ public class AnalysisModelTests
         var validWeekdays = new[] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
         foreach (var day in weekdays)
         {
-            string baseDayName = day.Split(' ')[0]; // Remove any counters (e.g., "Monday 2")
+            var baseDayName = day.Split(' ')[0]; // Remove any counters (e.g., "Monday 2")
             Assert.That(validWeekdays.Contains(baseDayName, StringComparer.OrdinalIgnoreCase), Is.True,
                 $"{baseDayName} is not a valid weekday");
         }
@@ -335,7 +314,7 @@ public class AnalysisModelTests
         var validWeekdays = new[] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
         foreach (var day in weekdays)
         {
-            string baseDayName = day.Split(' ')[0]; // Remove any counters (e.g., "Monday 2")
+            var baseDayName = day.Split(' ')[0]; // Remove any counters (e.g., "Monday 2")
             Assert.That(validWeekdays.Contains(baseDayName, StringComparer.OrdinalIgnoreCase), Is.True,
                 $"{baseDayName} is not a valid weekday");
         }
@@ -354,10 +333,8 @@ public class AnalysisModelTests
         // Expected dates in dd.MM.yyyy format (default format used in GeneActiveAnalysis)
         string[] expected = { "29.11.2024", "30.11.2024", "01.12.2024" };
 
-        for (int i = 0; i < expected.Length; i++)
-        {
+        for (var i = 0; i < expected.Length; i++)
             Assert.That(dates[i], Is.EqualTo(expected[i]), $"ActivityDates value at index {i} is incorrect");
-        }
     }
 
     [Test]
@@ -373,10 +350,8 @@ public class AnalysisModelTests
         // Expected dates in dd.MM.yyyy format (default format used in GeneActiveAnalysis)
         string[] expected = { "29.11.2024", "30.11.2024", "01.12.2024" };
 
-        for (int i = 0; i < expected.Length; i++)
-        {
+        for (var i = 0; i < expected.Length; i++)
             Assert.That(dates[i], Is.EqualTo(expected[i]), $"SleepDates value at index {i} is incorrect");
-        }
     }
 
     [Test]
@@ -385,7 +360,7 @@ public class AnalysisModelTests
         // Arrange - Create analysis with invalid date strings
         var invalidActivityRecords = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "invalid-date-1",
                 Steps = "1000",
@@ -396,7 +371,7 @@ public class AnalysisModelTests
                 Moderate = "3000",
                 Vigorous = "500"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "not-a-date",
                 Steps = "2000",
@@ -428,7 +403,7 @@ public class AnalysisModelTests
         // Arrange - Create analysis with invalid date strings
         var invalidSleepRecords = new List<SleepRecord>
         {
-            new SleepRecord
+            new()
             {
                 NightStarting = "invalid-date-1",
                 SleepOnsetTime = "21:00",
@@ -440,7 +415,7 @@ public class AnalysisModelTests
                 NumActivePeriods = "30",
                 MedianActivityLength = "120"
             },
-            new SleepRecord
+            new()
             {
                 NightStarting = "not-a-date",
                 SleepOnsetTime = "22:00",
@@ -505,7 +480,7 @@ public class AnalysisModelTests
         // Arrange - Create records with different valid date formats
         var mixedFormatRecords = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024-11-29", // ISO format
                 Steps = "1000",
@@ -516,7 +491,7 @@ public class AnalysisModelTests
                 Moderate = "3000",
                 Vigorous = "500"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "11/30/2024", // US format
                 Steps = "2000",
@@ -527,7 +502,7 @@ public class AnalysisModelTests
                 Moderate = "3500",
                 Vigorous = "600"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "01.12.2024", // German format (already in target format)
                 Steps = "3000",
@@ -549,16 +524,12 @@ public class AnalysisModelTests
 
         // Assert
         Assert.That(dates.Length, Is.EqualTo(3), "ActivityDates should return 3 dates");
-        
+
         // All should be converted to dd.MM.yyyy format
         Assert.That(dates[0], Is.EqualTo("29.11.2024"), "First date should be formatted correctly");
         Assert.That(dates[1], Is.EqualTo("30.11.2024"), "Second date should be formatted correctly");
         Assert.That(dates[2], Is.EqualTo("12.01.2024"), "Third date should be formatted correctly");
     }
-
-    #endregion
-
-    #region Chart Data Tests
 
     [Test]
     public void GetActivityDistributionChartData_ShouldReturnCorrectData()
@@ -574,15 +545,18 @@ public class AnalysisModelTests
 
         // First series should be Light Activity
         Assert.That(chartData[0].Title, Is.EqualTo("Leichte Aktivität"), "First series should be Light Activity");
-        Assert.That(chartData[0].Data.Length, Is.EqualTo(_analysis.LightActivity.Length), "Light Activity data length is incorrect");
+        Assert.That(chartData[0].Data.Length, Is.EqualTo(_analysis.LightActivity.Length),
+            "Light Activity data length is incorrect");
 
         // Second series should be Moderate Activity
         Assert.That(chartData[1].Title, Is.EqualTo("Mittlere Aktivität"), "Second series should be Moderate Activity");
-        Assert.That(chartData[1].Data.Length, Is.EqualTo(_analysis.ModerateActivity.Length), "Moderate Activity data length is incorrect");
+        Assert.That(chartData[1].Data.Length, Is.EqualTo(_analysis.ModerateActivity.Length),
+            "Moderate Activity data length is incorrect");
 
         // Third series should be Vigorous Activity
         Assert.That(chartData[2].Title, Is.EqualTo("Intensive Aktivität"), "Third series should be Vigorous Activity");
-        Assert.That(chartData[2].Data.Length, Is.EqualTo(_analysis.VigorousActivity.Length), "Vigorous Activity data length is incorrect");
+        Assert.That(chartData[2].Data.Length, Is.EqualTo(_analysis.VigorousActivity.Length),
+            "Vigorous Activity data length is incorrect");
     }
 
     [Test]
@@ -599,8 +573,10 @@ public class AnalysisModelTests
         Assert.That(chartData.Labels.Length, Is.EqualTo(2), "Sleep chart should have 2 labels");
 
         Assert.That(chartData.Data.Length, Is.EqualTo(2), "Sleep chart should have 2 data points");
-        Assert.That(chartData.Data[0], Is.EqualTo(Math.Round(_analysis.AverageSleepTime / 3600, 1)).Within(0.01), "Total Sleep Time data is incorrect");
-        Assert.That(chartData.Data[1], Is.EqualTo(Math.Round(_analysis.AverageWakeTime / 3600, 1)).Within(0.01), "Total Wake Time data is incorrect");
+        Assert.That(chartData.Data[0], Is.EqualTo(Math.Round(_analysis.AverageSleepTime / 3600, 1)).Within(0.01),
+            "Total Sleep Time data is incorrect");
+        Assert.That(chartData.Data[1], Is.EqualTo(Math.Round(_analysis.AverageWakeTime / 3600, 1)).Within(0.01),
+            "Total Wake Time data is incorrect");
     }
 
     [Test]
@@ -613,13 +589,15 @@ public class AnalysisModelTests
         var chartData = chartProvider.GetTotalSleepTimePerDayChartData();
 
         // Assert
-        Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.SleepWeekdays().Length), "Total sleep time chart labels length is incorrect");
-        Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.TotalSleepTimePerDay.Length), "Total sleep time chart data length is incorrect");
+        Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.SleepWeekdays().Length),
+            "Total sleep time chart labels length is incorrect");
+        Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.TotalSleepTimePerDay.Length),
+            "Total sleep time chart data length is incorrect");
 
-        for (int i = 0; i < _analysis.TotalSleepTimePerDay.Length; i++)
-        {
-            Assert.That(chartData.Data[i], Is.EqualTo(Math.Round(_analysis.TotalSleepTimePerDay[i] / 3600, 1)).Within(0.01), $"Total sleep time value at index {i} is incorrect");
-        }
+        for (var i = 0; i < _analysis.TotalSleepTimePerDay.Length; i++)
+            Assert.That(chartData.Data[i],
+                Is.EqualTo(Math.Round(_analysis.TotalSleepTimePerDay[i] / 3600, 1)).Within(0.01),
+                $"Total sleep time value at index {i} is incorrect");
     }
 
     [Test]
@@ -632,18 +610,15 @@ public class AnalysisModelTests
         var chartData = chartProvider.GetStepsChartData();
 
         // Assert
-        Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.ActivityWeekdays().Length), "Steps chart labels length is incorrect");
-        Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.StepsPerDay.Length), "Steps chart data length is incorrect");
+        Assert.That(chartData.Labels.Length, Is.EqualTo(_analysis.ActivityWeekdays().Length),
+            "Steps chart labels length is incorrect");
+        Assert.That(chartData.Data.Length, Is.EqualTo(_analysis.StepsPerDay.Length),
+            "Steps chart data length is incorrect");
 
-        for (int i = 0; i < _analysis.StepsPerDay.Length; i++)
-        {
-            Assert.That(chartData.Data[i], Is.EqualTo(_analysis.StepsPerDay[i]).Within(0.01), $"Steps value at index {i} is incorrect");
-        }
+        for (var i = 0; i < _analysis.StepsPerDay.Length; i++)
+            Assert.That(chartData.Data[i], Is.EqualTo(_analysis.StepsPerDay[i]).Within(0.01),
+                $"Steps value at index {i} is incorrect");
     }
-
-    #endregion
-
-    #region Cache Management Tests
 
     [Test]
     public void ClearCache_ShouldResetCachedValues()
@@ -671,14 +646,11 @@ public class AnalysisModelTests
         var updatedSteps = _analysis.StepsPerDay;
 
         // Assert
-        Assert.That(updatedSteps.Length, Is.Not.EqualTo(initialSteps.Length), "Cache was not cleared when adding new records");
+        Assert.That(updatedSteps.Length, Is.Not.EqualTo(initialSteps.Length),
+            "Cache was not cleared when adding new records");
         Assert.That(updatedSteps.Length, Is.EqualTo(4), "Updated StepsPerDay should have 4 items");
         Assert.That(updatedSteps[3], Is.EqualTo(5000).Within(0.01), "The new step value was not added correctly");
     }
-
-    #endregion
-
-    #region Additional Tests for Previously Untested Functions
 
     [Test]
     public void Days_WithEmptyActivityRecords_ShouldReturnEmptyArray()
@@ -702,7 +674,7 @@ public class AnalysisModelTests
         // Arrange - Create record with ISO date format
         var recordWithISODate = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024-01-15", // ISO format
                 Steps = "5000",
@@ -733,7 +705,7 @@ public class AnalysisModelTests
         // Arrange - Test with leap year date (2024 is a leap year)
         var recordWithLeapDate = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024-02-29", // Leap year date
                 Steps = "6000",
@@ -764,7 +736,7 @@ public class AnalysisModelTests
         // Arrange - Test various date formats that DateTime.Parse should handle
         var recordsWithVariousFormats = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024/03/15", // Slash format
                 Steps = "7000",
@@ -775,7 +747,7 @@ public class AnalysisModelTests
                 Moderate = "3600",
                 Vigorous = "900"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "March 16, 2024", // Long format
                 Steps = "7500",
@@ -807,7 +779,7 @@ public class AnalysisModelTests
         // Arrange - Test sleep records with various date formats
         var recordsWithVariousFormats = new List<SleepRecord>
         {
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024/04/20", // Slash format
                 SleepOnsetTime = "22:30",
@@ -819,7 +791,7 @@ public class AnalysisModelTests
                 NumActivePeriods = "20",
                 MedianActivityLength = "180"
             },
-            new SleepRecord
+            new()
             {
                 NightStarting = "April 21, 2024", // Long format
                 SleepOnsetTime = "23:00",
@@ -851,11 +823,11 @@ public class AnalysisModelTests
     {
         // Note: This tests the private ParseAndFormatDate method indirectly
         // The method uses a constant DateFormat of "dd.MM.yyyy", so we verify this behavior
-        
+
         // Arrange - Use an analysis with known date
         var record = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024-12-25", // Christmas date for easy verification
                 Steps = "1000",
@@ -887,7 +859,7 @@ public class AnalysisModelTests
         // Arrange - Use sleep analysis with known date
         var record = new List<SleepRecord>
         {
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-12-31", // New Year's Eve for easy verification
                 SleepOnsetTime = "23:30",
@@ -920,7 +892,7 @@ public class AnalysisModelTests
         // Arrange - Create records with mixed date formats to verify Days returns raw values
         var mixedRecords = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "raw-value-1", // Not a date - should be returned as-is
                 Steps = "1000",
@@ -931,7 +903,7 @@ public class AnalysisModelTests
                 Moderate = "3600",
                 Vigorous = "900"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "2024-01-01", // Valid date - should still be returned as-is in Days
                 Steps = "2000",
@@ -961,11 +933,11 @@ public class AnalysisModelTests
     {
         // This test verifies that both ActivityDates() and ActivityWeekdays() 
         // use the same date parsing logic (through ParseAndFormatDate method)
-        
+
         // Arrange - Use records with specific dates where we know the weekdays
         var recordsWithKnownWeekdays = new List<ActivityRecord>
         {
-            new ActivityRecord
+            new()
             {
                 Day = "2024-11-29", // This is a Friday (Freitag in German)
                 Steps = "8000",
@@ -976,7 +948,7 @@ public class AnalysisModelTests
                 Moderate = "3600",
                 Vigorous = "900"
             },
-            new ActivityRecord
+            new()
             {
                 Day = "2024-11-30", // This is a Saturday (Samstag in German)
                 Steps = "5000",
@@ -1000,14 +972,16 @@ public class AnalysisModelTests
         // Assert
         Assert.That(dates.Length, Is.EqualTo(2), "Should have two dates");
         Assert.That(weekdays.Length, Is.EqualTo(2), "Should have two weekdays");
-        
+
         // Verify formatted dates
         Assert.That(dates[0], Is.EqualTo("29.11.2024"), "First date should be formatted correctly");
         Assert.That(dates[1], Is.EqualTo("30.11.2024"), "Second date should be formatted correctly");
-        
+
         // Verify weekdays (should be German weekday names)
-        Assert.That(weekdays[0], Does.StartWith("Freitag").Or.StartWith("1. Freitag"), "First weekday should be Friday");
-        Assert.That(weekdays[1], Does.StartWith("Samstag").Or.StartWith("1. Samstag"), "Second weekday should be Saturday");
+        Assert.That(weekdays[0], Does.StartWith("Freitag").Or.StartWith("1. Freitag"),
+            "First weekday should be Friday");
+        Assert.That(weekdays[1], Does.StartWith("Samstag").Or.StartWith("1. Samstag"),
+            "Second weekday should be Saturday");
     }
 
     [Test]
@@ -1015,11 +989,11 @@ public class AnalysisModelTests
     {
         // This test verifies that both SleepDates() and SleepWeekdays() 
         // use the same date parsing logic
-        
+
         // Arrange - Use records with specific dates where we know the weekdays
         var recordsWithKnownWeekdays = new List<SleepRecord>
         {
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-12-01", // This is a Sunday (Sonntag in German)
                 SleepOnsetTime = "22:00",
@@ -1031,7 +1005,7 @@ public class AnalysisModelTests
                 NumActivePeriods = "15",
                 MedianActivityLength = "200"
             },
-            new SleepRecord
+            new()
             {
                 NightStarting = "2024-12-02", // This is a Monday (Montag in German)
                 SleepOnsetTime = "23:00",
@@ -1056,15 +1030,14 @@ public class AnalysisModelTests
         // Assert
         Assert.That(dates.Length, Is.EqualTo(2), "Should have two dates");
         Assert.That(weekdays.Length, Is.EqualTo(2), "Should have two weekdays");
-        
+
         // Verify formatted dates
         Assert.That(dates[0], Is.EqualTo("01.12.2024"), "First date should be formatted correctly");
         Assert.That(dates[1], Is.EqualTo("02.12.2024"), "Second date should be formatted correctly");
-        
+
         // Verify weekdays (should be German weekday names)
-        Assert.That(weekdays[0], Does.StartWith("Sonntag").Or.StartWith("1. Sonntag"), "First weekday should be Sunday");
+        Assert.That(weekdays[0], Does.StartWith("Sonntag").Or.StartWith("1. Sonntag"),
+            "First weekday should be Sunday");
         Assert.That(weekdays[1], Does.StartWith("Montag").Or.StartWith("1. Montag"), "Second weekday should be Monday");
     }
-
-    #endregion
 }

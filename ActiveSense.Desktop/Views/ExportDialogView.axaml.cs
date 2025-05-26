@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
 using ActiveSense.Desktop.ViewModels;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 
 namespace ActiveSense.Desktop.Views;
 
@@ -17,10 +14,7 @@ public partial class ExportDialogView : UserControl
 
         DataContextChanged += (sender, e) =>
         {
-            if (DataContext is ExportDialogViewModel viewModel)
-            {
-                viewModel.FilePickerRequested += ShowFilePickerAsync;
-            }
+            if (DataContext is ExportDialogViewModel viewModel) viewModel.FilePickerRequested += ShowFilePickerAsync;
         };
     }
 
@@ -49,7 +43,7 @@ public partial class ExportDialogView : UserControl
 
         var fileName = $"{selectedAnalysis.FileName}{extension}";
 
-        var result = await sp.SaveFilePickerAsync(new FilePickerSaveOptions()
+        var result = await sp.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save Analysis",
             SuggestedFileName = fileName,
@@ -58,7 +52,6 @@ public partial class ExportDialogView : UserControl
         });
 
         return result?.Path.LocalPath;
-
     }
 
     private IStorageProvider? GetStorageProvider()

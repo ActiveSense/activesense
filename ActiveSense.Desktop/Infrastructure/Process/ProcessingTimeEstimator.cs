@@ -6,11 +6,10 @@ using System.Security.Cryptography;
 using System.Threading;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
-using iText.Layout.Element;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
-    public class ProcessingTimeEstimator : IProcessingTimeEstimator
+public class ProcessingTimeEstimator : IProcessingTimeEstimator
 {
     private const double BenchmarkFileSizeMb = 767.7;
     private const double BenchmarkTimeSeconds = 388;
@@ -22,81 +21,55 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     // The reference calibration time is the time taken for the calibration task on the machine that has the above benchmark speed.
     private const double ReferenceCalibrationTimeSeconds = 1.239;
 
-    private static readonly Lazy<double> MachineSpeedFactor = new Lazy<double>(CalculateMachineSpeedFactor, LazyThreadSafetyMode.ExecutionAndPublication);
+    private static readonly Lazy<double> MachineSpeedFactor =
+        new(CalculateMachineSpeedFactor, LazyThreadSafetyMode.ExecutionAndPublication);
 
     public TimeSpan EstimateProcessingTime(double totalFileSizesMB, IList<ScriptArgument> arguments)
     {
-        if (totalFileSizesMB <= 10)
-        {
-            return TimeSpan.Zero;
-        }
-        
+        if (totalFileSizesMB <= 10) return TimeSpan.Zero;
+
         var estimatedSecondsOnBenchmarkMachine = totalFileSizesMB / BaselineMbPerSecond;
 
         var actualEstimatedSeconds = estimatedSecondsOnBenchmarkMachine * MachineSpeedFactor.Value;
 
         if (actualEstimatedSeconds < 0) actualEstimatedSeconds = 0;
-        
+
         // Apply reduction based on disabled analysis types
-        double reductionFactor = GetReductionFactor(arguments);
+        var reductionFactor = GetReductionFactor(arguments);
         actualEstimatedSeconds *= reductionFactor;
-        
-        if (totalFileSizesMB < 20)
-        {
-            return TimeSpan.FromSeconds(actualEstimatedSeconds + 15);
-        }
+
+        if (totalFileSizesMB < 20) return TimeSpan.FromSeconds(actualEstimatedSeconds + 15);
 
         return TimeSpan.FromSeconds(actualEstimatedSeconds);
     }
 
     private static double GetReductionFactor(IList<ScriptArgument> arguments)
     {
-        if (arguments == null || arguments.Count == 0)
-        {
-            return 1.0;
-        }
+        if (arguments == null || arguments.Count == 0) return 1.0;
 
-        bool activityEnabled = true;
-        bool sleepEnabled = true;
-        bool legacyEnabled = false;
+        var activityEnabled = true;
+        var sleepEnabled = true;
+        var legacyEnabled = false;
 
         foreach (var arg in arguments)
-        {
             if (arg is BoolArgument boolArg)
             {
                 if (boolArg.Flag == "activity")
-                {
                     activityEnabled = boolArg.Value;
-                }
                 else if (boolArg.Flag == "sleep")
-                {
                     sleepEnabled = boolArg.Value;
-                }
-                else if (boolArg.Flag == "legacy")
-                {
-                    legacyEnabled = boolArg.Value;
-                }
+                else if (boolArg.Flag == "legacy") legacyEnabled = boolArg.Value;
             }
-        }
 
         double baseFactor;
         if (activityEnabled && sleepEnabled)
-        {
             baseFactor = 1.0;
-        }
         else if (activityEnabled || sleepEnabled)
-        {
             baseFactor = 0.5;
-        }
         else
-        {
             baseFactor = 0.1;
-        }
 
-        if (legacyEnabled)
-        {
-            baseFactor *= 2.0; // Legacy mode takes double the time
-        }
+        if (legacyEnabled) baseFactor *= 2.0; // Legacy mode takes double the time
 
         return baseFactor;
     }
@@ -105,16 +78,10 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     {
         var values = new List<double>();
 
-        for (int i = 0; i < 4; i++)
-        {
-            values.Add(RunCalibrationTaskInternal());
-        }
+        for (var i = 0; i < 4; i++) values.Add(RunCalibrationTaskInternal());
 
         var average = values.Average();
-        if (average <= 0)
-        {
-            return 1.0;
-        }
+        if (average <= 0) return 1.0;
 
         var factor = average / ReferenceCalibrationTimeSeconds;
 
@@ -125,18 +92,19 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
 
     public static double RunCalibrationTaskInternal()
     {
-        byte[] data = new byte[CalibrationDataSizeBytes];
+        var data = new byte[CalibrationDataSizeBytes];
         new Random(42).NextBytes(data);
 
-        Stopwatch sw = Stopwatch.StartNew();
-        using (SHA256 sha256 = SHA256.Create())
+        var sw = Stopwatch.StartNew();
+        using (var sha256 = SHA256.Create())
         {
-            for (int i = 0; i < CalibrationIterations; i++)
+            for (var i = 0; i < CalibrationIterations; i++)
             {
-                data[0] = (byte)(i % 256); 
+                data[0] = (byte)(i % 256);
                 sha256.ComputeHash(data);
             }
         }
+
         sw.Stop();
         return sw.Elapsed.TotalSeconds;
     }
@@ -144,13 +112,15 @@ namespace ActiveSense.Desktop.Infrastructure.Process;
     // Helper method to test calibration
     public static void TestCalibration()
     {
-        Console.WriteLine($"Running calibration task with {CalibrationIterations} iterations on {CalibrationDataSizeBytes} byte blocks...");
+        Console.WriteLine(
+            $"Running calibration task with {CalibrationIterations} iterations on {CalibrationDataSizeBytes} byte blocks...");
         var values = new List<double>();
-        for(int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             Console.WriteLine($"Iteration {i + 1}...");
             values.Add(RunCalibrationTaskInternal());
         }
+
         Console.WriteLine($"Average time: {values.Average():F3}");
     }
 }

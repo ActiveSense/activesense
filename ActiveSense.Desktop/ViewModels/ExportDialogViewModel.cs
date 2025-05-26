@@ -6,6 +6,7 @@ using ActiveSense.Desktop.Core.Services;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
+using ActiveSense.Desktop.ViewModels.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -16,16 +17,16 @@ public partial class ExportDialogViewModel(
     ISharedDataService sharedDataService,
     MainViewModel mainViewModel,
     DialogService dialogService)
-    : Dialogs.DialogViewModel
+    : DialogViewModel
 {
     [ObservableProperty] private bool _confirmed;
-    [ObservableProperty] private SensorTypes _selectedSensorType = SensorTypes.GENEActiv;
-    [ObservableProperty] private bool _includeRawData;
     [ObservableProperty] private bool _exportStarted;
-
-    public event Func<bool, Task<string?>>? FilePickerRequested;
+    [ObservableProperty] private bool _includeRawData;
+    [ObservableProperty] private SensorTypes _selectedSensorType = SensorTypes.GENEActiv;
 
     public int SelectedAnalysesCount => sharedDataService.SelectedAnalyses.Count;
+
+    public event Func<bool, Task<string?>>? FilePickerRequested;
 
     public IAnalysis GetFirstSelectedAnalysis()
     {
@@ -44,10 +45,7 @@ public partial class ExportDialogViewModel(
     {
         var filePath = await FilePickerRequested?.Invoke(IncludeRawData)!;
 
-        if (string.IsNullOrEmpty(filePath))
-        {
-            return;
-        }
+        if (string.IsNullOrEmpty(filePath)) return;
 
         try
         {
@@ -64,26 +62,27 @@ public partial class ExportDialogViewModel(
             }
             else
             {
-                var dialog = new Dialogs.InfoDialogViewModel()
+                var dialog = new InfoDialogViewModel
                 {
                     Title = "Export fehlgeschlagen",
                     Message = "Export failed. Please check the file path and try again.",
-                    OkButtonText = "Schliessen",
+                    OkButtonText = "Schliessen"
                 };
-                await dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(mainViewModel, dialog);
+                await dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(mainViewModel, dialog);
             }
+
             Close();
         }
         catch (Exception ex)
         {
-            var dialog = new Dialogs.InfoDialogViewModel()
+            var dialog = new InfoDialogViewModel
             {
                 Title = "Export fehlgeschlagen",
                 Message = "Fehler beim Exportieren",
                 ExtendedMessage = ex.Message,
-                OkButtonText = "Schliessen",
+                OkButtonText = "Schliessen"
             };
-            await dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(mainViewModel, dialog);
+            await dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(mainViewModel, dialog);
         }
         finally
         {

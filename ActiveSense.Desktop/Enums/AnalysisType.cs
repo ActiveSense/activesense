@@ -4,5 +4,5 @@ public enum AnalysisType
 {
     Sleep,
     Activity,
-    Unknown,
+    Unknown
 }

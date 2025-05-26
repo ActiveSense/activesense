@@ -6,5 +6,8 @@ namespace ActiveSense.Desktop.Factories;
 
 public class SensorProcessorFactory(Func<SensorTypes, ISensorProcessor> processorFactory)
 {
-    public ISensorProcessor GetSensorProcessor(SensorTypes sensorType) => processorFactory.Invoke(sensorType);
+    public ISensorProcessor GetSensorProcessor(SensorTypes sensorType)
+    {
+        return processorFactory.Invoke(sensorType);
+    }
 }

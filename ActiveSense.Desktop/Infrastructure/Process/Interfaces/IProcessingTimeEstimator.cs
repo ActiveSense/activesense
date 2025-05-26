@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
 namespace ActiveSense.Desktop.Infrastructure.Process.Interfaces;

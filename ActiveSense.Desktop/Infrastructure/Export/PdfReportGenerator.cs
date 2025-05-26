@@ -50,13 +50,13 @@ public class PdfReportGenerator(
 
                                         table.Cell().Element(e =>
                                             e.Text(analysis.FileName)
-                                              .FontSize(16)
-                                              .Bold());
+                                                .FontSize(16)
+                                                .Bold());
 
                                         table.Cell().Element(e =>
                                             e.AlignRight().Text(DateTime.Now.ToString("dd.MM.yyyy"))
-                                              .FontSize(9)
-                                              .FontColor(Colors.Grey.Medium));
+                                                .FontSize(9)
+                                                .FontColor(Colors.Grey.Medium));
                                     });
 
                                 AddTags(column, analysis);
@@ -95,21 +95,20 @@ public class PdfReportGenerator(
     private void AddTags(ColumnDescriptor column, IAnalysis analysis)
     {
         if (analysis.Tags.Any())
-        {
             column.Item().PaddingBottom(5)
                 .Text(text =>
                 {
                     text.Span("Verfügbare Daten: ").FontSize(9);
-                
+
                     var tagNames = analysis.Tags.Select(t => t.Name);
                     text.Span(string.Join(", ", tagNames))
                         .FontSize(9)
                         .FontColor(Colors.Grey.Medium);
                 });
-        }
     }
 
-    private void AddGeneralSection(ColumnDescriptor column, ISleepAnalysis sleepAnalysis, IActivityAnalysis activityAnalysis)
+    private void AddGeneralSection(ColumnDescriptor column, ISleepAnalysis sleepAnalysis,
+        IActivityAnalysis activityAnalysis)
     {
         column.Item().PaddingTop(15)
             .Text("Zeitraum der Analyse")
@@ -117,20 +116,16 @@ public class PdfReportGenerator(
             .FontSize(14);
 
         if (activityAnalysis.ActivityRecords.Any())
-        {
             column.Item().PaddingTop(5)
                 .Text($"Aktivitätsdaten: {activityAnalysis.GetActivityDateRange()}")
                 .FontSize(9)
                 .FontColor(Colors.Grey.Darken1);
-        }
 
         if (sleepAnalysis.SleepRecords.Any())
-        {
             column.Item().PaddingTop(2)
                 .Text($"Schlafdaten: {sleepAnalysis.GetSleepDateRange()}")
                 .FontSize(9)
                 .FontColor(Colors.Grey.Darken1);
-        }
 
         column.Item().PaddingTop(15)
             .LineHorizontal(1)
@@ -171,12 +166,14 @@ public class PdfReportGenerator(
 
                     AddTableRow(table, "Tägliche Schlafzeit", $"{sleepAnalysis.AverageSleepTime / 3600:F1} Stunden");
                     AddTableRow(table, "Schlafeffizienz", $"{sleepAnalysis.SleepEfficiency.Average():F1}%");
-                    AddTableRow(table, "Wachphasen pro Nacht", $"{sleepAnalysis.SleepRecords.Average(r => double.Parse(r.NumActivePeriods)):F1}");
+                    AddTableRow(table, "Wachphasen pro Nacht",
+                        $"{sleepAnalysis.SleepRecords.Average(r => double.Parse(r.NumActivePeriods)):F1}");
                     AddTableRow(table, "Wachzeit pro Nacht", $"{sleepAnalysis.AverageWakeTime / 60:F0} Minuten");
                 });
-            
+
             column.Item().PaddingTop(5)
-                .Text("Die Schlafeffizienz beschreibt das Verhältnis zwischen Schlafzeit und insgesamt im Bett verbrachter Zeit.")
+                .Text(
+                    "Die Schlafeffizienz beschreibt das Verhältnis zwischen Schlafzeit und insgesamt im Bett verbrachter Zeit.")
                 .FontSize(8)
                 .FontColor(Colors.Grey.Medium)
                 .Italic();
@@ -220,12 +217,16 @@ public class PdfReportGenerator(
                         .Text("Durchschnitt").Bold();
 
                     AddTableRow(table, "Schritte pro Tag", $"{activityAnalysis.StepsPerDay.Average():N0}");
-                    AddTableRow(table, "Sitzzeit pro Tag", $"{activityAnalysis.AverageSedentaryTime / 3600:F1} Stunden");
-                    AddTableRow(table, "Leichte Aktivität", $"{activityAnalysis.AverageLightActivity / 60:F0} Minuten pro Tag");
-                    AddTableRow(table, "Mittlere Aktivität", $"{activityAnalysis.AverageModerateActivity / 60:F0} Minuten pro Tag");
-                    AddTableRow(table, "Intensive Aktivität", $"{activityAnalysis.AverageVigorousActivity / 60:F0} Minuten pro Tag");
+                    AddTableRow(table, "Sitzzeit pro Tag",
+                        $"{activityAnalysis.AverageSedentaryTime / 3600:F1} Stunden");
+                    AddTableRow(table, "Leichte Aktivität",
+                        $"{activityAnalysis.AverageLightActivity / 60:F0} Minuten pro Tag");
+                    AddTableRow(table, "Mittlere Aktivität",
+                        $"{activityAnalysis.AverageModerateActivity / 60:F0} Minuten pro Tag");
+                    AddTableRow(table, "Intensive Aktivität",
+                        $"{activityAnalysis.AverageVigorousActivity / 60:F0} Minuten pro Tag");
                 });
-            
+
             column.Item().PaddingTop(5)
                 .Text("")
                 .FontSize(8)

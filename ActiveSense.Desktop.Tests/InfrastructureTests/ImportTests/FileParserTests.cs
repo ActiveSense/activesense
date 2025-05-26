@@ -9,24 +9,19 @@ using ActiveSense.Desktop.Infrastructure.Parse;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.InfrastructureTests.ImportTests;
 
 [TestFixture]
 public class FileParserTests
 {
-    private Mock<IHeaderAnalyzer> _mockHeaderAnalyzer;
-    private DateToWeekdayConverter _dateConverter;
-    private FileParser _fileParser;
-    private string _tempDir;
-    private Mock<Serilog.ILogger> _mockLogger;
-
     [SetUp]
     public void Setup()
     {
         _mockHeaderAnalyzer = new Mock<IHeaderAnalyzer>();
         _dateConverter = new DateToWeekdayConverter();
-        _mockLogger = new Mock<Serilog.ILogger>();
+        _mockLogger = new Mock<ILogger>();
         _fileParser = new FileParser(_mockHeaderAnalyzer.Object, _dateConverter, _mockLogger.Object);
 
         // Create temp directory for test files
@@ -38,11 +33,14 @@ public class FileParserTests
     public void TearDown()
     {
         // Clean up the temporary directory
-        if (Directory.Exists(_tempDir))
-        {
-            Directory.Delete(_tempDir, true);
-        }
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
     }
+
+    private Mock<IHeaderAnalyzer> _mockHeaderAnalyzer;
+    private DateToWeekdayConverter _dateConverter;
+    private FileParser _fileParser;
+    private string _tempDir;
+    private Mock<ILogger> _mockLogger;
 
     [Test]
     public void DetermineAnalysisType_WhenHeadersMatchActivityCsv_ReturnsActivityType()
@@ -97,8 +95,9 @@ public class FileParserTests
     public void ParseCsvFile_WithActivityCsv_PopulatesActivityRecords()
     {
         // Arrange
-        string filePath = Path.Combine(_tempDir, "activity.csv");
-        File.WriteAllText(filePath, @"""Day.Number"",""Steps"",""Non_Wear"",""Sleep"",""Sedentary"",""Light"",""Moderate"",""Vigorous""
+        var filePath = Path.Combine(_tempDir, "activity.csv");
+        File.WriteAllText(filePath,
+            @"""Day.Number"",""Steps"",""Non_Wear"",""Sleep"",""Sedentary"",""Light"",""Moderate"",""Vigorous""
 ""1"",""3624"",""0"",""12994"",""26283"",""14007"",""3286"",""0""");
 
         var analysis = new GeneActiveAnalysis(_dateConverter);
@@ -107,7 +106,7 @@ public class FileParserTests
         _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.IsAny<string[]>())).Returns(false);
 
         // Act
-        bool result = _fileParser.ParseCsvFile(filePath, analysis);
+        var result = _fileParser.ParseCsvFile(filePath, analysis);
 
         // Assert
         Assert.That(result, Is.True);
@@ -124,8 +123,9 @@ public class FileParserTests
     public void ParseCsvFile_WithSleepCsv_PopulatesSleepRecords()
     {
         // Arrange
-        string filePath = Path.Combine(_tempDir, "sleep.csv");
-        File.WriteAllText(filePath, @"""Night.Starting"",""Sleep.Onset.Time"",""Rise.Time"",""Total.Elapsed.Bed.Time"",""Total.Sleep.Time"",""Total.Wake.Time"",""Sleep.Efficiency"",""Num.Active.Periods"",""Median.Activity.Length""
+        var filePath = Path.Combine(_tempDir, "sleep.csv");
+        File.WriteAllText(filePath,
+            @"""Night.Starting"",""Sleep.Onset.Time"",""Rise.Time"",""Total.Elapsed.Bed.Time"",""Total.Sleep.Time"",""Total.Wake.Time"",""Sleep.Efficiency"",""Num.Active.Periods"",""Median.Activity.Length""
 ""2024-11-29"",""21:25"",""06:58"",""34225"",""26676"",""7549"",""77.9"",""50"",""124""");
 
         var analysis = new GeneActiveAnalysis(_dateConverter);
@@ -134,7 +134,7 @@ public class FileParserTests
         _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.IsAny<string[]>())).Returns(true);
 
         // Act
-        bool result = _fileParser.ParseCsvFile(filePath, analysis);
+        var result = _fileParser.ParseCsvFile(filePath, analysis);
 
         // Assert
         Assert.That(result, Is.True);
@@ -151,7 +151,7 @@ public class FileParserTests
     public void ParseCsvFile_WithUnknownCsv_ReturnsFalse()
     {
         // Arrange
-        string filePath = Path.Combine(_tempDir, "unknown.csv");
+        var filePath = Path.Combine(_tempDir, "unknown.csv");
         File.WriteAllText(filePath, @"""Column1"",""Column2"",""Column3""
 ""Value1"",""Value2"",""Value3""");
 
@@ -161,7 +161,7 @@ public class FileParserTests
         _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.IsAny<string[]>())).Returns(false);
 
         // Act
-        bool result = _fileParser.ParseCsvFile(filePath, analysis);
+        var result = _fileParser.ParseCsvFile(filePath, analysis);
 
         // Assert
         Assert.That(result, Is.False);
@@ -173,13 +173,13 @@ public class FileParserTests
     public void ParseCsvFile_WithInvalidFile_ReturnsFalse()
     {
         // Arrange
-        string filePath = Path.Combine(_tempDir, "invalid.csv");
+        var filePath = Path.Combine(_tempDir, "invalid.csv");
         File.WriteAllText(filePath, "Not a CSV file");
 
         var analysis = new GeneActiveAnalysis(_dateConverter);
 
         // Act
-        bool result = _fileParser.ParseCsvFile(filePath, analysis);
+        var result = _fileParser.ParseCsvFile(filePath, analysis);
 
         // Assert
         Assert.That(result, Is.False);
@@ -189,21 +189,25 @@ public class FileParserTests
     public async Task ParseCsvDirectoryAsync_WithValidFiles_ReturnsAnalysisObject()
     {
         // Arrange
-        string directoryPath = Path.Combine(_tempDir, "valid_directory");
+        var directoryPath = Path.Combine(_tempDir, "valid_directory");
         Directory.CreateDirectory(directoryPath);
 
         // Create activity file
-        string activityFilePath = Path.Combine(directoryPath, "activity.csv");
-        File.WriteAllText(activityFilePath, @"""Day.Number"",""Steps"",""Non_Wear"",""Sleep"",""Sedentary"",""Light"",""Moderate"",""Vigorous""
+        var activityFilePath = Path.Combine(directoryPath, "activity.csv");
+        File.WriteAllText(activityFilePath,
+            @"""Day.Number"",""Steps"",""Non_Wear"",""Sleep"",""Sedentary"",""Light"",""Moderate"",""Vigorous""
 ""1"",""3624"",""0"",""12994"",""26283"",""14007"",""3286"",""0""");
 
         // Create sleep file
-        string sleepFilePath = Path.Combine(directoryPath, "sleep.csv");
-        File.WriteAllText(sleepFilePath, @"""Night.Starting"",""Sleep.Onset.Time"",""Rise.Time"",""Total.Elapsed.Bed.Time"",""Total.Sleep.Time"",""Total.Wake.Time"",""Sleep.Efficiency"",""Num.Active.Periods"",""Median.Activity.Length""
+        var sleepFilePath = Path.Combine(directoryPath, "sleep.csv");
+        File.WriteAllText(sleepFilePath,
+            @"""Night.Starting"",""Sleep.Onset.Time"",""Rise.Time"",""Total.Elapsed.Bed.Time"",""Total.Sleep.Time"",""Total.Wake.Time"",""Sleep.Efficiency"",""Num.Active.Periods"",""Median.Activity.Length""
 ""2024-11-29"",""21:25"",""06:58"",""34225"",""26676"",""7549"",""77.9"",""50"",""124""");
 
-        _mockHeaderAnalyzer.Setup(x => x.IsActivityCsv(It.Is<string[]>(h => h.Length > 0 && h[0] == "Day.Number"))).Returns(true);
-        _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.Is<string[]>(h => h.Length > 0 && h[0] == "Night.Starting"))).Returns(true);
+        _mockHeaderAnalyzer.Setup(x => x.IsActivityCsv(It.Is<string[]>(h => h.Length > 0 && h[0] == "Day.Number")))
+            .Returns(true);
+        _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.Is<string[]>(h => h.Length > 0 && h[0] == "Night.Starting")))
+            .Returns(true);
 
         // Act
         var result = await _fileParser.ParseCsvDirectoryAsync(directoryPath);
@@ -228,21 +232,19 @@ public class FileParserTests
     public Task ParseCsvDirectoryAsync_WithInvalidFiles_ReturnsNull()
     {
         // Arrange
-        string directoryPath = Path.Combine(_tempDir, "invalid_directory");
+        var directoryPath = Path.Combine(_tempDir, "invalid_directory");
         Directory.CreateDirectory(directoryPath);
 
         // Create invalid file
-        string invalidFilePath = Path.Combine(directoryPath, "invalid.csv");
-        File.WriteAllText(invalidFilePath, "\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\", \"laksjf\"\n\"2024-08-22\",1725,0,426,6316,2424,1545,0\n\"2024-08-23\",0,0,0,0,0,0,0\n");
+        var invalidFilePath = Path.Combine(directoryPath, "invalid.csv");
+        File.WriteAllText(invalidFilePath,
+            "\"Day.Number\",\"Steps\",\"Non_Wear\",\"Sleep\",\"Sedentary\",\"Light\",\"Moderate\",\"Vigorous\", \"laksjf\"\n\"2024-08-22\",1725,0,426,6316,2424,1545,0\n\"2024-08-23\",0,0,0,0,0,0,0\n");
 
         _mockHeaderAnalyzer.Setup(x => x.IsActivityCsv(It.IsAny<string[]>())).Returns(false);
         _mockHeaderAnalyzer.Setup(x => x.IsSleepCsv(It.IsAny<string[]>())).Returns(false);
 
         // Act & Assert
-        Assert.ThrowsAsync<Exception>(async () =>
-        {
-            await _fileParser.ParseCsvDirectoryAsync(directoryPath);
-        });
+        Assert.ThrowsAsync<Exception>(async () => { await _fileParser.ParseCsvDirectoryAsync(directoryPath); });
         return Task.CompletedTask;
     }
 }

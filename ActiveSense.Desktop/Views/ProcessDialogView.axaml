@@ -42,7 +42,7 @@
                 HorizontalAlignment="Right"
                 Background="Transparent"
                 BorderThickness="0">
-                <PathIcon Data="{StaticResource arrow_minimize_regular}"></PathIcon>
+                <PathIcon Data="{StaticResource arrow_minimize_regular}" />
             </Button>
 
             <ScrollViewer Grid.Row="1"
@@ -131,7 +131,7 @@
                                                VerticalAlignment="Center"
                                                Foreground="#888888"
                                                Margin="0,40,0,40" />
-                 
+
                                     <ListBox ItemsSource="{Binding SelectedFiles}"
                                              Background="Transparent"
                                              Padding="0"
@@ -140,7 +140,8 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid ColumnDefinitions="Auto, *" Margin="0,3">
-                                                    <PathIcon Data="{StaticResource folder_regular}" Height="15" Margin="0 0 5 0"></PathIcon>
+                                                    <PathIcon Data="{StaticResource folder_regular}" Height="15"
+                                                              Margin="0 0 5 0" />
                                                     <TextBlock Grid.Column="1"
                                                                Text="{Binding}"
                                                                TextWrapping="NoWrap"
@@ -166,7 +167,7 @@
                                     Margin="0,8,0,0"
                                     Classes="dialog-secondary-button">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <PathIcon Data="{StaticResource folder_add_regular}" Height="15"/>
+                                    <PathIcon Data="{StaticResource folder_add_regular}" Height="15" />
                                     <TextBlock>Dateien auswählen</TextBlock>
                                 </StackPanel>
                             </Button>
@@ -204,7 +205,7 @@
                     </StackPanel>
                 </Border>
             </Grid>
-            
+
             <Border Grid.Row="2"
                     BorderThickness="1"
                     BorderBrush="#DDDDDD"
@@ -215,22 +216,22 @@
                     IsVisible="{Binding !IsProcessing}">
                 <Grid ColumnDefinitions="Auto,*">
                     <PathIcon Grid.Column="0"
-                           Data="{StaticResource info_regular}" 
-                           Height="16"
-                           VerticalAlignment="Top"
-                           Margin="0,2,8,0" />
+                              Data="{StaticResource info_regular}"
+                              Height="16"
+                              VerticalAlignment="Top"
+                              Margin="0,2,8,0" />
                     <TextBlock Grid.Column="1"
-                       Text="{Binding ProcessingInfo}"
-                       Classes="Primary"
-                       TextWrapping="Wrap"
-                       Foreground="#333333" />
+                               Text="{Binding ProcessingInfo}"
+                               Classes="Primary"
+                               TextWrapping="Wrap"
+                               Foreground="#333333" />
                 </Grid>
             </Border>
 
             <Grid Grid.Row="3"
                   Margin="24,20"
                   ColumnDefinitions="Auto, *, Auto">
-                
+
                 <Button Grid.Column="0"
                         Classes="Secondary"
                         Command="{Binding CancelCommand}">

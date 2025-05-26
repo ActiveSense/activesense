@@ -62,14 +62,14 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
         LoadDefaultInformation();
     }
-    
+
     // public ProcessDialogViewModel() {}
 
     private void LoadDefaultInformation()
     {
         var processor = _sensorProcessorFactory.GetSensorProcessor(SelectedSensorTypes);
         ProcessingInfo = processor.ProcessingInfo;
-        
+
         Arguments.Clear();
 
         foreach (var arg in processor.DefaultArguments)
@@ -189,7 +189,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StatusMessage = "Laufzeit wird berechnet...";
             var estimatedTime = await processor.GetEstimatedProcessingTimeAsync(SelectedFiles, Arguments.ToList());
             StartCountdown(estimatedTime);
-                
+
             _sharedDataService.IsProcessingInBackground = true;
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -198,7 +198,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             var processingDirectory = _pathService.ScriptInputPath;
             var outputDirectory = _pathService.OutputDirectory;
 
-            
+
             await processor.CopyFilesAsync(SelectedFiles, processingDirectory, outputDirectory);
 
             StatusMessage = "Dateien werden verarbeitet...";
@@ -212,12 +212,12 @@ public partial class ProcessDialogViewModel : DialogViewModel
 
                 if (!scriptSuccess)
                 {
-                    var dialog = new InfoDialogViewModel()
+                    var dialog = new InfoDialogViewModel
                     {
                         Title = "Fehler",
                         Message = "Script Execution failed",
                         ExtendedMessage = output,
-                        OkButtonText = "Schliessen",
+                        OkButtonText = "Schliessen"
                     };
                     await _dialogService.ShowDialog<MainViewModel, InfoDialogViewModel>(_mainViewModel, dialog);
                     return;
@@ -229,20 +229,18 @@ public partial class ProcessDialogViewModel : DialogViewModel
             StopCountdown();
             await ParseResults();
         }
-        
+
         catch (OperationCanceledException)
         {
             Close();
         }
-        
+
         catch (FileNotFoundException)
         {
-            var dialog = new PathDialogViewModel()
-            {
-            };
+            var dialog = new PathDialogViewModel();
             await _dialogService.ShowDialog<MainViewModel, PathDialogViewModel>(_mainViewModel, dialog);
         }
-        
+
         catch (Exception ex)
         {
             var dialog = new InfoDialogViewModel
@@ -255,7 +253,7 @@ public partial class ProcessDialogViewModel : DialogViewModel
             };
             await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
         }
-        
+
         finally
         {
             StopCountdown();

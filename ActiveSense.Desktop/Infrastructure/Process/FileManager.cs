@@ -3,18 +3,19 @@ using System.IO;
 using System.Linq;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
+using Serilog;
 
 namespace ActiveSense.Desktop.Infrastructure.Process;
 
-public class FileManager(IPathService pathService, Serilog.ILogger logger) : IFileManager
+public class FileManager(IPathService pathService, ILogger logger) : IFileManager
 {
-    public void CopyFiles(string[] files, string processingDirectory, string outputDirectory, string[] supportedFileTypes)
+    public void CopyFiles(string[] files, string processingDirectory, string outputDirectory,
+        string[] supportedFileTypes)
     {
         pathService.ClearDirectory(processingDirectory);
         pathService.EnsureDirectoryExists(outputDirectory);
 
         foreach (var file in files)
-        {
             try
             {
                 var extension = Path.GetExtension(file).ToLowerInvariant();
@@ -37,7 +38,7 @@ public class FileManager(IPathService pathService, Serilog.ILogger logger) : IFi
             {
                 throw new Exception($"Fehler beim Kopieren des Files {file}." + ex.Message);
             }
-        }
+
         logger.Information("All files copied to {Directory}", processingDirectory);
     }
 }

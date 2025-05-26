@@ -5,7 +5,7 @@ namespace ActiveSense.Desktop.Converters;
 
 public class DateToWeekdayConverter
 {
-    private readonly CultureInfo _germanCulture = new CultureInfo("de-DE");
+    private readonly CultureInfo _germanCulture = new("de-DE");
 
     private DateTime ConvertStringToDate(string date)
     {

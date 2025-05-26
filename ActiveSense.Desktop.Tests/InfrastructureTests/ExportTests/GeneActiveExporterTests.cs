@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
@@ -6,27 +7,20 @@ using ActiveSense.Desktop.Infrastructure.Export;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace ActiveSense.Desktop.Tests.InfrastructureTests.ExportTests;
 
 [TestFixture]
 public class GeneActiveExporterTests
 {
-    private Mock<IPdfReportGenerator> _mockPdfReportGenerator;
-    private Mock<ICsvExporter> _mockCsvExporter;
-    private Mock<IArchiveCreator> _mockArchiveCreator;
-    private GeneActiveExporter _exporter;
-    private GeneActiveAnalysis _mockAnalysis;
-    private DateToWeekdayConverter _dateConverter;
-    private Mock<Serilog.ILogger> _mockLogger;
-
     [SetUp]
     public void Setup()
     {
         _mockPdfReportGenerator = new Mock<IPdfReportGenerator>();
         _mockCsvExporter = new Mock<ICsvExporter>();
         _mockArchiveCreator = new Mock<IArchiveCreator>();
-        _mockLogger = new Mock<Serilog.ILogger>();
+        _mockLogger = new Mock<ILogger>();
 
         _exporter = new GeneActiveExporter(
             _mockPdfReportGenerator.Object,
@@ -41,40 +35,50 @@ public class GeneActiveExporterTests
         };
     }
 
+    private Mock<IPdfReportGenerator> _mockPdfReportGenerator;
+    private Mock<ICsvExporter> _mockCsvExporter;
+    private Mock<IArchiveCreator> _mockArchiveCreator;
+    private GeneActiveExporter _exporter;
+    private GeneActiveAnalysis _mockAnalysis;
+    private DateToWeekdayConverter _dateConverter;
+    private Mock<ILogger> _mockLogger;
+
     [Test]
     public async Task ExportAsync_WithoutRawData_CallsOnlyPdfGenerator()
     {
         // Arrange
-        string outputPath = "test.pdf";
+        var outputPath = "test.pdf";
         _mockPdfReportGenerator.Setup(x => x.GeneratePdfReportAsync(_mockAnalysis, outputPath))
             .ReturnsAsync(true);
 
         // Act
-        bool result = await _exporter.ExportAsync(_mockAnalysis, outputPath, false);
+        var result = await _exporter.ExportAsync(_mockAnalysis, outputPath);
 
         // Assert
         Assert.That(result, Is.True);
         _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(_mockAnalysis, outputPath), Times.Once);
-        _mockCsvExporter.Verify(x => x.ExportSleepRecords(It.IsAny<System.Collections.Generic.IEnumerable<SleepRecord>>()), Times.Never);
-        _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<System.Collections.Generic.IEnumerable<ActivityRecord>>()), Times.Never);
-        _mockArchiveCreator.Verify(x => x.CreateArchiveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _mockCsvExporter.Verify(x => x.ExportSleepRecords(It.IsAny<IEnumerable<SleepRecord>>()), Times.Never);
+        _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<IEnumerable<ActivityRecord>>()), Times.Never);
+        _mockArchiveCreator.Verify(
+            x => x.CreateArchiveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>()), Times.Never);
     }
 
     [Test]
     public async Task ExportAsync_WithRawData_GeneratesPdfAndZipArchive()
     {
         // Arrange
-        string outputPath = "test.zip";
-        string sleepCsv = "sleep data";
-        string activityCsv = "activity data";
+        var outputPath = "test.zip";
+        var sleepCsv = "sleep data";
+        var activityCsv = "activity data";
 
         _mockPdfReportGenerator.Setup(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()))
             .ReturnsAsync(true);
 
-        _mockCsvExporter.Setup(x => x.ExportSleepRecords(It.IsAny<System.Collections.Generic.IEnumerable<SleepRecord>>()))
+        _mockCsvExporter.Setup(x => x.ExportSleepRecords(It.IsAny<IEnumerable<SleepRecord>>()))
             .Returns(sleepCsv);
 
-        _mockCsvExporter.Setup(x => x.ExportActivityRecords(It.IsAny<System.Collections.Generic.IEnumerable<ActivityRecord>>()))
+        _mockCsvExporter.Setup(x => x.ExportActivityRecords(It.IsAny<IEnumerable<ActivityRecord>>()))
             .Returns(activityCsv);
 
         _mockArchiveCreator.Setup(x => x.CreateArchiveAsync(
@@ -86,13 +90,14 @@ public class GeneActiveExporterTests
             .ReturnsAsync(true);
 
         // Act
-        bool result = await _exporter.ExportAsync(_mockAnalysis, outputPath, true);
+        var result = await _exporter.ExportAsync(_mockAnalysis, outputPath, true);
 
         // Assert
         Assert.That(result, Is.True);
-        _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()), Times.Once);
-        _mockCsvExporter.Verify(x => x.ExportSleepRecords(It.IsAny<System.Collections.Generic.IEnumerable<SleepRecord>>()), Times.Once);
-        _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<System.Collections.Generic.IEnumerable<ActivityRecord>>()), Times.Once);
+        _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()),
+            Times.Once);
+        _mockCsvExporter.Verify(x => x.ExportSleepRecords(It.IsAny<IEnumerable<SleepRecord>>()), Times.Once);
+        _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<IEnumerable<ActivityRecord>>()), Times.Once);
         _mockArchiveCreator.Verify(x => x.CreateArchiveAsync(
             outputPath,
             It.IsAny<string>(),
@@ -105,13 +110,13 @@ public class GeneActiveExporterTests
     public async Task ExportAsync_WhenPdfExportFails_ReturnsFalse()
     {
         // Arrange
-        string outputPath = "test.zip";
+        var outputPath = "test.zip";
 
         _mockPdfReportGenerator.Setup(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()))
             .ReturnsAsync(false);
 
         // Act
-        bool result = await _exporter.ExportAsync(_mockAnalysis, outputPath, true);
+        var result = await _exporter.ExportAsync(_mockAnalysis, outputPath, true);
 
         // Assert
         Assert.That(result, Is.False);
@@ -127,17 +132,18 @@ public class GeneActiveExporterTests
     public async Task ExportAsync_WhenAnalysisDoesNotImplementRequiredInterfaces_ReturnsFalse()
     {
         // Arrange
-        string outputPath = "test.zip";
+        var outputPath = "test.zip";
         var mockInvalidAnalysis = new Mock<IAnalysis>().Object;
 
         // Act
-        bool result = await _exporter.ExportAsync(mockInvalidAnalysis, outputPath, true);
+        var result = await _exporter.ExportAsync(mockInvalidAnalysis, outputPath, true);
 
         // Assert
         Assert.That(result, Is.False);
-        _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()), Times.Never);
-        _mockCsvExporter.Verify(x => x.ExportSleepRecords(It.IsAny<System.Collections.Generic.IEnumerable<SleepRecord>>()), Times.Never);
-        _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<System.Collections.Generic.IEnumerable<ActivityRecord>>()), Times.Never);
+        _mockPdfReportGenerator.Verify(x => x.GeneratePdfReportAsync(It.IsAny<IAnalysis>(), It.IsAny<string>()),
+            Times.Never);
+        _mockCsvExporter.Verify(x => x.ExportSleepRecords(It.IsAny<IEnumerable<SleepRecord>>()), Times.Never);
+        _mockCsvExporter.Verify(x => x.ExportActivityRecords(It.IsAny<IEnumerable<ActivityRecord>>()), Times.Never);
         _mockArchiveCreator.Verify(x => x.CreateArchiveAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),

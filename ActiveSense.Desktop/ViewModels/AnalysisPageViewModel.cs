@@ -69,7 +69,7 @@ public partial class AnalysisPageViewModel : PageViewModel
         }
         catch (Exception e)
         {
-            var dialog = new InfoDialogViewModel()
+            var dialog = new InfoDialogViewModel
             {
                 Title = "Fehler",
                 Message = "Fehler beim Aktualisieren der Analysen.",
@@ -100,12 +100,10 @@ public partial class AnalysisPageViewModel : PageViewModel
         await Task.Run(() =>
         {
             foreach (var pageName in parser.GetAnalysisPages())
-            {
                 TabItems.Add(new TabItemTemplate(
                     $"{pageName.ToString()}",
                     pageName,
                     _pageFactory.GetPageViewModel(pageName)));
-            }
 
             if (TabItems.Count > 0) SelectedTabItem = TabItems[0];
             return Task.CompletedTask;
@@ -113,7 +111,6 @@ public partial class AnalysisPageViewModel : PageViewModel
 
         ShowSpinner = false;
     }
-
 
 
     [RelayCommand]
@@ -127,15 +124,16 @@ public partial class AnalysisPageViewModel : PageViewModel
     {
         if (SelectedAnalyses.Count != 1)
         {
-            var dialog = new Dialogs.InfoDialogViewModel()
+            var dialog = new InfoDialogViewModel
             {
                 Title = "Export nicht möglich",
                 Message = "Bitte wählen Sie eine Analyse zum Exportieren aus.",
                 OkButtonText = "Schliessen"
             };
-            await _dialogService.ShowDialog<MainViewModel, Dialogs.WarningDialogViewModel>(_mainViewModel, dialog);
+            await _dialogService.ShowDialog<MainViewModel, WarningDialogViewModel>(_mainViewModel, dialog);
             return;
         }
+
         await _dialogService.ShowDialog<MainViewModel, ExportDialogViewModel>(_mainViewModel, _exportDialogViewModel);
     }
 }

@@ -34,7 +34,7 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
@@ -91,12 +91,12 @@ public class App : Application
 
         // Register converters
         collection.AddTransient<DateToWeekdayConverter>();
-        
+
         // Logging
         collection.AddSingleton(Log.Logger);
-        collection.AddLogging(loggingBuilder => 
+        collection.AddLogging(loggingBuilder =>
             loggingBuilder.AddSerilog(dispose: true));
-        
+
 
         // Register charts
         collection.AddTransient<BarChartViewModel>();
@@ -109,28 +109,28 @@ public class App : Application
             ApplicationPageNames.Schlaf => x.GetRequiredService<SleepPageViewModel>(),
             ApplicationPageNames.Aktivität => x.GetRequiredService<ActivityPageViewModel>(),
             ApplicationPageNames.Allgemein => x.GetRequiredService<GeneralPageViewModel>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         // Register processors 
         collection.AddSingleton<Func<SensorTypes, ISensorProcessor>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveProcessor>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         // Register parsers
         collection.AddSingleton<Func<SensorTypes, IResultParser>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveResultParser>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         // Register exporters
         collection.AddSingleton<Func<SensorTypes, IExporter>>(sp => type => type switch
         {
             SensorTypes.GENEActiv => sp.GetRequiredService<GeneActiveExporter>(),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         });
 
         var services = collection.BuildServiceProvider();
@@ -139,7 +139,7 @@ public class App : Application
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit
             DisableAvaloniaDataAnnotationValidation();
-            
+
             // Use dependency injection to get MainWindowViewModel
             desktop.MainWindow = new MainView
             {

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using ActiveSense.Desktop.Charts.DTOs;
 using ActiveSense.Desktop.Core.Domain.Models;
 
 namespace ActiveSense.Desktop.Core.Domain.Interfaces;
@@ -12,7 +11,3 @@ public interface IAnalysis
     List<AnalysisTag> Tags { get; set; }
     void AddTag(string name, string color);
 }
-
-
-
-

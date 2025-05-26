@@ -1,4 +1,3 @@
-using System;
 using LiveChartsCore;
 
 namespace ActiveSense.Desktop.ViewModels.Charts;

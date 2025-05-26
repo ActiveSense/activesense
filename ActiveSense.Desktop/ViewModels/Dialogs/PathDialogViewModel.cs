@@ -12,6 +12,7 @@ public partial class PathDialogViewModel : DialogViewModel
 {
     [ObservableProperty] private string _description =
         "ActiveSense benötigt R für die Verarbeitung von Sensordaten (.bin-Dateien). Bitte installieren Sie R oder geben Sie den Pfad zur vorhandenen Installation an.";
+
     [ObservableProperty] private string _downloadInstructions =
         "Installieren Sie R von der offiziellen Website und starten Sie die Anwendung erneut.";
 

@@ -16,10 +16,6 @@ namespace ActiveSense.Desktop.Tests.InfrastructureTests.ExportTests;
 [TestFixture]
 public class ExportIntegrationTests
 {
-    private IExporter _exporter;
-    private GeneActiveAnalysis _analysis;
-    private string _tempDir;
-
     [SetUp]
     public void Setup()
     {
@@ -37,7 +33,7 @@ public class ExportIntegrationTests
         var logger = new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
-        
+
 
         // Create exporter with real components
         _exporter = new GeneActiveExporter(pdfGenerator, csvExporter, archiveCreator, logger);
@@ -109,20 +105,21 @@ public class ExportIntegrationTests
     public void TearDown()
     {
         // Clean up the temporary directory
-        if (Directory.Exists(_tempDir))
-        {
-            Directory.Delete(_tempDir, true);
-        }
+        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
     }
+
+    private IExporter _exporter;
+    private GeneActiveAnalysis _analysis;
+    private string _tempDir;
 
     [Test]
     public async Task ExportAsync_WithRawDataFalse_CreatesPdfFile()
     {
         // Arrange
-        string pdfPath = Path.Combine(_tempDir, "output.pdf");
+        var pdfPath = Path.Combine(_tempDir, "output.pdf");
 
         // Act
-        bool result = await _exporter.ExportAsync(_analysis, pdfPath, false);
+        var result = await _exporter.ExportAsync(_analysis, pdfPath, false);
 
         // Assert
         Assert.That(result, Is.True);
@@ -132,7 +129,7 @@ public class ExportIntegrationTests
         using (var stream = File.OpenRead(pdfPath))
         {
             var buffer = new byte[5];
-            int bytesRead = stream.Read(buffer, 0, 5);
+            var bytesRead = stream.Read(buffer, 0, 5);
             Assert.That(bytesRead, Is.EqualTo(5), "Failed to read expected number of bytes");
             Assert.That(Encoding.ASCII.GetString(buffer), Is.EqualTo("%PDF-"));
         }
@@ -142,10 +139,10 @@ public class ExportIntegrationTests
     public async Task ExportAsync_WithRawDataTrue_CreatesZipFile()
     {
         // Arrange
-        string zipPath = Path.Combine(_tempDir, "output.zip");
+        var zipPath = Path.Combine(_tempDir, "output.zip");
 
         // Act
-        bool result = await _exporter.ExportAsync(_analysis, zipPath, true);
+        var result = await _exporter.ExportAsync(_analysis, zipPath, true);
 
         // Assert
         Assert.That(result, Is.True);
@@ -155,7 +152,7 @@ public class ExportIntegrationTests
         using (var stream = File.OpenRead(zipPath))
         {
             var buffer = new byte[4];
-            int bytesRead = stream.Read(buffer, 0, 4);
+            var bytesRead = stream.Read(buffer, 0, 4);
             Assert.That(bytesRead, Is.EqualTo(4), "Failed to read expected number of bytes");
             Assert.That(buffer[0], Is.EqualTo(0x50)); // P
             Assert.That(buffer[1], Is.EqualTo(0x4B)); // K
@@ -164,18 +161,18 @@ public class ExportIntegrationTests
         }
     }
 
-   [Test]
+    [Test]
     public Task ExportAsync_WithInvalidOutputPath_ThrowsException()
     {
         // Arrange
-        string invalidPath = Path.Combine(_tempDir, "nonexistent", "nested", "directory", "output.pdf");
-    
+        var invalidPath = Path.Combine(_tempDir, "nonexistent", "nested", "directory", "output.pdf");
+
         // Act & Assert
         var ex = Assert.ThrowsAsync<Exception>(async () =>
         {
             await _exporter.ExportAsync(_analysis, invalidPath, false);
         });
-    
+
         StringAssert.Contains("Error generating PDF report", ex.Message);
         return Task.CompletedTask;
     }
