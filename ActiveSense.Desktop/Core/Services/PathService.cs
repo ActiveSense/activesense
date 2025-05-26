@@ -1,28 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Process.Helpers;
+using Serilog;
 
 namespace ActiveSense.Desktop.Core.Services;
 
 public class PathService : IPathService
 {
+    private readonly ILogger _logger;
 
-    Serilog.ILogger _logger;
-    
-    public PathService(Serilog.ILogger logger)
+    public PathService(ILogger logger)
     {
         _logger = logger;
         EnsureDirectoryExists(OutputDirectory);
         EnsureDirectoryExists(ScriptInputPath);
     }
 
+    public string ApplicationBasePath => AppDomain.CurrentDomain.BaseDirectory;
+
+    private string SolutionBasePath
+    {
+        get
+        {
+            var dir = ApplicationBasePath;
+            while (!Directory.Exists(Path.Combine(dir, "ActiveSense.Desktop")) &&
+                   !File.Exists(Path.Combine(dir, "ActiveSense.Desktop.sln")))
+            {
+                var parent = Directory.GetParent(dir);
+                if (parent == null) break;
+                dir = parent.FullName;
+            }
+
+            return dir;
+        }
+    }
+
+    private bool IsDevelopment =>
+        Directory.Exists(Path.Combine(SolutionBasePath, ".git")) ||
+        Directory.Exists(Path.Combine(SolutionBasePath, ".idea")) ||
+        SolutionBasePath.Contains("bin\\Debug") ||
+        File.Exists(Path.Combine(SolutionBasePath, "ActiveSense.Desktop.sln"));
+
     public string OutputDirectory => IsDevelopment
-                ? CombinePaths(SolutionBasePath, "AnalysisFiles/")
-                : GetOrCreateLocalAppPath("AnalysisFiles/");
+        ? CombinePaths(SolutionBasePath, "AnalysisFiles/")
+        : GetOrCreateLocalAppPath("AnalysisFiles/");
 
     public string ScriptBasePath
     {
@@ -41,32 +65,6 @@ public class PathService : IPathService
     public string MainScriptPath => CombinePaths(ScriptBasePath, "_main.R");
     public string ScriptExecutablePath => FindRInstallation();
 
-    public string ApplicationBasePath => AppDomain.CurrentDomain.BaseDirectory;
-
-    private string SolutionBasePath
-    {
-        get
-        {
-            var dir = ApplicationBasePath;
-            while (!Directory.Exists(Path.Combine(dir, "ActiveSense.Desktop")) &&
-                   !File.Exists(Path.Combine(dir, "ActiveSense.Desktop.sln")))
-            {
-                var parent = Directory.GetParent(dir);
-                if (parent == null) break;
-                dir = parent.FullName;
-            }
-            return dir;
-        }
-    }
-
-    private bool IsDevelopment =>
-        Directory.Exists(Path.Combine(SolutionBasePath, ".git")) ||
-        Directory.Exists(Path.Combine(SolutionBasePath, ".idea")) ||
-        SolutionBasePath.Contains("bin\\Debug") ||
-        File.Exists(Path.Combine(SolutionBasePath, "ActiveSense.Desktop.sln"));
-
-    public string CombinePaths(params string[] paths) => Path.Combine(paths);
-
     public bool EnsureDirectoryExists(string path)
     {
         if (!Directory.Exists(path))
@@ -74,6 +72,7 @@ public class PathService : IPathService
             Directory.CreateDirectory(path);
             return true;
         }
+
         return false;
     }
 
@@ -87,35 +86,39 @@ public class PathService : IPathService
         }
         catch (Exception ex)
         {
-           _logger.Error(ex, "Could not clear directory"); 
+            _logger.Error(ex, "Could not clear directory");
         }
-    }
-
-    private string GetOrCreateLocalAppPath(string folder) =>
-        EnsureAndReturn(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ActiveSense", folder));
-
-    private string EnsureAndReturn(string path)
-    {
-        EnsureDirectoryExists(path);
-        return path;
     }
 
     public void CopyResources()
     {
         var sourceDir = Path.Combine(ApplicationBasePath, "RScripts");
         var targetPath = GetOrCreateLocalAppPath("RScripts");
-        
+
         _logger.Information("Copying resources from {source} to {target}", sourceDir, targetPath);
-        
+
         foreach (var dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
-        {
             EnsureDirectoryExists(dirPath.Replace(sourceDir, targetPath));
-        }
 
         foreach (var filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-        {
             File.Copy(filePath, filePath.Replace(sourceDir, targetPath), true);
-        }
+    }
+
+    public string CombinePaths(params string[] paths)
+    {
+        return Path.Combine(paths);
+    }
+
+    private string GetOrCreateLocalAppPath(string folder)
+    {
+        return EnsureAndReturn(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "ActiveSense", folder));
+    }
+
+    private string EnsureAndReturn(string path)
+    {
+        EnsureDirectoryExists(path);
+        return path;
     }
 
     private string FindRInstallation()
@@ -124,22 +127,25 @@ public class PathService : IPathService
         if (IsValidRPath(saved)) return saved;
 
         var platformPath = OperatingSystem.IsWindows() ? FindWindowsRInstallation()
-                          : OperatingSystem.IsMacOS() ? FindMacOSRInstallation()
-                          : OperatingSystem.IsLinux() ? FindLinuxRInstallation()
-                          : null;
+            : OperatingSystem.IsMacOS() ? FindMacOSRInstallation()
+            : OperatingSystem.IsLinux() ? FindLinuxRInstallation()
+            : null;
+
+        if (IsValidRPath(platformPath)) return platformPath;
 
         throw new FileNotFoundException("Could not locate R installation.");
-        
-        if (IsValidRPath(platformPath)) return platformPath;
     }
 
-    private bool IsValidRPath(string path) =>
-        !string.IsNullOrEmpty(path) && File.Exists(path) && RPathStorage.TestRExecutable(path);
+    private bool IsValidRPath(string path)
+    {
+        return !string.IsNullOrEmpty(path) && File.Exists(path) && RPathStorage.TestRExecutable(path);
+    }
 
     private string FindWindowsRInstallation()
     {
         var paths = new List<string>();
-        string[] baseDirs = {
+        string[] baseDirs =
+        {
             Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
             Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)
         };
@@ -151,7 +157,7 @@ public class PathService : IPathService
                 foreach (var ver in Directory.GetDirectories(rBase))
                     paths.Add(Path.Combine(ver, "bin", "Rscript.exe"));
 
-            for (double v = 4.0; v <= 5.0; v += 0.1)
+            for (var v = 4.0; v <= 5.0; v += 0.1)
             {
                 var version = $"R-{v:F1}";
                 paths.Add(Path.Combine(baseDir, "R", version, "bin", "Rscript.exe"));
@@ -174,7 +180,8 @@ public class PathService : IPathService
         };
 
         foreach (var path in paths)
-            if (File.Exists(path)) return path;
+            if (File.Exists(path))
+                return path;
 
         return RunWhich("Rscript") ?? throw new FileNotFoundException("No R installation found on macOS.");
     }
