@@ -35,6 +35,16 @@ source("functions/01_library_installer.R")
 # PARAMETERS
 # ==================================
 
+# Create directories
+dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
+dir.create(file.path(paste0(getwd(), "/libraries/")), showWarnings = FALSE)
+
+# Add further entries to libraries
+.libPaths(c("./libraries", .libPaths()))
+
+message("--- Library paths:--- \n")
+message(.libPaths())
+
 if ("optparse" %in% rownames(installed.packages()) == FALSE) {
   message("==== Installing optparse====")
   install_package("optparse")
@@ -100,8 +110,6 @@ moderate_right <- opt$moderate_right
 vigorous_right <- opt$vigorous_right
 
 # Create directories
-dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
-dir.create(file.path(paste0(getwd(), "/libraries/")), showWarnings = FALSE)
 dir.create(file.path(output_dir), showWarnings = FALSE)
 
 # ==================================
