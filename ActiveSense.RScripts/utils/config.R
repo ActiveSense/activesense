@@ -52,6 +52,8 @@ option_list <- list(
               help="Run sleep analysis [default: %default]"),
   make_option(c("-l", "--legacy"), type="logical", default=FALSE,
               help="Use old GENEA libraries [default: %default]"),
+  make_option(c("-c", "--clipping"), type="logical", default=FALSE,
+              help="Clip start and end of activity data [default: %default]"),
   
   # --- LEFT WRIST ---
   make_option("--sedentary_left", type="double", default=0.04,
@@ -83,6 +85,7 @@ output_dir <- opt$directory
 analyze_activity <- opt$activity
 analyze_sleep <- opt$sleep
 use_legacy <- opt$legacy
+use_clipping <- opt$clipping
 
 # left wrist
 sedentary_left <- opt$sedentary_left
@@ -182,5 +185,56 @@ getSummaryName <- function(name) {
 getPages <- function(binfile) {
   initial_run_data <- read.bin(binfile, mmap.load = TRUE, pagerefs = TRUE, virtual = TRUE)
   return(initial_run_data$pagerefs)
+}
+
+clipEndings <- function() {
+  outputs_dir <- "./outputs/"
+  
+  if (!dir.exists(outputs_dir)) {
+    warning("Outputs directory does not exist: ", outputs_dir)
+    return(invisible())
+  }
+  
+  subdirs <- list.dirs(outputs_dir, recursive = FALSE)
+  
+  if (length(subdirs) == 0) {
+    message("No subdirectories found in outputs folder")
+    return(invisible())
+  }
+  
+  for (subdir in subdirs) {
+    csv_files <- list.files(subdir, pattern = "\\.csv$", full.names = TRUE)
+    
+    activity_files <- csv_files[grepl("Activity", basename(csv_files))]
+    
+    if (length(activity_files) == 0) {
+      message("No Activity files found in: ", basename(subdir))
+      next
+    }
+    
+    for (file_path in activity_files) {
+      tryCatch({
+        data <- read.csv(file_path, stringsAsFactors = FALSE)
+        
+        if (nrow(data) <= 2) {
+          message("File ", basename(file_path), " has too few rows to clip (", nrow(data), " rows)")
+          next
+        }
+        
+        clipped_data <- data[-c(1, nrow(data)), ]
+        
+        write.csv(clipped_data, file_path, row.names = FALSE)
+        
+        message("Clipped ", basename(file_path), " - removed first and last entries (", 
+                nrow(data), " -> ", nrow(clipped_data), " rows)")
+        
+      }, error = function(e) {
+        warning("Error processing file ", basename(file_path), ": ", e$message)
+      })
+    }
+  }
+  
+  message("clipEndings() completed successfully")
+  return(invisible())
 }
 

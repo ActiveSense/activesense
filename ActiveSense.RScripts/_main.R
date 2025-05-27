@@ -38,5 +38,7 @@ for (binfile in files) {
 # END OF PROGRAM
 # ==================================
 
+if (use_clipping) { clipEndings() }
+
 cleanup_classification()
 
