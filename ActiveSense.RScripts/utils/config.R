@@ -101,6 +101,7 @@ vigorous_right <- opt$vigorous_right
 
 # Create directories
 dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
+dir.create(file.path(paste0(getwd(), "/libraries/")), showWarnings = FALSE)
 dir.create(file.path(output_dir), showWarnings = FALSE)
 
 # ==================================

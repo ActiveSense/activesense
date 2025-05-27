@@ -10,6 +10,11 @@
 # Surpress checking for newer binaries to source. 
 options(install.packages.check.source = "no")
 
+.libPaths(c("./libraries", .libPaths()))
+
+message("--- Library paths:--- \n")
+message(.libPaths())
+
 # ==================================
 # INSTALLER FUNCTION
 # ==================================
@@ -48,9 +53,9 @@ install_package <- function(pkg) {
   os_type <- Sys.info()["sysname"]
   
   if (os_type == "Windows" || os_type == "Darwin") {
-    install.packages(pkg, type = "binary")
+    install.packages(pkg, type = "binary", lib = "./libraries")
   } else if (os_type == "Linux") {
-    install.packages(pkg)
+    install.packages(pkg, lib = "./libraries")
   }
 }
 
