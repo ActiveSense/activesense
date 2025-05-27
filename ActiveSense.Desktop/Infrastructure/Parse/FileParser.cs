@@ -37,7 +37,16 @@ public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter d
                 catch (Exception e)
                 {
                     logger.Error(e, "Error parsing CSV file: {File}", file);
-                    throw new Exception($"Error parsing file {file}: {e.Message}", e);
+                    logger.Information("Removing invalid CSV file: {File}", file);
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        logger.Error(deleteEx, "Error deleting invalid CSV file: {File}", file);
+                    }
+                    throw new Exception($"Error parsing file {Path.GetFileName(file)}: {e.Message}", e);
                 }
         });
 
