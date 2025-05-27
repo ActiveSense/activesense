@@ -52,7 +52,7 @@ option_list <- list(
               help="Run sleep analysis [default: %default]"),
   make_option(c("-l", "--legacy"), type="logical", default=FALSE,
               help="Use old GENEA libraries [default: %default]"),
-  make_option(c("-c", "--clipping"), type="logical", default=TRUE,
+  make_option(c("-c", "--clipping"), type="logical", default=FALSE,
               help="Clip start and end of activity data [default: %default]"),
   
   # --- LEFT WRIST ---
