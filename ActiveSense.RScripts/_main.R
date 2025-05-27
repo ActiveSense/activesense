@@ -24,13 +24,13 @@ for (binfile in files) {
     )
   }
 
-  # if (analyze_sleep) {
-  #   sleep_analysis(
-  #     binfile = binfile,
-  #     summary_name = getSummaryName("Sleep_Summary_Metrics_"),
-  #     pagerefs = my_pagerefs
-  #   )
-  # }
+  if (analyze_sleep) {
+    sleep_analysis(
+      binfile = binfile,
+      summary_name = getSummaryName("Sleep_Summary_Metrics_"),
+      pagerefs = my_pagerefs
+    )
+  }
   
 }
 
