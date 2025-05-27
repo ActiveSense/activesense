@@ -10,11 +10,6 @@
 # Surpress checking for newer binaries to source. 
 options(install.packages.check.source = "no")
 
-.libPaths(c("./libraries", .libPaths()))
-
-message("--- Library paths:--- \n")
-message(.libPaths())
-
 # ==================================
 # INSTALLER FUNCTION
 # ==================================
