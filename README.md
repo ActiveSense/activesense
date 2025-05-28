@@ -7,7 +7,7 @@ ActiveSense is a desktop application that analyzes and visualizes activity and s
 ## **System Requirements**
 **ActiveSense has been tested on:**
 - **Windows 11**
-- **macOS Sonoma (14.x) and Sequoia (15.x)**
+- **macOS Sonoma and Sequoia (Intel only)**
 - **Linux (Pop!_OS)**
 
 **R 4.x or higher** (required for data processing)
