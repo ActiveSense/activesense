@@ -18,7 +18,7 @@ dotnet publish "$PROJECT_PATH" \
   --self-contained true \
   -p:PublishSingleFile=true \
   -o "$OUTPUT_DIR/temp"
-
+  
 echo "Creating app bundle structure..."
 mkdir -p "$OUTPUT_DIR/$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$OUTPUT_DIR/$APP_BUNDLE/Contents/Resources"
@@ -72,16 +72,14 @@ chmod +x "$OUTPUT_DIR/$APP_BUNDLE/Contents/MacOS/ActiveSense.Desktop"
 # Create a temporary directory for DMG contents
 mkdir -p "$OUTPUT_DIR/dmg_temp"
 cp -r "$OUTPUT_DIR/$APP_BUNDLE" "$OUTPUT_DIR/dmg_temp/"
-
-# allows users to drag and drop the app to their Applications folder
 ln -s /Applications "$OUTPUT_DIR/dmg_temp/Applications"
 
-echo "Creating DMG file..."
-hdiutil create -volname "$APP_NAME" -srcfolder "$OUTPUT_DIR/dmg_temp" -ov -format UDZO "$OUTPUT_DIR/$DMG_NAME"
+echo "Creating DMG file (read-only)..."
+hdiutil create -volname "$APP_NAME" -srcfolder "$OUTPUT_DIR/dmg_temp" -ov -format UDRO "$OUTPUT_DIR/$DMG_NAME"
 
 echo "Cleaning up..."
 rm -rf "$OUTPUT_DIR/temp"
 rm -rf "$OUTPUT_DIR/dmg_temp"
 
-echo "Done! Installer package created at $OUTPUT_DIR/$DMG_NAME"
+echo "Done! Read-only DMG created at $OUTPUT_DIR/$DMG_NAME"
 echo "You can distribute the DMG file to your users for easy installation."
