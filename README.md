@@ -1,113 +1,50 @@
 # **ActiveSense: Activity and Sleep Analysis Tool**
-
-## **Project Overview**
-**ActiveSense** is a desktop application designed to analyze and visualize activity and sleep data collected from **GENEActiv** accelerometer sensors. The application streamlines workflows for healthcare professionals, researchers, and patients by providing an intuitive interface for data processing, analysis, and visualization.
-
----
-
+## **Overview**
+ActiveSense is a desktop application that analyzes and visualizes activity and sleep data from **GENEActiv** accelerometer sensors.
 ## **Key Features**
-- ⚙️ **Efficient Data Processing**  
-  Optimized R-based analysis engine significantly reduces processing time compared to the original workflow.
+- **Interactive Charts** – Clear visualizations for clinical and personal use
+- **Cross-Platform** – Available for Windows and macOS
+## **System Requirements**
+**ActiveSense has been tested on:**
+- **Windows 11**
+- **macOS Sonoma and Sequoia (Intel only)**
+- **Linux (Pop!_OS)**
 
-- 🔄 **Dual Analysis**  
-  Simultaneous processing of both sleep and activity data.
+**R 4.x or higher** (required for data processing)
 
-- 📊 **Interactive Visualizations**  
-  Clear and informative charts suitable for both clinical professionals and patients.
-
-- 💻 **Cross-Platform Support**  
-  Compatible with **Windows** and **macOS**.
-
-- 🚀 **Streamlined Workflow**  
-  Simplified process from data import to report generation.
-
-- 📁 **Data Export**  
-  Export analysis results in **PDF** and **CSV** formats for sharing and archiving.
-
----
-
-## **Technical Architecture**
-
-The application leverages a modern, efficient technology stack:
-
-- **Frontend**: `C#/.NET` with **Avalonia UI** for cross-platform compatibility  
-- **Backend Analysis**: Optimized `R scripts`  
-- **Data Visualization**: `LiveChartsCore.SkiaSharpView`  
-- **Data Serialization**: `JSON` for configuration and export  
-
----
-
-## **Project Structure**
-
-The solution is divided into two main components:
-
-### **1. ActiveSense.Desktop**
-The primary desktop application including:
-- User interface components  
-- Data processing services  
-- Visualization models  
-- Export functionality  
-
-### **2. ActiveSense.RScripts**
-The R-based analysis engine including:
-- Data segmentation algorithms  
-- Sleep analysis functions  
-- Activity analysis functions  
-- Utility functions  
-
----
-
-## **Development Requirements**
-- `.NET 9.0 SDK`  
-- `R 4.x` (with required packages)  
-- `Visual Studio` or `JetBrains Rider`  
-
----
-
-## **Building the Project**
-
-1. Clone the repository  
-2. Open `ActiveSense.Desktop.sln` in Visual Studio or Rider  
-3. Restore NuGet packages  
-4. Build the solution  
-
----
-
-## **Usage**
-
-1. **Import Data**  
-   Upload GENEActiv `.bin` files or previously analyzed `.csv` files
-
-2. **Configure Analysis**  
-   Select analysis types: *Sleep*, *Activity*, or *Both*
-
-3. **Run Analysis**  
-   Start processing using optimized algorithms
-
-4. **View Results**  
-   Explore interactive visualizations and summary statistics
-
-5. **Export Data**  
-   Generate **PDF** reports or **CSV** exports for further analysis
-
----
-
-## **Key Optimizations**
-
-ActiveSense includes several performance optimizations:
-
-- **Parallelized data processing** across multiple CPU cores  
-- **Efficient memory mapping** for handling large files  
-- **Streamlined data segmentation** for faster analysis  
-- **Combined sleep and activity analysis** to minimize redundancy  
-
----
-
-## **Testing**
-
-The project includes comprehensive testing:
-
-- ✅ **Unit Tests** – Validate core functionality  
-- 🔄 **Integration Tests** – Ensure reliable interaction between components  
-- 🧪 **Regression Tests** – Maintain consistency with previous results  
-
+## **Download & Installation**
+### **Windows**
+1. Download `ActiveSense-Setup.exe` from the [Releases](../../releases) page
+2. Run the installer and follow the setup wizard
+3. Launch ActiveSense from the Start Menu or Desktop shortcut
+### **macOS**
+1. Download `ActiveSense-Installer.dmg` from the [Releases](../../releases) page
+2. Open the DMG file and drag ActiveSense to your Applications folder
+3. **Important**: Since we don't have an Apple Developer account, the app is not code-signed. You'll need to allow it manually:
+  - Try to launch ActiveSense from Applications
+  - When blocked, go to **System Preferences > Privacy & Security**
+  - Find ActiveSense in the security section and click **"Open Anyway"**
+  - Confirm by clicking **"Open"** in the dialog that appears
+### **Linux**
+1. Download `ActiveSense-Linux-Installer.tar.gz` from the [Releases](../../releases) page
+2. Extract the files: `tar -xzf ActiveSense-Linux-Installer.tar.gz`
+3. Run the installer: `sudo chmod +x install.sh` and then `sudo ./install.sh`
+   
+## **Getting Started**
+### **1. Import Your Data**
+- **GENEActiv Files**: Upload `.bin` files directly from your sensor
+- **PDF Reports**: Load existing ActiveSense reports to view or re-export
+### **2. Configure Analysis**
+- Choose analysis type: Sleep, Activity, or Both
+- Adjust sensor thresholds if needed (defaults work for most cases)
+### **3. Process & View Results**
+- Click "Start Analysis" to process your data
+- View interactive charts and summary statistics
+- Compare data across multiple time periods
+### **4. Export Results**
+- **PDF Report**: Summary with most important statistics
+- **CSV + PDF**: Complete data export with raw measurements
+  
+## **Supported Data Formats**
+- **Input**: GENEActiv `.bin` files, ActiveSense PDF reports
+- **Output**: PDF reports, CSV data files

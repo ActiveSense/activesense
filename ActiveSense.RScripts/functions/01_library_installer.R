@@ -48,9 +48,9 @@ install_package <- function(pkg) {
   os_type <- Sys.info()["sysname"]
   
   if (os_type == "Windows" || os_type == "Darwin") {
-    install.packages(pkg, type = "binary")
+    install.packages(pkg, type = "binary", lib = "./libraries")
   } else if (os_type == "Linux") {
-    install.packages(pkg)
+    install.packages(pkg, lib = "./libraries")
   }
 }
 

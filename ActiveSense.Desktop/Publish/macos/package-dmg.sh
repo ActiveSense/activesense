@@ -76,6 +76,9 @@ cp -r "$OUTPUT_DIR/$APP_BUNDLE" "$OUTPUT_DIR/dmg_temp/"
 # allows users to drag and drop the app to their Applications folder
 ln -s /Applications "$OUTPUT_DIR/dmg_temp/Applications"
 
+echo "Signing..."
+codesign --force --deep -s - "$OUTPUT_DIR/dmg_temp/ActiveSense.app"
+
 echo "Creating DMG file..."
 hdiutil create -volname "$APP_NAME" -srcfolder "$OUTPUT_DIR/dmg_temp" -ov -format UDZO "$OUTPUT_DIR/$DMG_NAME"
 

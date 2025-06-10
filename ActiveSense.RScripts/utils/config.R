@@ -35,6 +35,16 @@ source("functions/01_library_installer.R")
 # PARAMETERS
 # ==================================
 
+# Create directories
+dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
+dir.create(file.path(paste0(getwd(), "/libraries/")), showWarnings = FALSE)
+
+# Add further entries to libraries
+.libPaths(c("./libraries", .libPaths()))
+
+message("--- Library paths:--- \n")
+message(.libPaths())
+
 if ("optparse" %in% rownames(installed.packages()) == FALSE) {
   message("==== Installing optparse====")
   install_package("optparse")
@@ -52,6 +62,8 @@ option_list <- list(
               help="Run sleep analysis [default: %default]"),
   make_option(c("-l", "--legacy"), type="logical", default=FALSE,
               help="Use old GENEA libraries [default: %default]"),
+  make_option(c("-c", "--clipping"), type="logical", default=FALSE,
+              help="Clip start and end of activity data [default: %default]"),
   
   # --- LEFT WRIST ---
   make_option("--sedentary_left", type="double", default=0.04,
@@ -83,6 +95,7 @@ output_dir <- opt$directory
 analyze_activity <- opt$activity
 analyze_sleep <- opt$sleep
 use_legacy <- opt$legacy
+use_clipping <- opt$clipping
 
 # left wrist
 sedentary_left <- opt$sedentary_left
@@ -97,7 +110,6 @@ moderate_right <- opt$moderate_right
 vigorous_right <- opt$vigorous_right
 
 # Create directories
-dir.create(file.path(paste0(getwd(), "/data/")), showWarnings = FALSE)
 dir.create(file.path(output_dir), showWarnings = FALSE)
 
 # ==================================
@@ -183,4 +195,3 @@ getPages <- function(binfile) {
   initial_run_data <- read.bin(binfile, mmap.load = TRUE, pagerefs = TRUE, virtual = TRUE)
   return(initial_run_data$pagerefs)
 }
-

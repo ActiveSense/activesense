@@ -61,6 +61,16 @@ activity_detect <- function(segment_data,
     "Moderate" = as.GRtime(Moderate, format = "%H:%M"),
     "Vigorous" = as.GRtime(Vigorous, format = "%H:%M")
   )
+  
+  if (use_clipping) {
+    if (nrow(Activity_df) > 2) {
+      Activity_df <- Activity_df[-c(1, nrow(Activity_df)), ]
+    } else if (nrow(Activity_df) <= 2) {
+      warning("Data frame has 2 or fewer rows. Clipping would result in empty data frame.")
+      Activity_df <- Activity_df[0, ]  # Create empty data frame with same structure
+    }
+  }
+  
   return(Activity_df)
 }
 

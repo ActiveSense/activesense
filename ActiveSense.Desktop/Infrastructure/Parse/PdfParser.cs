@@ -49,7 +49,16 @@ public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter da
                 catch (Exception e)
                 {
                     logger.Error(e, "Error parsing PDF file: {File}", file);
-                    throw new InvalidDataException($"Error parsing PDF file {file}: {e.Message}");
+                    logger.Information("Removing invalid PDF file: {File}", file);
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        logger.Error(deleteEx, "Error deleting invalid PDF file: {File}", file);
+                    }
+                    throw new InvalidDataException($"Error parsing PDF file {Path.GetFileName(file)}: {e.Message}");
                 }
         });
 
