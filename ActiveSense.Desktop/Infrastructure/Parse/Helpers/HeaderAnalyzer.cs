@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 
-namespace ActiveSense.Desktop.Infrastructure.Parse;
+namespace ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 
 public class HeaderAnalyzer : IHeaderAnalyzer
 {

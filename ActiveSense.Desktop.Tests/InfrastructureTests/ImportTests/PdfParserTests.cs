@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
-using ActiveSense.Desktop.Infrastructure.Parse;
+using ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 using Moq;
 using NUnit.Framework;
 using Serilog;

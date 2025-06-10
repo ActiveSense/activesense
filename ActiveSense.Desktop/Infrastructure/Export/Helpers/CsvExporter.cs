@@ -5,7 +5,7 @@ using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using CsvHelper;
 
-namespace ActiveSense.Desktop.Infrastructure.Export;
+namespace ActiveSense.Desktop.Infrastructure.Export.Helpers;
 
 public class CsvExporter : ICsvExporter
 {

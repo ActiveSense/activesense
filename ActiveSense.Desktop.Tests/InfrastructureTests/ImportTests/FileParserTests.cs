@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Enums;
-using ActiveSense.Desktop.Infrastructure.Parse;
+using ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using Moq;
 using NUnit.Framework;

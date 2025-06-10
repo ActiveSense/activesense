@@ -4,10 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
-using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
-namespace ActiveSense.Desktop.Infrastructure.Process;
+namespace ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
 public class ProcessingTimeEstimator : IProcessingTimeEstimator
 {

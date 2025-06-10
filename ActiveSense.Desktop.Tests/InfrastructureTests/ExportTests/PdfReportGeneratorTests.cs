@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Core.Domain.Models;
-using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Helpers;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using Moq;
 using NUnit.Framework;

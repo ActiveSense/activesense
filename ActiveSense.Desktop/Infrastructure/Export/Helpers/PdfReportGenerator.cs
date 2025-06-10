@@ -9,7 +9,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace ActiveSense.Desktop.Infrastructure.Export;
+namespace ActiveSense.Desktop.Infrastructure.Export.Helpers;
 
 public class PdfReportGenerator(
     IAnalysisSerializer serializer)

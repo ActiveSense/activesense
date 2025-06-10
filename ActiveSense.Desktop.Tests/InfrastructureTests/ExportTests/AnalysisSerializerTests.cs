@@ -4,7 +4,7 @@ using System.Linq;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Interfaces;
 using ActiveSense.Desktop.Core.Domain.Models;
-using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Helpers;
 using ActiveSense.Desktop.Tests.InfrastructureTests.ExportTests.Mock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;

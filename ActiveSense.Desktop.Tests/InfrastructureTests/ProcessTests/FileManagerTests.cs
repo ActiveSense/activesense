@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using ActiveSense.Desktop.Core.Services.Interfaces;
-using ActiveSense.Desktop.Infrastructure.Process;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using Moq;
 using NUnit.Framework;
 using Serilog;

@@ -11,7 +11,7 @@ using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using CsvHelper;
 using Serilog;
 
-namespace ActiveSense.Desktop.Infrastructure.Parse;
+namespace ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 
 public class FileParser(IHeaderAnalyzer headerAnalyzer, DateToWeekdayConverter dateConverter, ILogger logger)
     : IFileParser
