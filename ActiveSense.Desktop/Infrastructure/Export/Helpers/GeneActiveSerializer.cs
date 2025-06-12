@@ -7,7 +7,7 @@ using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using Newtonsoft.Json;
 
-namespace ActiveSense.Desktop.Infrastructure.Export;
+namespace ActiveSense.Desktop.Infrastructure.Export.Helpers;
 
 public class AnalysisSerializer(DateToWeekdayConverter converter) : IAnalysisSerializer
 {

@@ -5,7 +5,7 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using Serilog;
 
-namespace ActiveSense.Desktop.Infrastructure.Process;
+namespace ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
 public class FileManager(IPathService pathService, ILogger logger) : IFileManager
 {

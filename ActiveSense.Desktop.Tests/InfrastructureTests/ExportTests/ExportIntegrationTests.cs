@@ -6,6 +6,7 @@ using ActiveSense.Desktop.Charts;
 using ActiveSense.Desktop.Converters;
 using ActiveSense.Desktop.Core.Domain.Models;
 using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Helpers;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;

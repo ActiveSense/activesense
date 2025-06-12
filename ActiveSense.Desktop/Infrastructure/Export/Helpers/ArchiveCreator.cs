@@ -4,7 +4,7 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 
-namespace ActiveSense.Desktop.Infrastructure.Export;
+namespace ActiveSense.Desktop.Infrastructure.Export.Helpers;
 
 public class ArchiveCreator : IArchiveCreator
 {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 
-namespace ActiveSense.Desktop.Infrastructure.Process;
+namespace ActiveSense.Desktop.Infrastructure.Process.Helpers;
 
 public class ScriptExecutor : IScriptExecutor
 {

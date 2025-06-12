@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Helpers;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.InfrastructureTests.ExportTests;

@@ -12,7 +12,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Serilog;
 
-namespace ActiveSense.Desktop.Infrastructure.Parse;
+namespace ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 
 public class PdfParser(IAnalysisSerializer serializer, DateToWeekdayConverter dateConverter, ILogger logger)
     : IPdfParser

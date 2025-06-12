@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ActiveSense.Desktop.Infrastructure.Process;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.InfrastructureTests.ProcessTests;

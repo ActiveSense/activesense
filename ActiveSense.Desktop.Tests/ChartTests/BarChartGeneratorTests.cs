@@ -387,7 +387,6 @@ public class BarChartGeneratorTests
         Assert.That(lineSeries2.ScalesYAt, Is.EqualTo(0), "Second line series should scale on first Y axis");
 
         // Check they have different colors (strokes)
-        // We can't check exact colors easily, but we can verify the strokes are different
         var stroke1 = lineSeries1.Stroke;
         var stroke2 = lineSeries2.Stroke;
         Assert.That(stroke1, Is.Not.Null, "First line should have a stroke");

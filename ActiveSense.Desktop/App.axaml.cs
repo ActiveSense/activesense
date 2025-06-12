@@ -7,10 +7,13 @@ using ActiveSense.Desktop.Core.Services.Interfaces;
 using ActiveSense.Desktop.Enums;
 using ActiveSense.Desktop.Factories;
 using ActiveSense.Desktop.Infrastructure.Export;
+using ActiveSense.Desktop.Infrastructure.Export.Helpers;
 using ActiveSense.Desktop.Infrastructure.Export.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Parse;
+using ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 using ActiveSense.Desktop.Infrastructure.Parse.Interfaces;
 using ActiveSense.Desktop.Infrastructure.Process;
+using ActiveSense.Desktop.Infrastructure.Process.Helpers;
 using ActiveSense.Desktop.Infrastructure.Process.Interfaces;
 using ActiveSense.Desktop.ViewModels;
 using ActiveSense.Desktop.ViewModels.AnalysisPages;
@@ -45,7 +48,6 @@ public class App : Application
     {
         var collection = new ServiceCollection();
 
-        collection.AddTransient<AnalysisSerializer>();
 
         // Register factories
         collection.AddSingleton<ResultParserFactory>();
@@ -65,14 +67,14 @@ public class App : Application
         collection.AddSingleton<IPdfReportGenerator, PdfReportGenerator>();
         collection.AddSingleton<IAnalysisSerializer, AnalysisSerializer>();
         collection.AddSingleton<IExporter, GeneActiveExporter>();
-
+        collection.AddSingleton<AnalysisSerializer>();
         collection.AddSingleton<GeneActiveExporter>();
 
         // Register parser components
-        collection.AddTransient<IHeaderAnalyzer, HeaderAnalyzer>();
-        collection.AddTransient<IFileParser, FileParser>();
-        collection.AddTransient<IPdfParser, PdfParser>();
-        collection.AddTransient<GeneActiveResultParser>();
+        collection.AddSingleton<IHeaderAnalyzer, HeaderAnalyzer>();
+        collection.AddSingleton<IFileParser, FileParser>();
+        collection.AddSingleton<IPdfParser, PdfParser>();
+        collection.AddSingleton<GeneActiveResultParser>();
 
         // Register services
         collection.AddSingleton<ISharedDataService, SharedDataService>();
@@ -90,18 +92,17 @@ public class App : Application
         collection.AddTransient<ExportDialogViewModel>();
 
         // Register converters
-        collection.AddTransient<DateToWeekdayConverter>();
+        collection.AddSingleton<DateToWeekdayConverter>();
 
         // Logging
         collection.AddSingleton(Log.Logger);
         collection.AddLogging(loggingBuilder =>
             loggingBuilder.AddSerilog(dispose: true));
 
-
         // Register charts
         collection.AddTransient<BarChartViewModel>();
         collection.AddTransient<PieChartViewModel>();
-        collection.AddTransient<ChartColors>();
+        collection.AddSingleton<ChartColors>();
 
         collection.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {

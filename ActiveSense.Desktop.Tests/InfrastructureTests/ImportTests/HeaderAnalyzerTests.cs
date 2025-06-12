@@ -1,5 +1,5 @@
 using System;
-using ActiveSense.Desktop.Infrastructure.Parse;
+using ActiveSense.Desktop.Infrastructure.Parse.Helpers;
 using NUnit.Framework;
 
 namespace ActiveSense.Desktop.Tests.InfrastructureTests.ImportTests;
