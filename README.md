@@ -40,7 +40,7 @@ ActiveSense is a desktop application that analyzes and visualizes activity and s
 ### **3. Process & View Results**
 - Click "Start Analysis" to process your data
 - View interactive charts and summary statistics
-- Compare data across multiple time periods
+- Compare data across multiple time periods (Shift + Mouse click)
 ### **4. Export Results**
 - **PDF Report**: Summary with most important statistics
 - **CSV + PDF**: Complete data export with raw measurements
